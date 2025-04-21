@@ -2,6 +2,6 @@ package at.aau.serg.websocketdemoserver.websocket.state;
 
 public enum GameTurnPhase {
     DRAW_TERRAIN_CARD,
-    PLACE_HOUSES,
+    MAIN_PHASE,
     END_TURN
 }
