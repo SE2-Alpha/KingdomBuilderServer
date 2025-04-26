@@ -6,14 +6,12 @@ import lombok.Getter;
 
 import java.util.List;
 
+@Getter
 public class GameState {
 
-    @Getter
-    private String gameId;
-    @Getter
-    private GameTurnManager turnManager;
-    @Getter
-    private List<GamePlayer> players;
+    private final String gameId;
+    private final GameTurnManager turnManager;
+    private final List<GamePlayer> players;
 
     public GameState(String gameId, List<String> playerIds) {
         this.gameId = gameId;
