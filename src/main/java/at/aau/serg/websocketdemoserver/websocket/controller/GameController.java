@@ -32,8 +32,11 @@ public class GameController {
         GameState game = games.get(action.getGameId());
         if (game != null) {
             boolean success = game.getTurnManager().performAction(action.getPlayerId(), action);
+            if (success) {
+                return game;
+            }
         }
-        return game;
+        return null;
     }
 
     @MessageMapping("/game/end-turn")
@@ -41,9 +44,12 @@ public class GameController {
     public GameState endTurn(@Payload PlayerActionDTO action) {
         GameState game = games.get(action.getGameId());
         if (game != null) {
-            boolean success = game.getTurnManager().endTurn(action.getPlayerId());
+            boolean success = game.getTurnManager().performAction(action.getPlayerId(), action);
+            if (success) {
+                return game;
+            }
         }
-        return game;
+        return null;
     }
 
     @MessageMapping("/game/draw-card")
@@ -51,8 +57,11 @@ public class GameController {
     public GameState drawCard(@Payload PlayerActionDTO action) {
         GameState game = games.get(action.getGameId());
         if (game != null) {
-            boolean success = game.getTurnManager().drawCard(action.getPlayerId());
+            boolean success = game.getTurnManager().performAction(action.getPlayerId(), action);
+            if (success) {
+                return game;
+            }
         }
-        return game;
+        return null;
     }
 }
