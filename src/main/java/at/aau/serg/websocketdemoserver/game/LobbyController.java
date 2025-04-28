@@ -16,16 +16,6 @@ public class LobbyController {
     private final SimpMessagingTemplate messagingTemplate;
 
     public LobbyController(LobbyService lobbyService, SimpMessagingTemplate messagingTemplate) {
-        Room a = lobbyService.createRoom("1");
-        a.addPlayer(new Player("1"));
-        a.addPlayer(new Player("1"));
-        a.addPlayer(new Player("1"));
-        a.addPlayer(new Player("1"));
-        Room b = lobbyService.createRoom("2");
-        b.addPlayer(new Player("2"));
-        b.addPlayer(new Player("2"));
-        b.setStatus(RoomStatus.FINISHED);
-        Room c = lobbyService.createRoom("3");
         this.lobbyService = lobbyService;
         this.messagingTemplate = messagingTemplate;
     }
