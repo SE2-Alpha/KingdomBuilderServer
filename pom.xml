@@ -14,10 +14,10 @@
 
     <!-- Zu den Projekt-spezifischen Daten abändern -->
     <groupId>at.aau.serg</groupId>
-    <artifactId>WebSocket-Server</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>WebSocket-Server</name>
-    <description>WebSocket-Server</description>
+    <artifactId>KingdomBuilder-Server</artifactId>
+    <version>0.0.1</version>
+    <name>KingdomBuilder-Server</name>
+    <description>KingdomBuilder-Server</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
