@@ -23,7 +23,7 @@ public class LobbyService {
         String roomId = UUID.randomUUID().toString();
         String name = "Room " + (rooms.size() + 1); // z.B. "Room A", "Room B", etc.
         Room room = new Room(roomId, name);
-        //room.addPlayer(new Player(playerId));
+        room.addPlayer(new Player(playerId));
         rooms.put(roomId, room);
         return room;
     }
