@@ -1,6 +1,4 @@
-package at.aau.serg.websocketdemoserver.game;
-
-import lombok.Setter;
+package at.aau.serg.kingdombuilderserver.game;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

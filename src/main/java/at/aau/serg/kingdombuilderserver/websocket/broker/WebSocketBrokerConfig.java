@@ -1,4 +1,4 @@
-package at.aau.serg.websocketdemoserver.websocket.broker;
+package at.aau.serg.kingdombuilderserver.websocket.broker;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -18,7 +18,7 @@ public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/websocket-example-broker")
+        registry.addEndpoint("/ws-kingdombuilder-broker")
                 .setAllowedOrigins("*");
     }
 }

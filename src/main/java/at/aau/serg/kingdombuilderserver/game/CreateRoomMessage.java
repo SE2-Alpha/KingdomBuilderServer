@@ -1,4 +1,4 @@
-package at.aau.serg.websocketdemoserver.game;
+package at.aau.serg.kingdombuilderserver.game;
 
 public class CreateRoomMessage {
     private String playerId;

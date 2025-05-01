@@ -1,6 +1,6 @@
-package at.aau.serg.websocketdemoserver;
+package at.aau.serg.kingdombuilderserver;
 
-import at.aau.serg.websocketdemoserver.websocket.StompFrameHandlerClientImpl;
+import at.aau.serg.kingdombuilderserver.websocket.StompFrameHandlerClientImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;

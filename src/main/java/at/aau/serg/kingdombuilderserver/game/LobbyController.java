@@ -1,4 +1,4 @@
-package at.aau.serg.websocketdemoserver.game;
+package at.aau.serg.kingdombuilderserver.game;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -50,6 +50,13 @@ public class LobbyController {
     public void leaveRoom(@Payload LeaveRoomMessage msg) {
         lobbyService.leaveRoom(msg.getRoomId(), msg.getPlayerId());
         broadcastLobby();
+    }
+
+    // Raum verlassen
+    @MessageMapping("/lobby/start")
+    public void startRoom(@Payload LeaveRoomMessage msg) {
+        lobbyService.startGame(msg.getRoomId());
+        System.out.println("TODO!! Start room " + msg.getRoomId());
     }
 
     // Hilfsmethode: Aktualisierten Lobby‑State an alle senden
