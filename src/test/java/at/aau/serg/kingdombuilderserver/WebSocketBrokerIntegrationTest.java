@@ -1,6 +1,6 @@
-package at.aau.serg.websocketdemoserver;
+package at.aau.serg.kingdombuilderserver;
 
-import at.aau.serg.websocketdemoserver.websocket.StompFrameHandlerClientImpl;
+import at.aau.serg.kingdombuilderserver.websocket.StompFrameHandlerClientImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,7 +25,7 @@ class WebSocketBrokerIntegrationTest {
     @LocalServerPort
     private int port;
 
-    private final String WEBSOCKET_URI = "ws://localhost:%d/websocket-example-broker";
+    private final String WEBSOCKET_URI = "ws://localhost:%d/ws-kingdombuilder-broker";
     private final String WEBSOCKET_TOPIC = "/topic/hello-response";
 
     /**

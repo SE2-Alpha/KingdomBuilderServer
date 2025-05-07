@@ -1,4 +1,4 @@
-package at.aau.serg.websocketdemoserver.websocket.handler;
+package at.aau.serg.kingdombuilderserver.websocket.handler;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;

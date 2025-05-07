@@ -1,4 +1,4 @@
-package at.aau.serg.websocketdemoserver.messaging.dtos;
+package at.aau.serg.kingdombuilderserver.messaging.dtos;
 
 
 public class OutputMessage {
