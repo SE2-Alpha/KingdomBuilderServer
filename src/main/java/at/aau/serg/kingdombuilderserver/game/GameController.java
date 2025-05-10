@@ -1,17 +1,13 @@
-package at.aau.serg.websocketdemoserver.websocket.controller;
+package at.aau.serg.kingdombuilderserver.game;
 
-import at.aau.serg.websocketdemoserver.websocket.gamedto.PlayerActionDTO;
-import at.aau.serg.websocketdemoserver.websocket.state.GameState;
+import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerActionDTO;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Controller
 public class GameController {

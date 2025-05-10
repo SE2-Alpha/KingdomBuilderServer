@@ -1,7 +1,7 @@
-package at.aau.serg.websocketdemoserver.websocket.gamedto;
+package at.aau.serg.kingdombuilderserver.messaging.dtos;
 
-import at.aau.serg.websocketdemoserver.websocket.state.GameActionType;
-import at.aau.serg.websocketdemoserver.websocket.state.GameHousePosition;
+import at.aau.serg.kingdombuilderserver.game.GameActionType;
+import at.aau.serg.kingdombuilderserver.game.GameHousePosition;
 import lombok.Getter;
 import lombok.Setter;
 

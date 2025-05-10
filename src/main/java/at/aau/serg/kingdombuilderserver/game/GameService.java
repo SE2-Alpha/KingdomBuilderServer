@@ -1,7 +1,6 @@
-package at.aau.serg.websocketdemoserver.websocket.controller;
+package at.aau.serg.kingdombuilderserver.game;
 
-import at.aau.serg.websocketdemoserver.websocket.gamedto.PlayerActionDTO;
-import at.aau.serg.websocketdemoserver.websocket.state.GameTurnPhase;
+import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerActionDTO;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
 

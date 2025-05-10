@@ -1,4 +1,4 @@
-package at.aau.serg.websocketdemoserver.websocket.state;
+package at.aau.serg.kingdombuilderserver.game;
 
 public enum GameTurnPhase {
     DRAW_TERRAIN_CARD,

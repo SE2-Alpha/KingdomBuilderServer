@@ -1,4 +1,4 @@
-package at.aau.serg.websocketdemoserver.websocket.state;
+package at.aau.serg.kingdombuilderserver.game;
 
 public enum GameActionType {
     PLACE_HOUSE,
