@@ -5,6 +5,7 @@ import at.aau.serg.websocketdemoserver.websocket.state.GameState;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.util.HashMap;
@@ -16,52 +17,74 @@ import java.util.UUID;
 public class GameController {
 
     private Map<String, GameState> games = new HashMap<>();
+    private final SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("/game/create")
-    @SendTo("/topic/game-updates")
-    public GameState createGame(@Payload List<String> playerIds) {
-        String gameId = UUID.randomUUID().toString();
-        GameState gameState = new GameState(gameId, playerIds);
-        games.put(gameId, gameState);
-        return gameState;
+    public GameController(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
     }
 
-    @MessageMapping("/game/place-house")
-    @SendTo("/topic/game-updates")
-    public GameState placeHouse(@Payload PlayerActionDTO action) {
+    @MessageMapping("/game/placeHouses")
+    public void placeHouse(@Payload PlayerActionDTO action) {
+        System.out.println("Received placeHouse request: " + action);
         GameState game = games.get(action.getGameId());
+
         if (game != null) {
             boolean success = game.getTurnManager().performAction(action.getPlayerId(), action);
             if (success) {
-                return game;
+                System.out.println("House placed by player " + action.getPlayerId() + " in game " + action.getGameId());
+                broadcastGameState(action.getGameId());
+            } else {
+                System.out.println("Failed to place house for player " + action.getPlayerId() + " in game " + action.getGameId());
             }
+        } else {
+            System.out.println("Game not found for gameId: " + action.getGameId());
         }
-        return null;
     }
 
-    @MessageMapping("/game/end-turn")
-    @SendTo("/topic/game-updates")
-    public GameState endTurn(@Payload PlayerActionDTO action) {
+    @MessageMapping("/game/endTurn")
+    public void endTurn(@Payload PlayerActionDTO action) {
+        System.out.println("Received endTurn request: " + action);
         GameState game = games.get(action.getGameId());
+
         if (game != null) {
-            boolean success = game.getTurnManager().performAction(action.getPlayerId(), action);
+            boolean success = game.getTurnManager().endTurn(action.getPlayerId());
             if (success) {
-                return game;
+                System.out.println("Turn ended by player " + action.getPlayerId() + " in game " + action.getGameId());
+                broadcastGameState(action.getGameId());
+            } else {
+                System.out.println("Failed to end turn for player " + action.getPlayerId() + " in game " + action.getGameId());
             }
+        } else {
+            System.out.println("Game not found for gameId: " + action.getGameId());
         }
-        return null;
     }
 
-    @MessageMapping("/game/draw-card")
-    @SendTo("/topic/game-updates")
-    public GameState drawCard(@Payload PlayerActionDTO action) {
+    @MessageMapping("/game/drawCard")
+    public void drawCard(@Payload PlayerActionDTO action) {
+        System.out.println("Received drawCard request: " + action);
         GameState game = games.get(action.getGameId());
+
         if (game != null) {
-            boolean success = game.getTurnManager().performAction(action.getPlayerId(), action);
+            boolean success = game.getTurnManager().drawCard(action.getPlayerId());
             if (success) {
-                return game;
+                System.out.println("Card drawn by player " + action.getPlayerId() + " in game " + action.getGameId());
+                broadcastGameState(action.getGameId());
+            } else {
+                System.out.println("Failed to draw card for player " + action.getPlayerId() + " in game " + action.getGameId());
             }
+        } else {
+            System.out.println("Game not found for gameId: " + action.getGameId());
         }
-        return null;
     }
+
+    private void broadcastGameState(String gameId) {
+        GameState game = games.get(gameId);
+        if (game != null) {
+            System.out.println("Broadcasting game state for game: " + gameId);
+            messagingTemplate.convertAndSend("/topic/game/" + gameId, game);
+        } else {
+            System.out.println("Game not found for broadcasting: " + gameId);
+        }
+    }
+
 }

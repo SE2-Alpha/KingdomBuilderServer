@@ -3,11 +3,13 @@ package at.aau.serg.websocketdemoserver.websocket.controller;
 import at.aau.serg.websocketdemoserver.websocket.gamedto.PlayerActionDTO;
 import at.aau.serg.websocketdemoserver.websocket.state.GameTurnPhase;
 import lombok.Getter;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 @Getter
-public class GameTurnManager {
+public class GameService {
 
     private List<String> playerOrder;
     private int currentPlayerIndex;
@@ -15,7 +17,7 @@ public class GameTurnManager {
     private int housesPlacedThisTurn = 0;
     private boolean usedSpecialAction = false;
 
-    public GameTurnManager(List<String> playerIds) {
+    public GameService(List<String> playerIds) {
         this.playerOrder = playerIds;
     }
 
