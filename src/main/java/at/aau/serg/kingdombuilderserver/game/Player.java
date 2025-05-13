@@ -3,9 +3,7 @@ package at.aau.serg.kingdombuilderserver.game;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 
-@EntityScan
 @Getter @Setter
 public class Player {
     private @Setter(AccessLevel.NONE) String id;

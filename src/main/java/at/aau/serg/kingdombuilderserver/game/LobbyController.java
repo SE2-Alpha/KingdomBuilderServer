@@ -52,7 +52,7 @@ public class LobbyController {
         broadcastLobby();
     }
 
-    // Raum verlassen
+    // Raum Starten
     @MessageMapping("/lobby/start")
     public void startRoom(@Payload LeaveRoomMessage msg) {
         lobbyService.startGame(msg.getRoomId());
