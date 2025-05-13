@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class LobbyService {
-    private final Map<String, Room> rooms = new ConcurrentHashMap<>();
+    private final Map<String, Room> rooms = RoomList.getInstance().list;
 
     public Collection<Room> getAllRooms() {
         return rooms.values();
@@ -25,6 +25,7 @@ public class LobbyService {
         Room room = new Room(roomId, name);
         room.addPlayer(new Player(playerId));
         rooms.put(roomId, room);
+        System.out.println("Rooms: " + rooms.toString());
         return room;
     }
 
