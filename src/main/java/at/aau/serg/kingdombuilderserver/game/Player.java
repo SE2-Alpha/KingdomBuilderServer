@@ -11,6 +11,7 @@ public class Player {
     private int color;
     private int remainingSettlements;
     private int score;
+
     public Player(String playerId) {
         this.id = playerId;
         remainingSettlements = 40;
@@ -36,11 +37,7 @@ public class Player {
      *Strictly decreases settlement count by the absolute value of the parameter.
      */
     public void decreaseSettlementsBy(int value){
-        if(remainingSettlements - Math.abs(value) < 0){
-            remainingSettlements = 0;
-        }else{
-            remainingSettlements -= Math.abs(value);
-        }
+        remainingSettlements = Math.max(remainingSettlements - Math.abs(value), 0);
     }
 
 
