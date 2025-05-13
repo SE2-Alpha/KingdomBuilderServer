@@ -24,11 +24,7 @@ public class Player {
     }
 
     public void setRemainingSettlements(int value) {
-        if(value < 0){
-            remainingSettlements = 0;
-        }else{
-            remainingSettlements = value;
-        }
+        remainingSettlements = Math.max(value, 0);
     }
 
     /**
