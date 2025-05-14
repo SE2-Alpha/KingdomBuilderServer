@@ -44,6 +44,10 @@ public class Room {
     }
 
     public void addPlayer(Player player) {
+        if (players.size() >= size) {
+            System.out.println("Room is full. Player " + player.getId() + " not added.");
+            return;
+        }
         players.add(player);
     }
 
@@ -53,5 +57,14 @@ public class Room {
 
     public boolean checkIfPlayerInRoom(String playerId) {
         return players.stream().anyMatch(p -> p.getId().equals(playerId));
+    }
+
+    /**
+     * Set Player Colors on Room start
+     */
+    public void setPlayerColor(){
+        for(Player p: players){
+            p.setColor(PlayerColor.getColor(players.indexOf(p)));
+        }
     }
 }
