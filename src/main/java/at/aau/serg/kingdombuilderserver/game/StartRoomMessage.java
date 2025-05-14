@@ -15,10 +15,10 @@ import java.util.List;
 @Setter
 public class StartRoomMessage {
     private String roomId;
-    private List<Player> player;
+    private List<Player> players;
 
     StartRoomMessage(String roomId) {
         this.roomId = roomId;
-        player = RoomList.list.get(roomId).getPlayers();
+        players = RoomList.list.get(roomId).getPlayers();
     }
 }
