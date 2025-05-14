@@ -12,7 +12,6 @@ public class WebSocketBrokerController {
     @MessageMapping("/hello")
     @SendTo("/topic/hello-response")
     public String handleHello(String text) {
-        // TODO handle the messages here
         return "echo from broker: "+text;
     }
     @MessageMapping("/object")

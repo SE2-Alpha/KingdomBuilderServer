@@ -1,51 +1,36 @@
 package at.aau.serg.kingdombuilderserver.game;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+@Getter
 public class Room {
     private final String id;
     private final String name;
-    private final int size = 4;
+    private static final int size = 4;
     private final List<Player> players = new CopyOnWriteArrayList<>();
+    @Setter
     private RoomStatus status = RoomStatus.WAITING;
+
+    private static final Logger logger = LoggerFactory.getLogger(Room.class);
 
     public Room(String id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
     public int getCurrentUsers() {
         return players.size();
     }
 
-    public List<Player> getPlayers() {
-        return players;
-    }
-
-    public RoomStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(RoomStatus status) {
-        this.status = status;
-    }
-
     public void addPlayer(Player player) {
         if (players.size() >= size) {
-            System.out.println("Room is full. Player " + player.getId() + " not added.");
+            logger.info("Room is full. Player {} not added.", player.getId());
             return;
         }
         players.add(player);

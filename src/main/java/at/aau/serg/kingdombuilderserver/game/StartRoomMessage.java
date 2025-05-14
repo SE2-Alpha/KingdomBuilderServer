@@ -1,7 +1,6 @@
 package at.aau.serg.kingdombuilderserver.game;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 

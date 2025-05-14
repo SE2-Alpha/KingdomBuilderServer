@@ -7,23 +7,22 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-
+        throw new UnsupportedOperationException("Operation not supported yet.");
     }
 
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-        // TODO handle the messages here
         session.sendMessage(new TextMessage("echo from handler: " + message.getPayload()));
     }
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-
+        throw new UnsupportedOperationException("Operation not supported.");
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-
+        throw new UnsupportedOperationException("Operation not supported.");
     }
 
     @Override

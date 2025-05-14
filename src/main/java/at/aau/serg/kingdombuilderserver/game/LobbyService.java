@@ -1,15 +1,19 @@
 package at.aau.serg.kingdombuilderserver.game;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class LobbyService {
-    private final Map<String, Room> rooms = RoomList.getInstance().list;
+
+    private static final Logger logger = LoggerFactory.getLogger(LobbyService.class);
+
+    private final Map<String, Room> rooms = RoomList.list;
 
     public Collection<Room> getAllRooms() {
         return rooms.values();
@@ -17,7 +21,7 @@ public class LobbyService {
 
     public Room createRoom(String playerId) {
         if(getPlayerRoom(playerId) != null) {
-            System.out.println("Player already in a room");
+            logger.info("Room with id {} already exists", playerId);
             return null;
         }
         String roomId = UUID.randomUUID().toString();
@@ -25,23 +29,23 @@ public class LobbyService {
         Room room = new Room(roomId, name);
         room.addPlayer(new Player(playerId));
         rooms.put(roomId, room);
-        System.out.println("Rooms: " + rooms.toString());
+        logger.info("Rooms: {}", rooms);
         return room;
     }
 
 
     public Room joinRoom(String roomId, String playerId) {
         if(getPlayerRoom(playerId) != null) {
-            System.out.println("Player already in a room");
+            logger.info("Player already in a room");
             return null;
         }
-        System.out.println("Joining room " + roomId + " with player " + playerId);
+        logger.info("Joining room {} to player {}", roomId, playerId);
         Room room = rooms.get(roomId);
         if (room != null && room.getPlayers().size() < 4 && room.getStatus() == RoomStatus.WAITING && !room.checkIfPlayerInRoom(playerId)) {
             room.addPlayer(new Player(playerId));
-            System.out.println("Joining room " + roomId + " " + room.getCurrentUsers());
+            logger.info("Player {} joined the room {}", playerId, roomId);
         } else {
-            System.out.println("Room is full or already started or player already in room");
+            logger.info("Room is full or already started or player already in room");
         }
 
         return room;
@@ -58,7 +62,7 @@ public class LobbyService {
     }
     public void startGame(String roomId) {
         Room room = rooms.get(roomId);
-        if (room != null && room.getPlayers().size() >= 1) {//TODO(): correct player count condition
+        if (room != null && !room.getPlayers().isEmpty()) {//TODO(): correct player count condition
             if(room.getStatus()!=RoomStatus.STARTED){
                 room.setPlayerColor();
                 room.setStatus(RoomStatus.STARTED);
