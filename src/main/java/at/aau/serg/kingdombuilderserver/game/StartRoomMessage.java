@@ -13,12 +13,16 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class StartRoomMessage {
+public final class StartRoomMessage {
     private String roomId;
     private List<Player> players;
 
     StartRoomMessage(String roomId) {
         this.roomId = roomId;
         players = RoomList.list.get(roomId).getPlayers();
+    }
+
+    public String toString(){
+        return "Room " + roomId + " started with " + players.size() + " players.";
     }
 }
