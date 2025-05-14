@@ -10,6 +10,7 @@ import lombok.Setter;
 public class PlayerActionDTO {
     private String gameId;
     private String playerId;
+    private boolean isPlayerActive;
     private GameActionType type; // PLACE_HOUSE oder SPECIAL_ACTION
     private GameHousePosition position; // für PLACE_HOUSE
     private String specialActionId; // für SPECIAL_ACTION
