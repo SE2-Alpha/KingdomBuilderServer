@@ -17,6 +17,7 @@ class LobbyServiceTest {
     @BeforeEach
     void setUp() {
         lobbyService = new LobbyService();
+        RoomList.getInstance().list.clear(); // Clear the room list before each test
     }
 
     @Test
