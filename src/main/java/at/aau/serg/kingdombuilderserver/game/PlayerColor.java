@@ -4,6 +4,9 @@ import java.awt.*;
 //Colors are Set when Room is started
 //Colors are assigned through List-iteration in Room
 public final class PlayerColor {
+
+    private PlayerColor() {}
+
     /**
      * Player 1
      */

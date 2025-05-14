@@ -24,7 +24,7 @@ class WebSocketHandlerIntegrationTest {
     @LocalServerPort
     private int port;
 
-    private final String WEBSOCKET_URI = "ws://localhost:%d/websocket-example-handler";
+    private final String websocketUri = "ws://localhost:%d/websocket-example-handler";
 
     /**
      * Queue of messages from the server.
@@ -32,7 +32,7 @@ class WebSocketHandlerIntegrationTest {
     BlockingQueue<String> messages = new LinkedBlockingDeque<>();
 
     @Test
-    public void testWebSocketMessageBroker() throws Exception {
+    void testWebSocketMessageBroker() throws Exception {
         WebSocketSession session = initStompSession();
 
         // send a message to the server
@@ -50,12 +50,10 @@ class WebSocketHandlerIntegrationTest {
         WebSocketClient client = new StandardWebSocketClient();
 
         // connect client to the websocket server
-        WebSocketSession session = client.execute(new WebSocketHandlerClientImpl(messages), // pass the message list
-                        String.format(WEBSOCKET_URI, port))
+        return client.execute(new WebSocketHandlerClientImpl(messages), // pass the message list
+                        String.format(websocketUri, port))
                 // wait 1 sec for the client to be connected
                 .get(1, TimeUnit.SECONDS);
-
-        return session;
     }
 
 }

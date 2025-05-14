@@ -16,7 +16,7 @@ public class GameController {
 
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
-    public final Map<String, Room> rooms = RoomList.getInstance().list;
+    public final Map<String, Room> rooms = RoomList.list;
     private final SimpMessagingTemplate messagingTemplate;
 
     public GameController(SimpMessagingTemplate messagingTemplate) {

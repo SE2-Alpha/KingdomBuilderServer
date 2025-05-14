@@ -25,8 +25,8 @@ class WebSocketBrokerIntegrationTest {
     @LocalServerPort
     private int port;
 
-    private final String WEBSOCKET_URI = "ws://localhost:%d/ws-kingdombuilder-broker";
-    private final String WEBSOCKET_TOPIC = "/topic/hello-response";
+    private final String websocketURI = "ws://localhost:%d/ws-kingdombuilder-broker";
+    private final String websocketTopic = "/topic/hello-response";
 
     /**
      * Queue of messages from the server.
@@ -34,7 +34,7 @@ class WebSocketBrokerIntegrationTest {
     BlockingQueue<String> messages = new LinkedBlockingDeque<>();
 
     @Test
-    public void testWebSocketMessageBroker() throws Exception {
+    void testWebSocketMessageBroker() throws Exception {
         StompSession session = initStompSession();
 
         // send a message to the server
@@ -53,7 +53,7 @@ class WebSocketBrokerIntegrationTest {
         stompClient.setMessageConverter(new StringMessageConverter());
 
         // connect client to the websocket server
-        StompSession session = stompClient.connectAsync(String.format(WEBSOCKET_URI, port),
+        StompSession session = stompClient.connectAsync(String.format(websocketURI, port),
                         new StompSessionHandlerAdapter() {
                         })
                 // wait 1 sec for the client to be connected
@@ -61,7 +61,7 @@ class WebSocketBrokerIntegrationTest {
 
         // subscribes to the topic defined in WebSocketBrokerController
         // and adds received messages to WebSocketBrokerIntegrationTest#messages
-        session.subscribe(WEBSOCKET_TOPIC, new StompFrameHandlerClientImpl(messages));
+        session.subscribe(websocketTopic, new StompFrameHandlerClientImpl(messages));
 
         return session;
     }
