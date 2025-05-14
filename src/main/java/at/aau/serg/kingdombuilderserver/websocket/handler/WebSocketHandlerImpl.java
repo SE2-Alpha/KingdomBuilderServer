@@ -18,12 +18,10 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-        throw new UnsupportedOperationException("Default constructor is not supported.");
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-        throw new UnsupportedOperationException("Default constructor is not supported.");
     }
 
     @Override

@@ -5,9 +5,7 @@ import java.awt.*;
 //Colors are assigned through List-iteration in Room
 public final class PlayerColor {
 
-    private PlayerColor() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
-    }
+    private PlayerColor() {}
 
     /**
      * Player 1
