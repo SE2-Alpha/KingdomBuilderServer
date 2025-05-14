@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 
 import java.util.Collection;
 
+import static at.aau.serg.kingdombuilderserver.game.RoomList.rooms;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class LobbyServiceTest {
