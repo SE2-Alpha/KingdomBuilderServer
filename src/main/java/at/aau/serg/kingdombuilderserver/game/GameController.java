@@ -8,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -19,31 +18,16 @@ public class GameController {
 
     public final Map<String, Room> rooms = RoomList.getInstance().list;
     private final SimpMessagingTemplate messagingTemplate;
-    //private final GameService gameService;
 
-    public GameController(SimpMessagingTemplate messagingTemplate, GameService gameService) {
+    public GameController(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
-        //this.games =....
-        //this.gameService = gameService;
     }
 
     @MessageMapping("/game/placeHouses")
     public void placeHouse(@Payload PlayerActionDTO action) {
         logger.info("Received placeHouse request: {}", action);
         String gameId = action.getGameId();
-
         if (rooms.containsKey(gameId)) {
-            /*
-            boolean success = game.getTurnManager().performAction(action.getPlayerId(), action);
-            if (success) {
-                logger.info("House placed by player {} in game {}", action.getPlayerId(), action.getGameId());
-                broadcastGameState(action.getGameId());
-            } else {
-                logger.warn("Failed to place house for player {} in game {}", action.getPlayerId(), action.getGameId());
-            }
-        } else {
-            logger.warn("Game not found for gameId: {}", action.getGameId());
-        */
         }
 
     }
@@ -52,20 +36,7 @@ public class GameController {
     public void endTurn(@Payload PlayerActionDTO action) {
         logger.info("Received endTurn request: {}", action);
         String gameId = action.getGameId();
-
         if (rooms.containsKey(gameId)) {
-            /*
-            boolean success = game.getTurnManager().endTurn(action.getPlayerId());
-            if (success) {
-                logger.info("Turn ended by player {} in game {}", action.getPlayerId(), action.getGameId());
-                broadcastGameState(action.getGameId());
-            } else {
-                logger.warn("Failed to end turn for player {} in game {}", action.getPlayerId(), action.getGameId());
-            }
-        } else {
-            logger.warn("Game not found for gameId: {}", action.getGameId());
-
-             */
         }
     }
 
@@ -100,7 +71,4 @@ public class GameController {
         logger.info("Broadcasting terrain type for game: {}", gameId + terrainCardType);
         messagingTemplate.convertAndSend("/topic/game/card/"+gameId, terrainCardType);
     }
-
-
-
 }
