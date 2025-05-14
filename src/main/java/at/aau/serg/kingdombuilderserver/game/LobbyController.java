@@ -56,6 +56,7 @@ public class LobbyController {
     @MessageMapping("/lobby/start")
     public void startRoom(@Payload LeaveRoomMessage msg) {
         lobbyService.startGame(msg.getRoomId());
+        broadcastRoom(new StartRoomMessage(msg.getRoomId()));
         System.out.println("TODO!! Start room " + msg.getRoomId());
     }
 
@@ -63,5 +64,11 @@ public class LobbyController {
     private void broadcastLobby() {
         System.out.println("Lobby broadcast "+lobbyService.getAllRooms().size());
         messagingTemplate.convertAndSend("/topic/lobby", lobbyService.getAllRooms());
+    }
+
+    //Sendet Player-Liste mit an alle Clients in einem Raum
+    private void broadcastRoom(StartRoomMessage msg){
+        System.out.println("Initializing Room " + msg.getRoomId());
+        messagingTemplate.convertAndSend("/topic/room/Init/"+msg.getRoomId(), msg);
     }
 }
