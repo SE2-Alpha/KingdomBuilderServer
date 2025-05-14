@@ -10,19 +10,21 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 @Controller
 public class GameController {
 
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
-    //private Map<String, GameState> games = new HashMap<>();
     public final Map<String, Room> rooms = RoomList.getInstance().list;
     private final SimpMessagingTemplate messagingTemplate;
+    //private final GameService gameService;
 
-    public GameController(SimpMessagingTemplate messagingTemplate) {
+    public GameController(SimpMessagingTemplate messagingTemplate, GameService gameService) {
         this.messagingTemplate = messagingTemplate;
         //this.games =....
+        //this.gameService = gameService;
     }
 
     @MessageMapping("/game/placeHouses")
@@ -73,17 +75,13 @@ public class GameController {
         logger.info("Rooms: "+rooms.keySet());
         String gameId = action.getGameId();
         logger.info("Game ID: "+gameId);
-        String playerId = action.getPlayerId();
         logger.info("Pid: "+action.getPlayerId());
-        logger.info("Rooms: "+rooms.toString());
+        logger.info("Rooms: "+rooms);
         if (rooms.containsKey(gameId)) {
-            boolean success = true;
-            if (success) {
-                logger.info("Card drawn by player {} in game {}", action.getPlayerId(), action.getGameId());
-                broadcastGameState(action.getGameId());
-            } else {
-                logger.warn("Failed to draw card for player {} in game {}", action.getPlayerId(), action.getGameId());
-            }
+            logger.info("Card drawn by player {} in game {}", action.getPlayerId(), action.getGameId());
+            Random random = new Random();
+            int terrainCardType = random.nextInt(5);
+            broadcastTerrainCardType(action.getGameId(), terrainCardType);
         } else {
             logger.warn("Game not found for gameId: {}", action.getGameId());
         }
@@ -97,5 +95,12 @@ public class GameController {
             logger.warn("Game not found for broadcasting: {}", gameId);
         }
     }
+
+    private void broadcastTerrainCardType(String gameId, int terrainCardType){
+        logger.info("Broadcasting terrain type for game: {}", gameId + terrainCardType);
+        messagingTemplate.convertAndSend("/topic/game/card/"+gameId, terrainCardType);
+    }
+
+
 
 }

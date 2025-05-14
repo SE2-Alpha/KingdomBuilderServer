@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Random;
 
 @Service
 @Getter
@@ -24,12 +25,14 @@ public class GameService {
         return playerOrder.get(currentPlayerIndex);
     }
 
-    public boolean drawCard(String playerId) {
+    public int drawCard(String playerId) {
         if (!isCurrentPlayer(playerId) || currentPhase != GameTurnPhase.DRAW_TERRAIN_CARD) {
-            return false;
+            return -1;
         }
         currentPhase = GameTurnPhase.MAIN_PHASE;
-        return true;
+
+        Random random = new Random();
+        return random.nextInt(5);
     }
 
     public boolean performAction(String playerId, PlayerActionDTO action) {
