@@ -8,5 +8,6 @@ import lombok.Setter;
 public class JoinRoomMessage {
     private String roomId;
     private String playerId;
+    private String userName;
 
 }

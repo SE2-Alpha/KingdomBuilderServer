@@ -34,14 +34,14 @@ public class LobbyController {
     // Raum erstellen
     @MessageMapping("/lobby/create")
     public void createRoom(@Payload CreateRoomMessage msg) {
-        lobbyService.createRoom(msg.getPlayerId());
+        lobbyService.createRoom(msg.getPlayerId(), msg.getUserName());
         broadcastLobby();
     }
 
     // Raum beitreten
     @MessageMapping("/lobby/join")
     public void joinRoom(@Payload JoinRoomMessage msg) {
-        lobbyService.joinRoom(msg.getRoomId(), msg.getPlayerId());
+        lobbyService.joinRoom(msg.getRoomId(), msg.getPlayerId(), msg.getUserName());
         broadcastLobby();
     }
 
@@ -62,7 +62,7 @@ public class LobbyController {
 
     // Hilfsmethode: Aktualisierten Lobby‑State an alle senden
     private void broadcastLobby() {
-        System.out.println("Lobby broadcast "+lobbyService.getAllRooms().size());
+        System.out.println("Lobby broadcast " + lobbyService.getAllRooms().size());
         messagingTemplate.convertAndSend("/topic/lobby", lobbyService.getAllRooms());
     }
 
