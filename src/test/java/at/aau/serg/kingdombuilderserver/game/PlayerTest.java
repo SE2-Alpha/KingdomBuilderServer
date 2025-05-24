@@ -9,7 +9,7 @@ public class PlayerTest {
 
     @Test
     void constructor1Test(){
-        player = new Player("12345");
+        player = new Player("12345","Playername");
         assertEquals("12345",player.getId());
         assertEquals(40,player.getRemainingSettlements());
     }
@@ -23,14 +23,14 @@ public class PlayerTest {
 
     @Test
     void setRemainingSettlementsTest(){
-        player = new Player("12345");
+        player = new Player("12345","Playername");
         player.setRemainingSettlements(400);
         assertEquals(400,player.getRemainingSettlements());
     }
 
     @Test
     void setRemainingSettlementsFailTest(){
-        player = new Player("12345");
+        player = new Player("12345","Playername");
         player.setRemainingSettlements(-2);
         assertEquals(0,player.getRemainingSettlements());
     }
