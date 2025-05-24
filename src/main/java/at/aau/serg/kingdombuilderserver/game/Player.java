@@ -12,8 +12,9 @@ public class Player {
     private int remainingSettlements;
     private int score;
 
-    public Player(String playerId) {
+    public Player(String playerId, String playerName) {
         this.id = playerId;
+        this.name = playerName;
         remainingSettlements = 40;
     }
 
