@@ -4,6 +4,8 @@ import at.aau.serg.kingdombuilderserver.board.quadrants.QuadrantOasis;
 import at.aau.serg.kingdombuilderserver.board.quadrants.QuadrantTavern;
 import at.aau.serg.kingdombuilderserver.board.quadrants.QuadrantTower;
 import at.aau.serg.kingdombuilderserver.board.quadrants.QuadrantFields;
+import at.aau.serg.kingdombuilderserver.game.GameHousePosition;
+import at.aau.serg.kingdombuilderserver.game.Player;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -71,5 +73,30 @@ public class GameBoard {
     // Getter für das Feld-Array, etc.
     public TerrainField[] getFields() {
         return fields;
+    }
+
+    public boolean isPositionValid(GameHousePosition position) {
+        if (position == null) {
+            return false;
+        }
+        int x = position.getX();
+        int y = position.getY();
+        return x >= 0 && x < 20 && y >= 0 && y < 20; // 20x20 Spielfeld
+    }
+
+    public void placeHouse(Player activePlayer, GameHousePosition position, int round) {
+        if (activePlayer == null || position == null) {
+            throw new IllegalArgumentException("Aktiver Spieler und Position dürfen nicht null sein.");
+        }
+
+        int id = position.getY() * 20 + position.getX(); // Umrechnung in 1D-Index
+        TerrainField field = fields[id];
+
+        if (field.getOwner() != null) {
+            throw new IllegalStateException("Feld ist bereits von einem anderen Spieler besetzt: " + field);
+        }
+
+        field.setOwner(activePlayer.getId());
+        field.setOwnerSinceRound(round); // Setze die aktuelle Runde als Besitzrunde
     }
 }

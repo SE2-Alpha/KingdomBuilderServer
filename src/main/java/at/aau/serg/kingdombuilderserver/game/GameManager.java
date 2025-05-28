@@ -13,6 +13,7 @@ public class GameManager {
     @Getter
     @Setter
     private Player activePlayer;
+    private int roundCounter = 0;
 
     public GameManager() {
         // Private constructor to prevent instantiation
@@ -20,4 +21,15 @@ public class GameManager {
         gameBoard.buildGameBoard();
     }
 
+    public void placeHouse(GameHousePosition position) {
+        if (gameBoard.isPositionValid(position)) {
+            gameBoard.placeHouse(activePlayer, position, roundCounter);
+        } else {
+            throw new IllegalArgumentException("Ungültige Position für das Platzieren des Hauses: " + position);
+        }
+    }
+
+    public void nextRound() {
+        roundCounter++;
+    }
 }

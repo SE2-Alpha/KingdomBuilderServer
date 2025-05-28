@@ -65,4 +65,13 @@ public class Room {
             p.setColor(PlayerColor.getColor(players.indexOf(p)));
         }
     }
+
+    public Player getNextPlayer(Player activePlayer) {
+        int currentIndex = players.indexOf(activePlayer);
+        if (currentIndex == -1) {
+            throw new IllegalArgumentException("Active player not found in the room.");
+        }
+        int nextIndex = (currentIndex + 1) % players.size();
+        return players.get(nextIndex);
+    }
 }

@@ -1,5 +1,6 @@
 package at.aau.serg.kingdombuilderserver.board;
 
+import at.aau.serg.kingdombuilderserver.game.Player;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +9,9 @@ import lombok.Setter;
 public class TerrainField {
     private TerrainType type;
     private int id;
+    private String owner; // Optional, falls ein Spieler das Feld besitzt
+    private int ownerSinceRound; // Optional, falls ein Spieler das Feld besitzt
+
 
     // ... weitere Methoden, siehe Kotlin
 

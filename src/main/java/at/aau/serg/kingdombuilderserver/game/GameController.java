@@ -29,6 +29,7 @@ public class GameController {
 
     private void broadcastGameUpdate(Room room){
         logger.info("Broadcasting GameUpdate for game: {}", room.getId());
+        System.out.println("Broadcasting GameUpdate for game: " + room.getId());
         messagingTemplate.convertAndSend("/topic/game/update/"+room.getId(), room);
     }
 
@@ -37,6 +38,21 @@ public class GameController {
         logger.info("Received placeHouse request: {}", action.getGameId());
         String gameId = action.getGameId();
         if (rooms.containsKey(gameId)) {
+            broadcastGameUpdate(rooms.get(gameId));
+            if(action.getType().equals(GameActionType.PLACE_HOUSE)) {
+                logger.info("Placing house for player {} at position {}", action.getPlayerId(), action.getPosition());
+                Room room = rooms.get(gameId);
+                GameManager gameManager = room.getGameManager();
+                Player activePlayer = gameManager.getActivePlayer();
+
+                if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
+
+                    gameManager.placeHouse(action.getPosition());
+                    logger.info("House placed successfully for player {}", action.getPlayerId());
+                } else {
+                    logger.warn("Player {} is not the active player in game {}", action.getPlayerId(), gameId);
+                }
+            }
             broadcastGameUpdate(rooms.get(gameId));
         }
 
@@ -47,6 +63,22 @@ public class GameController {
         logger.info("Received endTurn request: {}", action);
         String gameId = action.getGameId();
         if (rooms.containsKey(gameId)) {
+            logger.info("Ending turn for player {} in game {}", action.getPlayerId(), gameId);
+            Room room = rooms.get(gameId);
+            GameManager gameManager = room.getGameManager();
+            Player activePlayer = gameManager.getActivePlayer();
+
+            if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
+                // Logik zum Beenden des Zuges, z.B. Wechsel zum nächsten Spieler
+                gameManager.setActivePlayer(room.getNextPlayer(activePlayer));
+                gameManager.nextRound();
+                logger.info("Turn ended successfully for player {}", action.getPlayerId());
+                broadcastGameUpdate(room);
+            } else {
+                logger.warn("Player {} is not the active player in game {}", action.getPlayerId(), gameId);
+            }
+        } else {
+            logger.warn("Game not found for gameId: {}", action.getGameId());
         }
     }
 
