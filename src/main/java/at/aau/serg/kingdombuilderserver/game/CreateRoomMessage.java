@@ -1,16 +1,18 @@
 package at.aau.serg.kingdombuilderserver.game;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class CreateRoomMessage {
+    // Getter und Setter
+    @Getter
+    @Setter
     private String playerId;
+    @Getter
+    @Setter
+    private String userName;
 
     // Standard-Konstruktor
     public CreateRoomMessage() { }
 
-    // Getter und Setter
-    public String getPlayerId() {
-        return playerId;
-    }
-    public void setPlayerId(String playerId) {
-        this.playerId = playerId;
-    }
 }

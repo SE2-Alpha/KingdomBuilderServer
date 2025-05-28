@@ -19,7 +19,7 @@ public class LobbyService {
         return rooms.values();
     }
 
-    public Room createRoom(String playerId) {
+    public Room createRoom(String playerId, String userName) {
         if(getPlayerRoom(playerId) != null) {
             logger.info("Room with id {} already exists", playerId);
             return null;
@@ -27,14 +27,14 @@ public class LobbyService {
         String roomId = UUID.randomUUID().toString();
         String name = "Room " + (rooms.size() + 1); // z.B. "Room A", "Room B", etc.
         Room room = new Room(roomId, name);
-        room.addPlayer(new Player(playerId));
+        room.addPlayer(new Player(playerId, userName));
         rooms.put(roomId, room);
         logger.info("Rooms: {}", rooms);
         return room;
     }
 
 
-    public Room joinRoom(String roomId, String playerId) {
+    public Room joinRoom(String roomId, String playerId, String userName) {
         if(getPlayerRoom(playerId) != null) {
             logger.info("Player already in a room");
             return null;
@@ -42,7 +42,7 @@ public class LobbyService {
         logger.info("Joining room {} to player {}", roomId, playerId);
         Room room = rooms.get(roomId);
         if (room != null && room.getPlayers().size() < 4 && room.getStatus() == RoomStatus.WAITING && !room.checkIfPlayerInRoom(playerId)) {
-            room.addPlayer(new Player(playerId));
+            room.addPlayer(new Player(playerId,userName));
             logger.info("Player {} joined the room {}", playerId, roomId);
         } else {
             logger.info("Room is full or already started or player already in room");

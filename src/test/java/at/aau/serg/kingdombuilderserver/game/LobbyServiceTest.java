@@ -24,9 +24,10 @@ class LobbyServiceTest {
     void testCreateRoom() {
         // Arrange
         String playerId = "player1";
+        String playername = "player";
 
         // Act
-        Room room = lobbyService.createRoom(playerId);
+        Room room = lobbyService.createRoom(playerId,playername);
 
         // Assert
         assertThat(room).isNotNull();
@@ -38,10 +39,11 @@ class LobbyServiceTest {
     void testCreateRoomAlreadyIn() {
         // Arrange
         String playerId = "player1";
+        String playername = "player";
 
         // Act
-        Room room = lobbyService.createRoom(playerId);
-        Room room2 = lobbyService.createRoom(playerId);
+        Room room = lobbyService.createRoom(playerId,playername);
+        Room room2 = lobbyService.createRoom(playerId,playername);
 
         // Assert
         assertThat(room).isNotNull();
@@ -54,12 +56,14 @@ class LobbyServiceTest {
     void testJoinRoom() {
         // Arrange
         String playerId1 = "player1";
+        String playername1 = "player1";
         String playerId2 = "player2";
-        Room room = lobbyService.createRoom(playerId1);
+        String playername2 = "player2";
+        Room room = lobbyService.createRoom(playerId1,playername1);
 
         // Act
-        Room joinedRoom = lobbyService.joinRoom(room.getId(), playerId2);
-        Room joinedRoom2 = lobbyService.joinRoom(room.getId(), playerId2);
+        Room joinedRoom = lobbyService.joinRoom(room.getId(), playerId2,playername2);
+        Room joinedRoom2 = lobbyService.joinRoom(room.getId(), playerId2,playername2);
 
         // Assert
         assertThat(joinedRoom).isNotNull();
@@ -76,13 +80,13 @@ class LobbyServiceTest {
         String playerId3 = "player3";
         String playerId4 = "player4";
         String playerId5 = "player5";
-        Room room = lobbyService.createRoom(playerId1);
+        Room room = lobbyService.createRoom(playerId1,playerId1);
 
         // Act
-        Room joinedRoom = lobbyService.joinRoom(room.getId(), playerId2);
-        Room joinedRoom2 = lobbyService.joinRoom(room.getId(), playerId3);
-        Room joinedRoom3 = lobbyService.joinRoom(room.getId(), playerId4);
-        Room joinedRoom4 = lobbyService.joinRoom(room.getId(), playerId5);
+        Room joinedRoom = lobbyService.joinRoom(room.getId(), playerId2,playerId1);
+        Room joinedRoom2 = lobbyService.joinRoom(room.getId(), playerId3,playerId3);
+        Room joinedRoom3 = lobbyService.joinRoom(room.getId(), playerId4,playerId4);
+        Room joinedRoom4 = lobbyService.joinRoom(room.getId(), playerId5,playerId5);
 
         // Assert
         assertThat(joinedRoom).isNotNull();
@@ -98,7 +102,7 @@ class LobbyServiceTest {
     void testLeaveRoom() {
         // Arrange
         String playerId = "player1";
-        Room room = lobbyService.createRoom(playerId);
+        Room room = lobbyService.createRoom(playerId,playerId);
 
         // Act
         lobbyService.leaveRoom(room.getId(), playerId);
@@ -113,8 +117,8 @@ class LobbyServiceTest {
         // Arrange
         String playerId1 = "player1";
         String playerId2 = "player2";
-        Room room = lobbyService.createRoom(playerId1);
-        lobbyService.joinRoom(room.getId(), playerId2);
+        Room room = lobbyService.createRoom(playerId1,playerId1);
+        lobbyService.joinRoom(room.getId(), playerId2,playerId2);
 
         // Act
         lobbyService.startGame(room.getId());
@@ -127,7 +131,7 @@ class LobbyServiceTest {
     void testGetPlayerRoom() {
         // Arrange
         String playerId = "player1";
-        Room room = lobbyService.createRoom(playerId);
+        Room room = lobbyService.createRoom(playerId,playerId);
 
         // Act
         String roomId = lobbyService.getPlayerRoom(playerId);
@@ -141,8 +145,8 @@ class LobbyServiceTest {
         // Arrange
         String playerId1 = "player1";
         String playerId2 = "player2";
-        Room room = lobbyService.createRoom(playerId1);
-        lobbyService.joinRoom(room.getId(), playerId2);
+        Room room = lobbyService.createRoom(playerId1,playerId1);
+        lobbyService.joinRoom(room.getId(), playerId2,playerId2);
 
         // Act
         lobbyService.finishGame(room.getId());

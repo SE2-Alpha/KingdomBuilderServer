@@ -12,7 +12,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Room {
     private final String id;
     private final String name;
-    private static final int size = 4;
+    private final int size = 4;
     private final List<Player> players = new CopyOnWriteArrayList<>();
     @Setter
     private RoomStatus status = RoomStatus.WAITING;
