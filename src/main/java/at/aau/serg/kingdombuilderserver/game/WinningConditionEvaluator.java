@@ -1,8 +1,6 @@
 package at.aau.serg.kingdombuilderserver.game;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class WinningConditionEvaluator {
    //Platzhalterklasse soll durch echtes Gameboard ersetzt werden
@@ -38,8 +36,14 @@ public class WinningConditionEvaluator {
 
     //Entdecker
     public int evaluateDiscoverers(Player player){
+        Set<Integer> rowsWithSettlements = new HashSet<>();
 
-        return 0;
+        for(int fieldId : player.getHouseFieldIds()){
+            int row = fieldId / 20;
+            rowsWithSettlements.add(row);
+        }
+
+        return rowsWithSettlements.size();
     }
 
 }
