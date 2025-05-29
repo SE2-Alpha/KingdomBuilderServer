@@ -36,9 +36,21 @@ public class WinningConditionEvaluatorTest {
     }
 
     @Test
+    void testEvaluateWinners() {
+        Player winner = evaluator.evaluateWinner();
+        assertEquals(player3, winner);
+    }
+
+    @Test
     void testEvaluateDiscoverers() {
         int points = evaluator.evaluateDiscoverers(player1);
         assertEquals(4, points);
     }
+
+    @Test
+    void testEvaluateHermits(){}
+
+    @Test
+    void testEvaluateMiners(){}
     
 }
