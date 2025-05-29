@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class WinningConditionEvaluatorTest {
 
@@ -36,15 +37,31 @@ public class WinningConditionEvaluatorTest {
     }
 
     @Test
-    void testEvaluateWinners() {
-        Player winner = evaluator.evaluateWinner();
-        assertEquals(player3, winner);
+    void testEvaluateWinnersMultiple() {
+
+        players.remove(player3);
+
+        List<Player> winners = evaluator.evaluateWinner();
+
+        assertEquals(2, winners.size());
+        assertTrue(winners.contains(player2));
+        assertTrue(winners.contains(player4));
+    }
+
+    @Test
+    void testEvaluateWinnersSingle() {
+        List<Player> winners = evaluator.evaluateWinner();
+
+        assertEquals(1, winners.size());
+        assertTrue(winners.contains(player3));
     }
 
     @Test
     void testEvaluateDiscoverers() {
-        int points = evaluator.evaluateDiscoverers(player1);
-        assertEquals(4, points);
+        int points1 = evaluator.evaluateDiscoverers(player1);
+        int points3 = evaluator.evaluateDiscoverers(player3);
+        assertEquals(4, points1);
+        assertEquals(10, points3);
     }
 
     @Test
@@ -52,5 +69,5 @@ public class WinningConditionEvaluatorTest {
 
     @Test
     void testEvaluateMiners(){}
-    
+
 }
