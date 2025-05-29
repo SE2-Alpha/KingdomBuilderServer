@@ -4,6 +4,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Getter @Setter
 public class Player {
     private @Setter(AccessLevel.NONE) String id;
@@ -11,6 +14,7 @@ public class Player {
     private int color;
     private int remainingSettlements;
     private int score;
+    private Set<Integer> houseFieldIds = new HashSet<>();
 
     public Player(String playerId, String playerName) {
         this.id = playerId;
@@ -41,5 +45,14 @@ public class Player {
         remainingSettlements = Math.max(remainingSettlements - Math.abs(value), 0);
     }
 
+    // Haus auf ein Feld setzen
+    public boolean placeHouse(int fieldId) {
+        return houseFieldIds.add(fieldId); // Gibt false zurück, wenn schon gesetzt
+    }
+
+    // Prüfen ob ein Haus auf dem Feld steht
+    public boolean hasHouseOnField(int fieldId) {
+        return houseFieldIds.contains(fieldId);
+    }
 
 }
