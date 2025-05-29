@@ -1,6 +1,7 @@
 package at.aau.serg.kingdombuilderserver.game;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class WinningConditionEvaluator {
    //Platzhalterklasse soll durch echtes Gameboard ersetzt werden
@@ -16,9 +17,9 @@ public class WinningConditionEvaluator {
     /**
      * Geht in einer for-Schleife alle Spieler durch und berechnet für jeden die Gesamtpunktezahl.
      *
-     * @return winner
+     * @return winner(s)
      */
-    public Player evaluateWinner() {
+    public List<Player> evaluateWinner() {
 
         for (Player player : players) {
             int points =
@@ -28,10 +29,14 @@ public class WinningConditionEvaluator {
             playerPoints.put(player, points);
         }
 
+        int maxPoints = playerPoints.values().stream()
+                .max(Integer::compareTo)
+                .orElse(0);
+
         return playerPoints.entrySet().stream()
-                .max(Comparator.comparingInt(Map.Entry::getValue))
+                .filter(entry -> entry.getValue() == maxPoints)
                 .map(Map.Entry::getKey)
-                .orElse(null);
+                .collect(Collectors.toList());
     }
 
     /**
