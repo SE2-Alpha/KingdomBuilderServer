@@ -38,7 +38,6 @@ public class GameController {
         logger.info("Received placeHouse request: {}", action.getGameId());
         String gameId = action.getGameId();
         if (rooms.containsKey(gameId)) {
-            broadcastGameUpdate(rooms.get(gameId));
             if(action.getType().equals(GameActionType.PLACE_HOUSE)) {
                 logger.info("Placing house for player {} at position {}", action.getPlayerId(), action.getPosition());
                 Room room = rooms.get(gameId);
