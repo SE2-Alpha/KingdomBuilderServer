@@ -25,7 +25,8 @@ public class WinningConditionEvaluator {
             int points =
                       evaluateHermits(player)
                     + evaluateMiners(player)
-                    + evaluateDiscoverers(player);
+                    + evaluateDiscoverers(player)
+                    + evaluateCastleFields(player);
             playerPoints.put(player, points);
         }
 
@@ -84,10 +85,28 @@ public class WinningConditionEvaluator {
      * Siedlung angrenzt, erhält der Spieler am Ende des Spiels
      * 3 Gold."
      * @param player
-     * @return points from castle hex
+     * @return points from castle hex =CITY field
      */
     public int evaluateCastleFields(Player player) {
+        int points = 0;
 
-        return 0;
+        /* wieder "ein"kommentieren, sobald Klassen (TerrainType und TerrainField) vorhanden sind
+        for (int id = 0; id < 400; id++) {
+            if (board.getFieldType(id) == TerrainType.CITY) {
+                int[] neighbours = getNeighbours(id);
+
+                for (int neighbourId : neighbours) {
+                    // Sicherstellen, dass die Nachbar-ID gültig ist
+                    if (neighbourId >= 0 && neighbourId < 400 &&
+                            player.getHouseFieldIds().contains(neighbourId)) {
+                        points += 3;
+                        break; // Pro CITY-Feld nur einmal Punkte
+                    }
+                }
+            }
+        }
+         */
+
+        return points;
     }
 }
