@@ -5,8 +5,6 @@ import at.aau.serg.kingdombuilderserver.board.TerrainType;
 
 import java.util.Arrays;
 
-import java.util.Arrays;
-
 public class QuadrantFields implements Quadrant {
     private static final TerrainType[] MAP = new TerrainType[100];
 
