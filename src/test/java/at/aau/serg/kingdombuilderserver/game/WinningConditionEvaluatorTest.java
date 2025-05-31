@@ -1,5 +1,6 @@
 package at.aau.serg.kingdombuilderserver.game;
 
+import at.aau.serg.kingdombuilderserver.board.GameBoard;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,11 +17,11 @@ public class WinningConditionEvaluatorTest {
     private Player player3;
     private Player player4;
     private List<Player> players;
-    GameBoardWinningConditions board;
+    GameBoard board;
 
     @BeforeEach
     void setUp() {
-        board = new GameBoardWinningConditions();
+        board = new GameBoard();
         player1 = new Player("1", "Player1");
         player2 = new Player("2", "Player2");
         player3 = new Player("3", "Player3");

@@ -1,22 +1,24 @@
 package at.aau.serg.kingdombuilderserver.game;
 
+import at.aau.serg.kingdombuilderserver.board.GameBoard;
+import at.aau.serg.kingdombuilderserver.board.TerrainType;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class WinningConditionEvaluator {
-   //Platzhalterklasse soll durch echtes Gameboard ersetzt werden
-    private GameBoardWinningConditions board;
+
+    private GameBoard board;
     private final List<Player> players;
     Map<Player, Integer> playerPoints = new HashMap<>();
 
-    public WinningConditionEvaluator(GameBoardWinningConditions board, List<Player> players) {
+    public WinningConditionEvaluator(GameBoard board, List<Player> players) {
         this.board = board;
         this.players = players;
     }
 
     /**
      * Geht in einer for-Schleife alle Spieler durch und berechnet für jeden die Gesamtpunktezahl.
-     *
      * @return winner(s)
      */
     public List<Player> evaluateWinner() {
@@ -75,7 +77,7 @@ public class WinningConditionEvaluator {
         visited.add(id);
         group.add(id);
 
-        /* wieder "ein"kommentieren, sobald Klassen (TerrainType und TerrainField) und Methode getNeighbours() vorhanden sind
+        /*  wieder "ein"kommentieren, sobald Methode getNeighbours() vorhanden sind
         for (int neighbor : getNeighbours(id)) {
             if (houses.contains(neighbor)) {
                 findConnectedGroup(neighbor, houses, group, visited);
@@ -93,7 +95,7 @@ public class WinningConditionEvaluator {
     public int evaluateMiners(Player player) {
         int points = 0;
 
-        /* wieder "ein"kommentieren, sobald Klassen (TerrainType und TerrainField) und Methode getNeighbours() vorhanden sind
+        /* wieder "ein"kommentieren, sobald Methode getNeighbours() vorhanden sind
         for (int houseId : player.getHouseFieldIds()) {
             int[] neighbours = getNeighbours(houseId);
 
@@ -138,7 +140,7 @@ public class WinningConditionEvaluator {
     public int evaluateCastleFields(Player player) {
         int points = 0;
 
-        /* wieder "ein"kommentieren, sobald Klassen (TerrainType und TerrainField) und Methode getNeighbours() vorhanden sind
+        /*  wieder "ein"kommentieren, sobald Methode getNeighbours() vorhanden sind
         for (int id = 0; id < 400; id++) {
             if (board.getFieldType(id) == TerrainType.CITY) {
                 int[] neighbours = getNeighbours(id);
@@ -153,8 +155,8 @@ public class WinningConditionEvaluator {
                 }
             }
         }
-         */
 
+         */
         return points;
     }
 }

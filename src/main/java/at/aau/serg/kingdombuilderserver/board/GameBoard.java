@@ -99,4 +99,11 @@ public class GameBoard {
         field.setOwner(activePlayer.getId());
         field.setOwnerSinceRound(round); // Setze die aktuelle Runde als Besitzrunde
     }
+
+    public TerrainType getFieldType(int id) {
+        if (id < 0 || id >= fields.length) {
+            throw new IllegalArgumentException("Ungültige Feld-ID: " + id);
+        }
+        return fields[id].getType();
+    }
 }
