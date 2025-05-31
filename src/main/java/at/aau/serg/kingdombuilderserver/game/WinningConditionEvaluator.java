@@ -47,8 +47,41 @@ public class WinningConditionEvaluator {
      * @return points from hermits
      */
     public int evaluateHermits(Player player) {
+        Set<Integer> visited = new HashSet<>();
+        Set<Integer> houses = new HashSet<>(player.getHouseFieldIds());
+        int points = 0;
 
-        return 0;
+        for (int id : houses) {
+            if (!visited.contains(id)) {
+                Set<Integer> group = new HashSet<>();
+                findConnectedGroup(id, houses, group, visited);
+                points++; // eine neue zusammenhängende Gruppe -> 1 Punkt
+            }
+        }
+
+        return points;
+    }
+
+    /**
+     * Hilfsmethode für evaluateHermits() um zusammenhängende Siedlungen ausfindig zu machen.
+     * @param id
+     * @param houses
+     * @param group
+     * @param visited
+     */
+    private void findConnectedGroup(int id, Set<Integer> houses, Set<Integer> group, Set<Integer> visited) {
+        if (!houses.contains(id) || visited.contains(id)) return;
+
+        visited.add(id);
+        group.add(id);
+
+        /* wieder "ein"kommentieren, sobald Klassen (TerrainType und TerrainField) und Methode getNeighbours() vorhanden sind
+        for (int neighbor : getNeighbours(id)) {
+            if (houses.contains(neighbor)) {
+                findConnectedGroup(neighbor, houses, group, visited);
+            }
+        }
+         */
     }
 
     /**
@@ -58,8 +91,23 @@ public class WinningConditionEvaluator {
      * @return points from miners
      */
     public int evaluateMiners(Player player) {
+        int points = 0;
 
-        return 0;
+        /* wieder "ein"kommentieren, sobald Klassen (TerrainType und TerrainField) und Methode getNeighbours() vorhanden sind
+        for (int houseId : player.getHouseFieldIds()) {
+            int[] neighbours = getNeighbours(houseId);
+
+            for (int neighbourId : neighbours) {
+                if (neighbourId >= 0 && neighbourId < 400 &&
+                        board.getFieldType(neighbourId) == TerrainType.MOUNTAIN) {
+                    points++;
+                    break; // Nur 1 Punkt pro Siedlung, auch wenn mehrere Berge angrenzen
+                }
+            }
+        }
+         */
+
+        return points;
     }
 
     /**
@@ -90,7 +138,7 @@ public class WinningConditionEvaluator {
     public int evaluateCastleFields(Player player) {
         int points = 0;
 
-        /* wieder "ein"kommentieren, sobald Klassen (TerrainType und TerrainField) vorhanden sind
+        /* wieder "ein"kommentieren, sobald Klassen (TerrainType und TerrainField) und Methode getNeighbours() vorhanden sind
         for (int id = 0; id < 400; id++) {
             if (board.getFieldType(id) == TerrainType.CITY) {
                 int[] neighbours = getNeighbours(id);
