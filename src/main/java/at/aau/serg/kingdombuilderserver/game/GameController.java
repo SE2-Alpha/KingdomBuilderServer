@@ -27,6 +27,7 @@ public class GameController {
         this.messagingTemplate = messagingTemplate;
     }
 
+
     private void broadcastGameUpdate(Room room){
         logger.info("Broadcasting GameUpdate for game: {}", room.getId());
         System.out.println("Broadcasting GameUpdate for game: " + room.getId());
@@ -97,6 +98,16 @@ public class GameController {
             broadcastGameUpdate(rooms.get(gameId));
         } else {
             logger.warn("Game not found for gameId: {}", action.getGameId());
+        }
+    }
+    @MessageMapping("/game/get")
+    public void getGameUpdate(String gameId) {
+        logger.info("Received getGameUpdate request for gameId: {}", gameId);
+        if (rooms.containsKey(gameId)) {
+            logger.info("Broadcasting game state for gameId: {}", gameId);
+            broadcastGameUpdate(rooms.get(gameId));
+        } else {
+            logger.warn("Game not found for gameId: {}", gameId);
         }
     }
 
