@@ -78,4 +78,16 @@ public class WinningConditionEvaluator {
         return rowsWithSettlements.size();
     }
 
+    /**
+     * Berechnet die Punkte, die ein Spieler durch die Burgfelder bekommt.
+     * "Für jedes Burgfeld, an das mindestens eine eigene
+     * Siedlung angrenzt, erhält der Spieler am Ende des Spiels
+     * 3 Gold."
+     * @param player
+     * @return points from castle hex
+     */
+    public int evaluateCastleFields(Player player) {
+
+        return 0;
+    }
 }
