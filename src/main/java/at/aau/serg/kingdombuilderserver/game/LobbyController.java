@@ -1,5 +1,6 @@
 package at.aau.serg.kingdombuilderserver.game;
 
+import at.aau.serg.kingdombuilderserver.messaging.dtos.RoomLobbyDTO;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -23,11 +24,12 @@ public class LobbyController {
     // Initialer Lobby‑State
     @MessageMapping("/lobby/get")
     @SendTo("/topic/lobby")
-    public Collection<Room> getLobby() {
+    public Collection<RoomLobbyDTO> getLobby() {
         System.out.println("Lobby get"+lobbyService.getAllRooms().size());
         return lobbyService.getAllRooms()
                 .stream()
-                .sorted(Comparator.comparing(Room::getName))
+                .map(RoomLobbyDTO::from)
+                .sorted(Comparator.comparing(RoomLobbyDTO::getName))
                 .toList();
     }
 
@@ -63,7 +65,7 @@ public class LobbyController {
     // Hilfsmethode: Aktualisierten Lobby‑State an alle senden
     private void broadcastLobby() {
         System.out.println("Lobby broadcast " + lobbyService.getAllRooms().size());
-        messagingTemplate.convertAndSend("/topic/lobby", lobbyService.getAllRooms());
+        messagingTemplate.convertAndSend("/topic/lobby", lobbyService.getAllRooms().stream().map(RoomLobbyDTO::from).toList());
     }
 
     //Sendet Player-Liste mit an alle Clients in einem Raum

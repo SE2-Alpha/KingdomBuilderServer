@@ -65,7 +65,8 @@ public class LobbyService {
         if (room != null && !room.getPlayers().isEmpty()) {//TODO(): correct player count condition
             if(room.getStatus()!=RoomStatus.STARTED){
                 room.setPlayerColor();
-                room.setStatus(RoomStatus.STARTED);
+                //room.setStatus(RoomStatus.STARTED);
+                room.startGame();
             }
         }
     }

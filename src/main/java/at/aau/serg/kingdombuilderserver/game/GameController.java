@@ -1,13 +1,17 @@
 package at.aau.serg.kingdombuilderserver.game;
 
 import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerActionDTO;
+import at.aau.serg.kingdombuilderserver.messaging.dtos.RoomLobbyDTO;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Random;
 
@@ -23,11 +27,33 @@ public class GameController {
         this.messagingTemplate = messagingTemplate;
     }
 
+
+    private void broadcastGameUpdate(Room room){
+        logger.info("Broadcasting GameUpdate for game: {}", room.getId());
+        System.out.println("Broadcasting GameUpdate for game: " + room.getId());
+        messagingTemplate.convertAndSend("/topic/game/update/"+room.getId(), room);
+    }
+
     @MessageMapping("/game/placeHouses")
     public void placeHouse(@Payload PlayerActionDTO action) {
-        logger.info("Received placeHouse request: {}", action);
+        logger.info("Received placeHouse request: {}", action.getGameId());
         String gameId = action.getGameId();
         if (rooms.containsKey(gameId)) {
+            if(action.getType().equals(GameActionType.PLACE_HOUSE)) {
+                logger.info("Placing house for player {} at position {}", action.getPlayerId(), action.getPosition());
+                Room room = rooms.get(gameId);
+                GameManager gameManager = room.getGameManager();
+                Player activePlayer = gameManager.getActivePlayer();
+
+                if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
+
+                    gameManager.placeHouse(action.getPosition());
+                    logger.info("House placed successfully for player {}", action.getPlayerId());
+                } else {
+                    logger.warn("Player {} is not the active player in game {}", action.getPlayerId(), gameId);
+                }
+            }
+            broadcastGameUpdate(rooms.get(gameId));
         }
 
     }
@@ -37,6 +63,22 @@ public class GameController {
         logger.info("Received endTurn request: {}", action);
         String gameId = action.getGameId();
         if (rooms.containsKey(gameId)) {
+            logger.info("Ending turn for player {} in game {}", action.getPlayerId(), gameId);
+            Room room = rooms.get(gameId);
+            GameManager gameManager = room.getGameManager();
+            Player activePlayer = gameManager.getActivePlayer();
+
+            if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
+                // Logik zum Beenden des Zuges, z.B. Wechsel zum nächsten Spieler
+                gameManager.setActivePlayer(room.getNextPlayer(activePlayer));
+                gameManager.nextRound();
+                logger.info("Turn ended successfully for player {}", action.getPlayerId());
+                broadcastGameUpdate(room);
+            } else {
+                logger.warn("Player {} is not the active player in game {}", action.getPlayerId(), gameId);
+            }
+        } else {
+            logger.warn("Game not found for gameId: {}", action.getGameId());
         }
     }
 
@@ -53,8 +95,19 @@ public class GameController {
             Random random = new Random();
             int terrainCardType = random.nextInt(5);
             broadcastTerrainCardType(action.getGameId(), terrainCardType);
+            broadcastGameUpdate(rooms.get(gameId));
         } else {
             logger.warn("Game not found for gameId: {}", action.getGameId());
+        }
+    }
+    @MessageMapping("/game/get")
+    public void getGameUpdate(String gameId) {
+        logger.info("Received getGameUpdate request for gameId: {}", gameId);
+        if (rooms.containsKey(gameId)) {
+            logger.info("Broadcasting game state for gameId: {}", gameId);
+            broadcastGameUpdate(rooms.get(gameId));
+        } else {
+            logger.warn("Game not found for gameId: {}", gameId);
         }
     }
 

@@ -10,7 +10,10 @@ public class GameTest {
 
     @Test
     void testGameHousePosition() {
-        assertThrows(UnsupportedOperationException.class, GameHousePosition::new, "Default constructor should throw UnsupportedOperationException.");
+        GameHousePosition position = new GameHousePosition(5, 10);
+        assertEquals(5, position.getX(), "X position should be 5.");
+        assertEquals(10, position.getY(), "Y position should be 10.");
+        assertEquals("GameHousePosition{x=5, y=10}", position.toString(), "toString should return correct format.");
     }
 
     private PlayerActionDTO playerActionDTO;
