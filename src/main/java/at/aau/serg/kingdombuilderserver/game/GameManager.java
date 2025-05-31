@@ -13,12 +13,18 @@ public class GameManager {
     @Getter
     @Setter
     private Player activePlayer;
+    @Getter
     private int roundCounter = 0;
 
     public GameManager() {
         // Private constructor to prevent instantiation
         this.gameBoard = new GameBoard();
         gameBoard.buildGameBoard();
+    }
+
+    // Zusätzlicher Konstruktor NUR FÜR TESTS (package-private)
+    GameManager(GameBoard gameBoard) {
+        this.gameBoard = gameBoard;
     }
 
     public void placeHouse(GameHousePosition position) {
