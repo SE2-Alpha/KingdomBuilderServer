@@ -70,4 +70,6 @@ public class WinningConditionEvaluatorTest {
     @Test
     void testEvaluateMiners(){}
 
+    @Test
+    void testEvaluateCastleFields(){}
 }
