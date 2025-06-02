@@ -15,6 +15,8 @@ public class GameBoard {
     private static final int SIZE = 400; // 20x20
     private TerrainField[] fields = new TerrainField[SIZE];
 
+    private final Random rand = new Random();
+
     // Alle verfügbaren Quadranten (hier z.B. 4, erweiterbar)
     private static final List<Supplier<Quadrant>> QUADRANT_SUPPLIERS = List.of(
             QuadrantTower::new,
@@ -31,7 +33,6 @@ public class GameBoard {
         List<Quadrant> quadrants = pool.subList(0, 4).stream().map(Supplier::get).collect(Collectors.toList());
 
         // 2. Für jeden Quadranten eine Zufallsrotation wählen (0, 90, 180, 270 Grad)
-        Random rand = new Random();
         List<Integer> rotations = List.of(rand.nextInt(4), rand.nextInt(4), rand.nextInt(4), rand.nextInt(4));
 
         // 3. Quadranten "befüllen" und rotieren
