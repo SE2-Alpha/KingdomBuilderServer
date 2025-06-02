@@ -124,4 +124,32 @@ public class GameController {
         logger.info("Broadcasting terrain type for game: {}", gameId + terrainCardType);
         messagingTemplate.convertAndSend("/topic/game/card/"+gameId, terrainCardType);
     }
+
+    @MessageMapping("/game/cheat")
+    public void handleCheat(@Payload PlayerActionDTO action) {
+        logger.info("Received cheat attempt from player {} in game {}", action.getPlayerId(), action.getGameId());
+
+        String gameID = action.getGameId();
+        if (rooms.containsKey(gameID)){
+            Room room = rooms.get(gameID);
+            GameManager gameManager = room.getGameManager();
+            Player activePlayer = gameManager.getActivePlayer();
+
+            if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())){
+               activePlayer.setHasCheated(true);
+
+               // zusätzliches Haus setzen
+                gameManager.placeHouse(action.getPosition());
+
+                logger.info("Player {} placed an extra (cheated) house in game {}", action.getPlayerId(), gameID);
+
+                       broadcastGameUpdate(room);
+                } else {
+                logger.warn("Player {} tried to cheat but is not the active player", action.getPlayerId());
+            }
+            } else {
+            logger.warn("Game not found for gameId: {}", action.getGameId());
+        }
+        }
+
 }

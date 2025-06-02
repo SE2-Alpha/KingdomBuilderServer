@@ -11,6 +11,7 @@ public class Player {
     private int color;
     private int remainingSettlements;
     private int score;
+    private boolean hasCheated = false;
 
     public Player(String playerId, String playerName) {
         this.id = playerId;
@@ -40,6 +41,4 @@ public class Player {
     public void decreaseSettlementsBy(int value){
         remainingSettlements = Math.max(remainingSettlements - Math.abs(value), 0);
     }
-
-
 }
