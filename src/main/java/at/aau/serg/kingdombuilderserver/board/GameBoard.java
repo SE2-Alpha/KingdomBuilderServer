@@ -83,6 +83,24 @@ public class GameBoard {
         return x >= 0 && x < 20 && y >= 0 && y < 20; // 20x20 Spielfeld
     }
 
+    /*
+    TODO():
+    - Check Player house count (safety measure)
+    -Check placing-type (Normal, Special)
+    - Normal House placing:
+        - Get required field type (Draw Card)
+        - Check field is placeable (includes: Check field is empty)
+        - check if required field type is available
+            - if Yes: are some of them adjacent to Houses of Player?
+                - if yes: make placeable
+                - if no: make all fields of required type placeable
+            - if No: Make all adjacent fields placeable (respecting general placement rules)
+    -Special House placing (Farm, Oracle, Tavern, Tower): Separate function?
+            - Farm: Build one additional settlement on Grass (adjacent if possible)
+            - Oracle: Build one additional settlement of the same type as required Field type (Draw Card, must be adjacent)
+            - Tavern: Build one additional settlement on the end of a straight line of at least 3 settlements
+            - Tower: Build one Settlement on the Edge of the Board (adjacent if possible)
+     */
     public void placeHouse(Player activePlayer, GameHousePosition position, int round) {
         if (activePlayer == null || position == null) {
             throw new IllegalArgumentException("Aktiver Spieler und Position dürfen nicht null sein.");
