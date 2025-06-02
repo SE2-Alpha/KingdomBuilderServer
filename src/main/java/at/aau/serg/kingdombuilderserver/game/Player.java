@@ -4,6 +4,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter @Setter
 public class Player {
     private @Setter(AccessLevel.NONE) String id;
@@ -12,6 +15,10 @@ public class Player {
     private int remainingSettlements;
     private int score;
     private boolean hasCheated = false;
+    private boolean skippedTurn = false;
+    private int gold = 0;
+    private List<GameHousePosition> housesPlacedThisTurn = new ArrayList<>();
+
 
     public Player(String playerId, String playerName) {
         this.id = playerId;

@@ -30,6 +30,8 @@ public class GameManager {
     public void placeHouse(GameHousePosition position) {
         if (gameBoard.isPositionValid(position)) {
             gameBoard.placeHouse(activePlayer, position, roundCounter);
+
+            activePlayer.getHousesPlacedThisTurn().add(position);
         } else {
             throw new IllegalArgumentException("Ungültige Position für das Platzieren des Hauses: " + position);
         }
