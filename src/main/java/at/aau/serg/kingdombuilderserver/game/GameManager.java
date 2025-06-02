@@ -39,5 +39,8 @@ public class GameManager {
 
     public void nextRound() {
         roundCounter++;
+        if (activePlayer != null) {
+            activePlayer.getHousesPlacedThisTurn().clear();
+        }
     }
 }
