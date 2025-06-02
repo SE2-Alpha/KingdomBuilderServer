@@ -48,4 +48,9 @@ public class Player {
     public void decreaseSettlementsBy(int value){
         remainingSettlements = Math.max(remainingSettlements - Math.abs(value), 0);
     }
+
+    public boolean hasCheated() {
+        return hasCheated;
+    }
+
 }

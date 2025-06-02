@@ -62,6 +62,7 @@ public class GameController {
     public void endTurn(@Payload PlayerActionDTO action) {
         logger.info("Received endTurn request: {}", action);
         String gameId = action.getGameId();
+
         if (rooms.containsKey(gameId)) {
             logger.info("Ending turn for player {} in game {}", action.getPlayerId(), gameId);
             Room room = rooms.get(gameId);
@@ -70,10 +71,10 @@ public class GameController {
 
             if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
                 // Logik zum Beenden des Zuges, z.B. Wechsel zum nächsten Spieler
-                gameManager.setActivePlayer(room.getNextPlayer(activePlayer));
-                gameManager.nextRound();
-                logger.info("Turn ended successfully for player {}", action.getPlayerId());
-                broadcastGameUpdate(room);
+                logger.info("Initiating cheat report window for game {}", gameId);
+
+                // 1. Cheat-Report-Fenster aktivieren"
+
             } else {
                 logger.warn("Player {} is not the active player in game {}", action.getPlayerId(), gameId);
             }

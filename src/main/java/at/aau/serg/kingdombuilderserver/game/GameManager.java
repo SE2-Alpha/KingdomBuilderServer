@@ -4,6 +4,9 @@ import at.aau.serg.kingdombuilderserver.board.GameBoard;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 
 public class GameManager {
 
@@ -15,6 +18,8 @@ public class GameManager {
     private Player activePlayer;
     @Getter
     private int roundCounter = 0;
+    private boolean awaitingCheatReports = false;
+    private Set<String> reports = new HashSet<>();
 
     public GameManager() {
         // Private constructor to prevent instantiation
@@ -43,4 +48,11 @@ public class GameManager {
             activePlayer.getHousesPlacedThisTurn().clear();
         }
     }
+
+    public void registerCheatReport (String reporterId){
+        if (awaitingCheatReports){
+            reports.add(reporterId);
+        }
+    }
+
 }
