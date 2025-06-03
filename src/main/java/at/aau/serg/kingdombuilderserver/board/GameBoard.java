@@ -71,7 +71,7 @@ public class GameBoard {
         }
     }
 
-    // Getter für das Feld-Array, etc.
+    // Getter für das Feld-Array, etc., (needed for JSON-conversion)
     public TerrainField[] getFields() {
         return fields;
     }

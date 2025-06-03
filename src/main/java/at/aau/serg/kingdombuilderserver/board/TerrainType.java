@@ -1,7 +1,5 @@
 package at.aau.serg.kingdombuilderserver.board;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public enum TerrainType {
     GRASS(true),
     CANYON(true),
@@ -20,18 +18,18 @@ public enum TerrainType {
     }
 
     public static TerrainType fromInt(int value) {
-       switch (value){
-           case 0: return GRASS;
-           case 1: return CANYON;
-           case 2: return DESERT;
-           case 3: return FLOWERS;
-           case 4: return FOREST;
-           case 5: return WATER;
-           case 6: return MOUNTAIN;
-           case 7: return SPECIALABILITY;
-           case 8: return CITY;
-           default: throw new IllegalArgumentException("Unknown terrain type: " + value);
-       }
+        return switch (value) {
+            case 0 -> GRASS;
+            case 1 -> CANYON;
+            case 2 -> DESERT;
+            case 3 -> FLOWERS;
+            case 4 -> FOREST;
+            case 5 -> WATER;
+            case 6 -> MOUNTAIN;
+            case 7 -> SPECIALABILITY;
+            case 8 -> CITY;
+            default -> throw new IllegalArgumentException("Unknown terrain type: " + value);
+        };
     }
 
     public int toInt(){
