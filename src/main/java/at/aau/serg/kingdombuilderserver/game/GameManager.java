@@ -85,4 +85,15 @@ public class GameManager {
         }
     }
 
+    public void cleanupTurn() {
+        if (activePlayer != null){
+            activePlayer.setHasCheated(false);
+            activePlayer.getHousesPlacedThisTurn().clear(); // Liste der in dieser Runde platzierten Häuser für den nächsten Zug zurücksetzen
+        }
+        this.cheatReportsThisTurn.clear(); // Auch hier die Reports löschen
+        System.out.println("Turn cleanup for player" + (activePlayer != null ? activePlayer.getId() : "null"));
+    }
+
+
+
 }
