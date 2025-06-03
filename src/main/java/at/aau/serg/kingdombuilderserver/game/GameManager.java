@@ -94,6 +94,11 @@ public class GameManager {
         System.out.println("Turn cleanup for player" + (activePlayer != null ? activePlayer.getId() : "null"));
     }
 
-
+    // Hilfmethode, um Spieler anhand der ID zu finden
+    private Player getPlayerById(String playerId){
+        if (this.activePlayer != null && this.activePlayer.getId().equals(playerId)) return this.activePlayer;
+        System.err.println("WARNUNG: getPlayerById needs a proper implementation to find any player, not just activePlayer.");
+        return null;
+    }
 
 }
