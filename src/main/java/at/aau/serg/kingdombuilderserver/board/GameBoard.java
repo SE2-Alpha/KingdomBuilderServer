@@ -99,4 +99,22 @@ public class GameBoard {
         field.setOwner(activePlayer.getId());
         field.setOwnerSinceRound(round); // Setze die aktuelle Runde als Besitzrunde
     }
+
+    /**
+     * Prüft, ob zwei Felder benachbart sind
+     * @param field1 Erstes Feld
+     * @param field2 Zweites Feld
+     */
+    public boolean areFieldsAdjacent(TerrainField field1, TerrainField field2) {
+        int[] neighbours = TerrainField.getNeighbours(field1.getId()); //hole alle Nachbarn vom field1
+
+        for(int neighbour : neighbours) {
+            if (field2.getId() == neighbour) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }
