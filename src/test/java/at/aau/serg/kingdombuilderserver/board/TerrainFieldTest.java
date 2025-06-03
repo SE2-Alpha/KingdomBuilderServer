@@ -38,7 +38,7 @@ public class TerrainFieldTest {
                     break;
 
                 default:
-                    if ((id >= 1 && id <= 18) || (id >= 381 && id <= 398)) {
+                    if (id <= 18 || id >= 381) {
                         assertEquals(4, size);
                     } else if (
                             id == 20 || id == 59 || id == 60 || id == 99 || id == 100 || id == 139 ||

@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class GameBoard {
     private static final int SIZE = 400; // 20x20
-    private TerrainField[] fields = new TerrainField[SIZE];
+    private final TerrainField[] fields = new TerrainField[SIZE];
 
     // Alle verfügbaren Quadranten (hier z.B. 4, erweiterbar)
     private static final List<Supplier<Quadrant>> QUADRANT_SUPPLIERS = List.of(

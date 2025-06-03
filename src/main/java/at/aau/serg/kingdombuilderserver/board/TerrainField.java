@@ -1,6 +1,5 @@
 package at.aau.serg.kingdombuilderserver.board;
 
-import at.aau.serg.kingdombuilderserver.game.Player;
 import lombok.Getter;
 import lombok.Setter;
 
