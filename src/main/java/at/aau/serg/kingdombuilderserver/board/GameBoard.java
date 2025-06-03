@@ -116,5 +116,11 @@ public class GameBoard {
         return false;
     }
 
+    /**
+     * Id vom einem Feld was man durch row und column kennt
+     **/
+    public TerrainField getFieldByRowAndCol(int row, int col){
+        return fields[row*20 + col];
+    }
 
 }
