@@ -2,6 +2,7 @@ package at.aau.serg.kingdombuilderserver.game;
 
 import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerActionDTO;
 import at.aau.serg.kingdombuilderserver.messaging.dtos.RoomLobbyDTO;
+import io.micrometer.observation.GlobalObservationConvention;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -32,6 +33,11 @@ public class GameController {
         logger.info("Broadcasting GameUpdate for game: {}", room.getId());
         System.out.println("Broadcasting GameUpdate for game: " + room.getId());
         messagingTemplate.convertAndSend("/topic/game/update/"+room.getId(), room);
+    }
+
+    private void broadcastCheatReportWindow(Room room){
+        logger.info("Broadcasting CheatReportWindoow status for game: {}", room.getId());
+        messagingTemplate.convertAndSend("/topic/game/cheatReportWindow/"+ room.getId(), Map.of("isCheatReportWindowActive", true, "gameId", room.getId()));
     }
 
     @MessageMapping("/game/placeHouses")
@@ -73,7 +79,31 @@ public class GameController {
                 // Logik zum Beenden des Zuges, z.B. Wechsel zum nächsten Spieler
                 logger.info("Initiating cheat report window for game {}", gameId);
 
-                // 1. Cheat-Report-Fenster aktivieren"
+                // Cheat-Report-Fenster aktivieren"
+                gameManager.setAwaitingCheatReports(true);
+                broadcastCheatReportWindow(room);
+
+                // Timer für 3 Sekunden aktivieren
+                new java.util.Timer().schedule(new java.util.TimerTask(){
+                    @override
+                            public void run(){
+                        logger.info("Processing cheat reports for game {}", gameId);
+
+                        // Cheat-Auswertung durchführen
+                        gameManager.processCheatReportOutcome();
+
+                        // Reset & cleanup
+                        gameManager.seAwaitingCheatReports(false);
+                        gameManager.cleanupTurn();
+
+                        // Nächster Spieler + nächste Runde
+                        gameManager.setActivePlayer(room.getNextPlayer(activePlayer));
+                        gameManager.nextRound();
+
+                        // Game update senden
+                        broadcastGameUpdate(room);
+                    }
+                }, 3000); // 3 Sekunden Delay (Zeit für das Entlarfen)
 
             } else {
                 logger.warn("Player {} is not the active player in game {}", action.getPlayerId(), gameId);

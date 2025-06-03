@@ -55,4 +55,14 @@ public class GameManager {
         }
     }
 
+    public void processCheatReportOutcome(){
+        Player active = getActivePlayer();
+
+        if (active.hasCheated() && !reports.isEmpty()){
+            // Cheat wurde korrekt erkannt
+            for (GameHousePosition pos: active.getHousesPlacedThisTurn()){
+            }
+        }
+    }
+
 }

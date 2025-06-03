@@ -53,4 +53,8 @@ public class Player {
         return hasCheated;
     }
 
+    public List <GameHousePosition> getHousePlacedThisTurn(){
+        return housesPlacedThisTurn;
+    }
+
 }
