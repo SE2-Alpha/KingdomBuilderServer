@@ -6,11 +6,9 @@ import at.aau.serg.kingdombuilderserver.board.quadrants.QuadrantTower;
 import at.aau.serg.kingdombuilderserver.board.quadrants.QuadrantFields;
 import at.aau.serg.kingdombuilderserver.game.GameHousePosition;
 import at.aau.serg.kingdombuilderserver.game.Player;
-import lombok.Getter;
 
 import java.util.*;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class GameBoard {
     private static final int SIZE = 400; // 20x20
@@ -104,14 +102,36 @@ public class GameBoard {
             throw new IllegalArgumentException("Aktiver Spieler, Position und Karte dürfen nicht null sein.");
         }
 
+        TerrainType currenCard = activePlayer.getCurrentCard();
+        String currentPID = activePlayer.getId();
+
         int id = position.getY() * 20 + position.getX(); // Umrechnung in 1D-Index
         TerrainField field = fields[id];
 
+        if(!field.getType().isBuildable){
+            throw new IllegalStateException("Feld kann nicht bebaut werden: " + field);
+        }
+
+        List<Integer> freeFields = getFreeFieldsOfType(currenCard);
+        List<Integer> buildByActivePlayer = getFieldsBuiltBy(activePlayer.getId());
+        List<Integer> freeAdjacentCurrentTypeFields = getAdjacentFields(buildByActivePlayer, freeFields);
+
         if (field.getOwner() != null) {
+            //TODO(): Remove House if: owner is activePlayer and field was built in current round
             throw new IllegalStateException("Feld ist bereits von einem anderen Spieler besetzt: " + field);
         }
 
-        field.setOwner(activePlayer.getId());
+        if(!freeFields.isEmpty()) {
+            if (field.getType() != currenCard) {
+                throw new IllegalStateException("Feld hat falschen FeldTypen: " + field);
+            }
+        }else{
+
+        }
+
+
+
+        field.setOwner(currentPID);
         field.setOwnerSinceRound(round); // Setze die aktuelle Runde als Besitzrunde
     }
 
@@ -132,10 +152,60 @@ public class GameBoard {
     }
 
     /**
+     * Suche alle nachbarfelder in bezug auf ein zentrales Feld
+     * @return Liste der Nachbarfelder
+     */
+    public List<Integer> getAdjacentFields(int center, List<Integer> candidates) {
+        List<Integer> adjacentFields = new ArrayList<>();
+        for(int candidate: candidates) {
+            if(areFieldsAdjacent(fields[center],fields[candidate])){adjacentFields.add(candidate);}
+        }
+        return adjacentFields;
+    }
+
+    /**
+     * Suche alle nachbarfelder in bezug auf einer Liste von Feldern
+     * @return Liste der Nachbarfelder
+     */
+    public List<Integer> getAdjacentFields(List<Integer> ownedFields, List<Integer> candidates){
+        List<Integer> adjacentFields = new ArrayList<>();
+        for(int ownedField : ownedFields) {
+            adjacentFields.addAll(getAdjacentFields(ownedField,candidates));
+        }
+        return adjacentFields;
+    }
+
+    /**
      * Id vom einem Feld was man durch row und column kennt
      **/
     public TerrainField getFieldByRowAndCol(int row, int col){
         return fields[row*20 + col];
     }
+
+    /**
+     * Überprüfe, ob es für einen Feldtyp freie Felder gibt.
+     * @return Liste mit indizes freier Felder (evtl. leere Liste)
+     */
+    public List<Integer> getFreeFieldsOfType(TerrainType type){
+        List<Integer> freeFields = new ArrayList<>();
+        for(int i = 0; i < fields.length; i++){
+            TerrainField f = fields[i];
+            if(f.getType() == type && f.getOwner() == null){freeFields.add(i);}
+        }
+        return freeFields;
+    }
+
+    /**
+     * @param id Spieler ID
+     * @return Liste der Felder die von Spieler mit id bebaut wurden
+     */
+    public List<Integer> getFieldsBuiltBy(String id){
+        List<Integer> fieldsByPlayer = new ArrayList<>();
+        for(int i = 0; i < fields.length; i++){
+            if(fields[i].getOwner().equals(id)){fieldsByPlayer.add(i);}
+        }
+        return fieldsByPlayer;
+    }
+
 
 }

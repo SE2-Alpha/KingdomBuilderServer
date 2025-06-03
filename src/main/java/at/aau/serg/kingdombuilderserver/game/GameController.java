@@ -36,7 +36,6 @@ public class GameController {
         messagingTemplate.convertAndSend("/topic/game/update/"+room.getId(), room);
     }
 
-    //TODO(): Get current FieldType from Client
     @MessageMapping("/game/placeHouses")
     public void placeHouse(@Payload PlayerActionDTO action) {
         logger.info("Received placeHouse request: {}", action.getGameId());
