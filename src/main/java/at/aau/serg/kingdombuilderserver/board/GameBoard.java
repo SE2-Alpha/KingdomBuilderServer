@@ -100,8 +100,8 @@ public class GameBoard {
             - Tower: Build one Settlement on the Edge of the Board (adjacent if possible)
      */
     public void placeHouse(Player activePlayer, GameHousePosition position, int round) {
-        if (activePlayer == null || position == null) {
-            throw new IllegalArgumentException("Aktiver Spieler und Position dürfen nicht null sein.");
+        if (activePlayer == null || position == null || activePlayer.getCurrentCard() == null) {
+            throw new IllegalArgumentException("Aktiver Spieler, Position und Karte dürfen nicht null sein.");
         }
 
         int id = position.getY() * 20 + position.getX(); // Umrechnung in 1D-Index

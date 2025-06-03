@@ -1,5 +1,6 @@
 package at.aau.serg.kingdombuilderserver.game;
 
+import at.aau.serg.kingdombuilderserver.board.TerrainType;
 import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerActionDTO;
 import at.aau.serg.kingdombuilderserver.messaging.dtos.RoomLobbyDTO;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -27,6 +28,7 @@ public class GameController {
         this.messagingTemplate = messagingTemplate;
     }
 
+    private final Random random = new Random();
 
     private void broadcastGameUpdate(Room room){
         logger.info("Broadcasting GameUpdate for game: {}", room.getId());
@@ -34,6 +36,7 @@ public class GameController {
         messagingTemplate.convertAndSend("/topic/game/update/"+room.getId(), room);
     }
 
+    //TODO(): Get current FieldType from Client
     @MessageMapping("/game/placeHouses")
     public void placeHouse(@Payload PlayerActionDTO action) {
         logger.info("Received placeHouse request: {}", action.getGameId());
@@ -90,12 +93,19 @@ public class GameController {
         logger.info("Game ID: "+gameId);
         logger.info("Pid: "+action.getPlayerId());
         logger.info("Rooms: "+rooms);
+        Room room = rooms.get(gameId);
+        GameManager gameManager = room.getGameManager();
+        Player activePlayer = gameManager.getActivePlayer();
         if (rooms.containsKey(gameId)) {
-            logger.info("Card drawn by player {} in game {}", action.getPlayerId(), action.getGameId());
-            Random random = new Random();
-            int terrainCardType = random.nextInt(5);
-            broadcastTerrainCardType(action.getGameId(), terrainCardType);
-            broadcastGameUpdate(rooms.get(gameId));
+            if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
+                logger.info("Card drawn by player {} in game {}", action.getPlayerId(), action.getGameId());
+                TerrainType terrainCardType = TerrainType.fromInt(random.nextInt(5));
+                broadcastTerrainCardType(action.getGameId(), terrainCardType.toInt());
+                broadcastGameUpdate(rooms.get(gameId));
+            }else{
+                logger.warn("Player {} is not the active player in game {}", action.getPlayerId(), gameId);
+            }
+
         } else {
             logger.warn("Game not found for gameId: {}", action.getGameId());
         }

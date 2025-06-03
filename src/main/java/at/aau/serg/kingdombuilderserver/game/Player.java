@@ -1,5 +1,6 @@
 package at.aau.serg.kingdombuilderserver.game;
 
+import at.aau.serg.kingdombuilderserver.board.TerrainType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +12,7 @@ public class Player {
     private int color;
     private int remainingSettlements;
     private int score;
+    private TerrainType currentCard = null; //Card pulled in current turn
 
     public Player(String playerId, String playerName) {
         this.id = playerId;
