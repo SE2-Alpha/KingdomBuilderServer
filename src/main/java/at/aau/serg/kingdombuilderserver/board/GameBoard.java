@@ -14,9 +14,7 @@ import java.util.stream.Collectors;
 
 public class GameBoard {
     private static final int SIZE = 400; // 20x20
-    // Getter für das Feld-Array, etc.
-    @Getter
-    private TerrainField[] fields = new TerrainField[SIZE];
+    private final TerrainField[] fields = new TerrainField[SIZE];
 
     private final Random rand = new Random();
 
@@ -116,4 +114,28 @@ public class GameBoard {
         field.setOwner(activePlayer.getId());
         field.setOwnerSinceRound(round); // Setze die aktuelle Runde als Besitzrunde
     }
+
+    /**
+     * Prüft, ob zwei Felder benachbart sind
+     * @param field1 Erstes Feld
+     * @param field2 Zweites Feld
+     */
+    public boolean areFieldsAdjacent(TerrainField field1, TerrainField field2) {
+        int[] neighbours = TerrainField.getNeighbours(field1.getId()); //hole alle Nachbarn vom field1
+
+        for(int neighbour : neighbours) {
+            if (field2.getId() == neighbour) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Id vom einem Feld was man durch row und column kennt
+     **/
+    public TerrainField getFieldByRowAndCol(int row, int col){
+        return fields[row*20 + col];
+    }
+
 }
