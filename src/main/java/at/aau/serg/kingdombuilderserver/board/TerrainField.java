@@ -9,7 +9,7 @@ public class TerrainField {
     private TerrainType type;
     private int id;
     private String owner; // Optional, falls ein Spieler das Feld besitzt
-    private int ownerSinceRound; // Optional, falls ein Spieler das Feld besitzt
+    private Integer ownerSinceRound; // Optional, falls ein Spieler das Feld besitzt
 
 
     // ... weitere Methoden, siehe Kotlin

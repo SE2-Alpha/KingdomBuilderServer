@@ -119,8 +119,12 @@ public class GameBoard {
 
 
         if (field.getOwner() != null) {
-            //TODO(): Remove House if: owner is activePlayer and field was built in current round
-            throw new IllegalStateException("Feld ist bereits von einem anderen Spieler besetzt: " + field);
+            if(field.getOwner().equals(currentPID) && field.getOwnerSinceRound() == round){
+                field.setOwner(null);
+                field.setOwnerSinceRound(null);
+            }else{
+                throw new IllegalStateException("Feld ist bereits von einem anderen Spieler besetzt: " + field);
+            }
         }
 
         //First building
