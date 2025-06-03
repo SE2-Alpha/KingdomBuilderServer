@@ -112,27 +112,47 @@ public class GameBoard {
             throw new IllegalStateException("Feld kann nicht bebaut werden: " + field);
         }
 
-        List<Integer> freeFields = getFreeFieldsOfType(currenCard);
+        List<Integer> freeFieldsOfCurrentType = getFreeFieldsOfType(currenCard);
         List<Integer> buildByActivePlayer = getFieldsBuiltBy(activePlayer.getId());
-        List<Integer> freeAdjacentCurrentTypeFields = getAdjacentFields(buildByActivePlayer, freeFields);
+        List<Integer> allFreeAdjacentFields = getAdjacentFields(buildByActivePlayer);
+        List<Integer> freeAdjacentCurrentTypeFields = getAdjacentFields(buildByActivePlayer, freeFieldsOfCurrentType);
+
 
         if (field.getOwner() != null) {
             //TODO(): Remove House if: owner is activePlayer and field was built in current round
             throw new IllegalStateException("Feld ist bereits von einem anderen Spieler besetzt: " + field);
         }
 
-        if(!freeFields.isEmpty()) {
-            if (field.getType() != currenCard) {
-                throw new IllegalStateException("Feld hat falschen FeldTypen: " + field);
-            }
-        }else{
+        //First building
+        if(buildByActivePlayer.isEmpty() &&
+                (freeFieldsOfCurrentType.isEmpty() || freeFieldsOfCurrentType.contains(id))
+        ){
+            field.setOwner(currentPID);
+            field.setOwnerSinceRound(round); // Setze die aktuelle Runde als Besitzrunde
+            return;
+        }
 
+        if((!freeAdjacentCurrentTypeFields.isEmpty() && freeAdjacentCurrentTypeFields.contains(id))
+                || allFreeAdjacentFields.contains(id)
+        ){
+            field.setOwner(currentPID);
+            field.setOwnerSinceRound(round); // Setze die aktuelle Runde als Besitzrunde
+            return;
+        }
+
+        if(!freeFieldsOfCurrentType.isEmpty() && (field.getType() != currenCard)) {
+            throw new IllegalStateException("Feld hat falschen FeldTypen: " + field);
         }
 
 
+        if(!freeAdjacentCurrentTypeFields.isEmpty()  && !freeAdjacentCurrentTypeFields.contains(id)
+                || !allFreeAdjacentFields.isEmpty() && !allFreeAdjacentFields.contains(id)
+        ){
+            throw new IllegalStateException("Feld an nicht erlaubter Position:" + field);
+        }
 
-        field.setOwner(currentPID);
-        field.setOwnerSinceRound(round); // Setze die aktuelle Runde als Besitzrunde
+        //Failsafe
+        throw new IllegalStateException("Feld konnte nicht bebaut werden: " + field);
     }
 
     /**
@@ -152,8 +172,8 @@ public class GameBoard {
     }
 
     /**
-     * Suche alle nachbarfelder in bezug auf ein zentrales Feld
-     * @return Liste der Nachbarfelder
+     * Suche alle Nachbarfelder in bezug auf ein zentrales Feld
+     * @return ID-Liste der Nachbarfelder
      */
     public List<Integer> getAdjacentFields(int center, List<Integer> candidates) {
         List<Integer> adjacentFields = new ArrayList<>();
@@ -164,13 +184,26 @@ public class GameBoard {
     }
 
     /**
-     * Suche alle nachbarfelder in bezug auf einer Liste von Feldern
-     * @return Liste der Nachbarfelder
+     * Suche alle Nachbarfelder in bezug auf einer Liste von Feldern
+     * @return ID-Liste der Nachbarfelder
      */
     public List<Integer> getAdjacentFields(List<Integer> ownedFields, List<Integer> candidates){
         List<Integer> adjacentFields = new ArrayList<>();
         for(int ownedField : ownedFields) {
             adjacentFields.addAll(getAdjacentFields(ownedField,candidates));
+        }
+        return adjacentFields;
+    }
+
+    /**
+     * Suche alle Nachbarfelder in bezug auf gesamtes Spielbrett
+     * @return ID-Liste der Nachbarfelder
+     */
+    public List<Integer> getAdjacentFields(List<Integer> ownedFields){
+        List<Integer> adjacentFields = new ArrayList<>();
+        for( TerrainField field : fields) {
+            int id = field.getId();
+            adjacentFields.addAll(getAdjacentFields(id,ownedFields));
         }
         return adjacentFields;
     }
