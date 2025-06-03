@@ -37,7 +37,8 @@ public class GameController {
 
     private void broadcastCheatReportWindow(Room room){
         logger.info("Broadcasting CheatReportWindoow status for game: {}", room.getId());
-        messagingTemplate.convertAndSend("/topic/game/cheatReportWindow/"+ room.getId(), Map.of("isCheatReportWindowActive", true, "gameId", room.getId()));
+        messagingTemplate.convertAndSend("/topic/game/cheatReportWindow/"+ room.getId(),
+                Map.of("gameId", room.getId(), "isCheatReportWindowActive", true, "durationSeconds", 3));
     }
 
     @MessageMapping("/game/placeHouses")
@@ -85,20 +86,24 @@ public class GameController {
 
                 // Timer für 3 Sekunden aktivieren
                 new java.util.Timer().schedule(new java.util.TimerTask(){
-                    @override
-                            public void run(){
+                    @Override
+                    public void run(){
                         logger.info("Processing cheat reports for game {}", gameId);
 
                         // Cheat-Auswertung durchführen
                         gameManager.processCheatReportOutcome();
 
                         // Reset & cleanup
-                        gameManager.seAwaitingCheatReports(false);
+                        gameManager.setAwaitingCheatReports(false);
                         gameManager.cleanupTurn();
 
-                        // Nächster Spieler + nächste Runde
-                        gameManager.setActivePlayer(room.getNextPlayer(activePlayer));
-                        gameManager.nextRound();
+                        Player nextPlayer = room.getNextPlayer(activePlayer);
+                        gameManager.setActivePlayer(nextPlayer);
+                        if (nextPlayer != null) {
+                            gameManager.nextRound();
+                        } else {
+                            logger.info("No next player found, potentially game end for game {}", gameId);
+                        }
 
                         // Game update senden
                         broadcastGameUpdate(room);

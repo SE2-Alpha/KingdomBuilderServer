@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -18,8 +20,10 @@ public class GameManager {
     private Player activePlayer;
     @Getter
     private int roundCounter = 0;
+    @Getter
     private boolean awaitingCheatReports = false;
     private Set<String> reports = new HashSet<>();
+    private Map<String, List<String>> cheatReportsThisTurn;
 
     public GameManager() {
         // Private constructor to prevent instantiation
@@ -64,5 +68,13 @@ public class GameManager {
             }
         }
     }
+    public void setAwaitingCheatReports(boolean awaitingCheatReports){
+        this.awaitingCheatReports = awaitingCheatReports;
+        if (awaitingCheatReports){
+            this.cheatReportsThisTurn.clear();  // Alte Meldungen für neue Runde löschen
+        }
+    }
+
+
 
 }
