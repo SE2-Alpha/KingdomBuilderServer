@@ -4,10 +4,7 @@ import at.aau.serg.kingdombuilderserver.board.GameBoard;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 public class GameManager {
@@ -75,6 +72,17 @@ public class GameManager {
         }
     }
 
-
+    public void recordCheatReport(String reporterPlayerId, String reportedPlayerId){
+        if(!awaitingCheatReports){
+            // Logik, falss außerhalb der Zeitfenster gemeldet wird (sollte nicht passieren, wenn Controller prüft)
+            System.err.println("Attempt to record cheat report outside of allowed window");
+            return;
+        }
+        if (activePlayer != null && activePlayer.getId().equals(reportedPlayerId)){
+            this.cheatReportsThisTurn.computeIfAbsent(reportedPlayerId, k -> new ArrayList<>()).add(reportedPlayerId);
+        }else{
+            System.err.println("Attempt to report non-active player or active player is null.");
+        }
+    }
 
 }
