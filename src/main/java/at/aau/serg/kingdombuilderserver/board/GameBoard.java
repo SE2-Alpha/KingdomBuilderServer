@@ -135,12 +135,12 @@ public class GameBoard {
         fieldsBuiltPastRounds.removeAll(fieldsBuiltCurrentRound);
 
 
-        if(fieldRemoved){
-            if(builtByActivePlayer.isEmpty()){return;}
+        if(fieldRemoved){//TODO(): finalize
+            if(builtByActivePlayer.size()<2){return;}
             boolean isAdjacent = false;
             for(int f: fieldsBuiltCurrentRound){
                 for(int n: getNeighbours(fields[f])){
-                    if (builtByActivePlayer.contains(n)) {
+                    if (fieldsBuiltPastRounds.contains(n)) {
                         isAdjacent = true;
                         break;
                     }
