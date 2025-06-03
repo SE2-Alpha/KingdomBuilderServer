@@ -121,7 +121,7 @@ public class GameBoard {
         if (field.getOwner() != null) {
             if(field.getOwner().equals(currentPID) && field.getOwnerSinceRound() == round){
                 field.setOwner(null);
-                field.setOwnerSinceRound(null);
+                field.setOwnerSinceRound(-1);
             }else{
                 throw new IllegalStateException("Feld ist bereits von einem anderen Spieler besetzt: " + field);
             }
