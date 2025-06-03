@@ -21,24 +21,20 @@ public class TerrainField {
         if (id > -1 && id < 400) {
             switch (id) {
                 //Felder am linken Rand mit 5 Nachbarn
-                case 20: case 60: case 100: case 140: case 180:
-                case 220: case 260: case 300: case 340:
+                case 20, 60, 100, 140, 180, 220, 260, 300, 340:
                     return new int[]{id - 20, id - 19, id + 1, id + 20, id + 21};
 
 
                 //Felder am linken Rand mit 3 Nachbarn
-                case 40: case 80: case 120: case 160: case 200:
-                case 240: case 280: case 320: case 360:
+                case 40, 80, 120, 160, 200, 240, 280, 320, 360:
                     return new int[]{id - 20, id + 1, id + 20};
 
                 //Felder am rechten Rand mit 3 Nachbarn
-                case 39: case 79: case 119: case 159: case 199:
-                case 239: case 279: case 319: case 359:
+                case 39, 79, 119, 159, 199, 239, 279, 319, 359:
                     return new int[]{id - 20, id - 1, id + 20};
 
                 //Felder am rechten Rand mit 5 Nachbarn
-                case 59: case 99: case 139: case 179: case 219:
-                case 259: case 299: case 339: case 379:
+                case 59, 99, 139, 179, 219, 259, 299, 339, 379:
                     return new int[]{id - 21, id - 20, id - 1, id + 19, id + 20};
 
                 //Ecke links oben

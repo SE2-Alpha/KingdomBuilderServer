@@ -9,31 +9,24 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TerrainFieldTest {
-    private TerrainField terrainField;
+class TerrainFieldTest {
 
     //Überprüft ob alle Felder die richtige Anzahl an Nachbarn haben
     @ParameterizedTest
     @MethodSource("fieldnums")
-    public void getNeighboursAmountTest(int id) {
-        terrainField = new TerrainField(TerrainType.GRASS, id);
+    void getNeighboursAmountTest(int id) {
+        TerrainField terrainField = new TerrainField(TerrainType.GRASS, id);
         int size = TerrainField.getNeighbours(id).length;
 
         if (id < 0 || id > 399) {
             assertEquals(1, size);
         } else {
             switch (id) {
-                case 0:
-                case 399:
+                case 0, 399:
                     assertEquals(2, size);
                     break;
 
-                case 19:
-                case 380:
-                case 40: case 80: case 120: case 160: case 200:
-                case 240: case 280: case 320: case 360:
-                case 39: case 79: case 119: case 159: case 199:
-                case 239: case 279: case 319: case 359:
+                case 19, 380, 40, 80, 120, 160, 200, 240, 280, 320, 360, 39, 79, 119, 159, 199, 239, 279, 319, 359:
                     assertEquals(3, size);
                     break;
 

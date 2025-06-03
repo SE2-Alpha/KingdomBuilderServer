@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class GameBoardTest {
+class GameBoardTest {
     private GameBoard gameBoardTest;
     private TerrainField field1;
     private TerrainField field2;
@@ -71,15 +71,15 @@ public class GameBoardTest {
 
     @Test
     void testAdjacentFields() {
-        TerrainField field1 = gameBoardTest.getFieldByRowAndCol(0,0);
-        TerrainField field2 = gameBoardTest.getFieldByRowAndCol(0,1);
+        field1 = gameBoardTest.getFieldByRowAndCol(0,0);
+        field2 = gameBoardTest.getFieldByRowAndCol(0,1);
         assertTrue(gameBoardTest.areFieldsAdjacent(field1,field2));
     }
 
     @Test
     void testNonAdjacentFields() {
-        TerrainField field1 = gameBoardTest.getFieldByRowAndCol(0,0);
-        TerrainField field2 = gameBoardTest.getFieldByRowAndCol(2,2);
+        field1 = gameBoardTest.getFieldByRowAndCol(0,0);
+        field2 = gameBoardTest.getFieldByRowAndCol(2,2);
         assertFalse(gameBoardTest.areFieldsAdjacent(field1,field2));
     }
 
@@ -91,8 +91,8 @@ public class GameBoardTest {
         TerrainField firstFieldQuadrant2 = gameBoardTest.getFieldByRowAndCol(10, 10);
 
 
-        System.out.printf("Field 1 ID: %d, Position: (%d, %d)", lastFieldQuadrant1.getId(), lastFieldQuadrant1.getId() % 20, lastFieldQuadrant1.getId() / 20);
-        System.out.printf("\nField 2 ID: %d, Position: (%d, %d)", firstFieldQuadrant2.getId(), firstFieldQuadrant2.getId() % 20, firstFieldQuadrant2.getId() / 20);
+        System.out.printf("Field 1 ID: %d, Position: (%d, %d)\n", lastFieldQuadrant1.getId(), lastFieldQuadrant1.getId() % 20, lastFieldQuadrant1.getId() / 20);
+        System.out.printf("Field 2 ID: %d, Position: (%d, %d)", firstFieldQuadrant2.getId(), firstFieldQuadrant2.getId() % 20, firstFieldQuadrant2.getId() / 20);
 
         assertTrue(
                 gameBoardTest.areFieldsAdjacent(lastFieldQuadrant1, firstFieldQuadrant2),
@@ -103,13 +103,13 @@ public class GameBoardTest {
     @Test
     void testSpecificAdjacentPositions() {
         // Horizontale Nachbarn
-        TerrainField field1 = gameBoardTest.getFieldByRowAndCol(5, 5);
-        TerrainField field2 = gameBoardTest.getFieldByRowAndCol(5, 6);
+        field1 = gameBoardTest.getFieldByRowAndCol(5, 5);
+        field2 = gameBoardTest.getFieldByRowAndCol(5, 6);
         assertTrue(gameBoardTest.areFieldsAdjacent(field1, field2));
 
         // Vertikale Nachbarn (versetzt)
-        TerrainField field3 = gameBoardTest.getFieldByRowAndCol(5, 5);
-        TerrainField field4 = gameBoardTest.getFieldByRowAndCol(6, 5);
+        field3 = gameBoardTest.getFieldByRowAndCol(5, 5);
+        field4 = gameBoardTest.getFieldByRowAndCol(6, 5);
         assertTrue(gameBoardTest.areFieldsAdjacent(field3, field4));
 
         // Diagonale Nachbarn
