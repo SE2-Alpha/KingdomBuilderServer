@@ -87,16 +87,7 @@ public class GameBoard {
 
     /*
     TODO():
-    - Check Player house count (safety measure)
-    -Check placing-type (Normal, Special)
-    - Normal House placing:
-        - Get required field type (Draw Card)
-        - Check field is placeable (includes: Check field is empty)
-        - check if required field type is available
-            - if Yes: are some of them adjacent to Houses of Player?
-                - if yes: make placeable
-                - if no: make all fields of required type placeable
-            - if No: Make all adjacent fields placeable (respecting general placement rules)
+    -Removing Houses: Check if remaining houses of current round are on legal positions, if not, remove
     -Special House placing (Farm, Oracle, Tavern, Tower): Separate function?
             - Farm: Build one additional settlement on Grass (adjacent if possible)
             - Oracle: Build one additional settlement of the same type as required Field type (Draw Card, must be adjacent)
@@ -114,6 +105,7 @@ public class GameBoard {
 
         TerrainType currentCard = activePlayer.getCurrentCard();
         String currentPID = activePlayer.getId();
+        boolean fieldRemoved = false;
 
         int id = position.getY() * 20 + position.getX(); // Umrechnung in 1D-Index
         TerrainField field = fields[id];
@@ -122,29 +114,56 @@ public class GameBoard {
             throw new IllegalStateException("Feld kann nicht bebaut werden: " + field);
         }
 
-        List<Integer> freeFieldsOfCurrentType = getFreeFieldsOfType(currentCard);
-        List<Integer> buildByActivePlayer = getFieldsBuiltBy(activePlayer.getId());
-        List<Integer> allFreeAdjacentFields = getAdjacentFields(buildByActivePlayer);
-        List<Integer> freeAdjacentCurrentTypeFields = getAdjacentFields(buildByActivePlayer, freeFieldsOfCurrentType);
-
-
         if (field.getOwner() != null) {
             if(field.getOwner().equals(currentPID) && field.getOwnerSinceRound() == round){
                 //TODO(): Check for other Illegal buildings after removing
                 field.setOwner(null);
                 field.setOwnerSinceRound(-1);
-                return;
+                fieldRemoved = true;
+                //no Return
             }else{
                 throw new IllegalStateException("Feld ist bereits von einem anderen Spieler besetzt: " + field);
             }
         }
 
-        if(freeFieldsOfCurrentType.isEmpty()){//TODO(): Check avaliable Fields when pulling Card
+        List<Integer> freeFieldsOfCurrentType = getFreeFieldsOfType(currentCard);
+        List<Integer> builtByActivePlayer = getFieldsBuiltBy(currentPID);
+        List<Integer> allFreeAdjacentFields = getAdjacentFields(builtByActivePlayer);
+        List<Integer> freeAdjacentCurrentTypeFields = getAdjacentFields(builtByActivePlayer, freeFieldsOfCurrentType);
+        List<Integer> fieldsBuiltCurrentRound = getFieldsBuiltBy(currentPID, round);
+        List<Integer> fieldsBuiltPastRounds = new ArrayList<>(builtByActivePlayer);
+        fieldsBuiltPastRounds.removeAll(fieldsBuiltCurrentRound);
+
+
+        if(fieldRemoved){
+            if(builtByActivePlayer.isEmpty()){return;}
+            boolean isAdjacent = false;
+            for(int f: fieldsBuiltCurrentRound){
+                for(int n: getNeighbours(fields[f])){
+                    if (builtByActivePlayer.contains(n)) {
+                        isAdjacent = true;
+                        break;
+                    }
+                }
+                if(!isAdjacent && !freeAdjacentCurrentTypeFields.isEmpty()){
+                    fields[f].setOwner(null);
+                    fields[f].setOwnerSinceRound(-1);
+                    return;
+                }
+            }
+            //Always return (End Remove house Action)
+            return;
+        }
+
+
+
+
+        if(freeFieldsOfCurrentType.isEmpty()){//TODO(): Check available Fields when pulling Card
             throw new IllegalStateException("Es Existiert kein freies Feld mit richtigen Typen: " + field);
         }
 
         //First building
-        if(buildByActivePlayer.isEmpty() && freeFieldsOfCurrentType.contains(id)
+        if(builtByActivePlayer.isEmpty() && freeFieldsOfCurrentType.contains(id)
         ){
             field.setOwner(currentPID);
             field.setOwnerSinceRound(round); // Setze die aktuelle Runde als Besitzrunde
@@ -191,6 +210,15 @@ public class GameBoard {
             }
         }
         return false;
+    }
+
+    public List<Integer> getNeighbours(TerrainField field) {
+        int[] neighboursArray = TerrainField.getNeighbours(field.getId());
+        List<Integer> neighbours = new ArrayList<>();
+        for(int n:neighboursArray) {
+            neighbours.add(n);
+        }
+        return neighbours;
     }
 
     /**
@@ -259,6 +287,13 @@ public class GameBoard {
         for(int i = 0; i < fields.length; i++){
             TerrainField field = fields[i];
             if(field.getOwner() != null && field.getOwner().equals(id)){fieldsByPlayer.add(i);}
+        }
+        return fieldsByPlayer;
+    }
+    public List<Integer> getFieldsBuiltBy(String id, int round){
+        List<Integer> fieldsByPlayer = new ArrayList<>();
+        for(Integer field : getFieldsBuiltBy(id)){
+            if(fields[field].getOwnerSinceRound() == round){fieldsByPlayer.add(field);}
         }
         return fieldsByPlayer;
     }
