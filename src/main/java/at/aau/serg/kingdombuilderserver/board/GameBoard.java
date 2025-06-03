@@ -14,7 +14,7 @@ public class GameBoard {
     private static final int SIZE = 400; // 20x20
     private final TerrainField[] fields = new TerrainField[SIZE];
 
-    private final Random rand = new Random();
+
 
     // Alle verfügbaren Quadranten (hier z.B. 4, erweiterbar)
     private static final List<Supplier<Quadrant>> QUADRANT_SUPPLIERS = List.of(
@@ -31,6 +31,7 @@ public class GameBoard {
         Collections.shuffle(pool);
         List<Quadrant> quadrants = pool.subList(0, 4).stream().map(Supplier::get).toList();
 
+        Random rand = new Random();
         // 2. Für jeden Quadranten eine Zufallsrotation wählen (0, 90, 180, 270 Grad)
         List<Integer> rotations = List.of(rand.nextInt(4), rand.nextInt(4), rand.nextInt(4), rand.nextInt(4));
 
@@ -70,6 +71,11 @@ public class GameBoard {
         }
     }
 
+    // Getter für das Feld-Array, etc.
+    public TerrainField[] getFields() {
+        return fields;
+    }
+
     public boolean isPositionValid(GameHousePosition position) {
         if (position == null) {
             return false;
@@ -99,10 +105,14 @@ public class GameBoard {
      */
     public void placeHouse(Player activePlayer, GameHousePosition position, int round) {
         if (activePlayer == null || position == null || activePlayer.getCurrentCard() == null) {
-            throw new IllegalArgumentException("Aktiver Spieler, Position und Karte dürfen nicht null sein.");
+            int errcode = 1000;
+            if(activePlayer == null) errcode +=1; else if(activePlayer.getCurrentCard() == null) errcode +=100;
+            if(position == null) errcode +=10;
+
+            throw new IllegalArgumentException("Aktiver Spieler, Position und Karte dürfen nicht null sein. " + errcode);
         }
 
-        TerrainType currenCard = activePlayer.getCurrentCard();
+        TerrainType currentCard = activePlayer.getCurrentCard();
         String currentPID = activePlayer.getId();
 
         int id = position.getY() * 20 + position.getX(); // Umrechnung in 1D-Index
@@ -112,7 +122,7 @@ public class GameBoard {
             throw new IllegalStateException("Feld kann nicht bebaut werden: " + field);
         }
 
-        List<Integer> freeFieldsOfCurrentType = getFreeFieldsOfType(currenCard);
+        List<Integer> freeFieldsOfCurrentType = getFreeFieldsOfType(currentCard);
         List<Integer> buildByActivePlayer = getFieldsBuiltBy(activePlayer.getId());
         List<Integer> allFreeAdjacentFields = getAdjacentFields(buildByActivePlayer);
         List<Integer> freeAdjacentCurrentTypeFields = getAdjacentFields(buildByActivePlayer, freeFieldsOfCurrentType);
@@ -120,39 +130,47 @@ public class GameBoard {
 
         if (field.getOwner() != null) {
             if(field.getOwner().equals(currentPID) && field.getOwnerSinceRound() == round){
+                //TODO(): Check for other Illegal buildings after removing
                 field.setOwner(null);
                 field.setOwnerSinceRound(-1);
+                return;
             }else{
                 throw new IllegalStateException("Feld ist bereits von einem anderen Spieler besetzt: " + field);
             }
         }
 
+        if(freeFieldsOfCurrentType.isEmpty()){//TODO(): Check avaliable Fields when pulling Card
+            throw new IllegalStateException("Es Existiert kein freies Feld mit richtigen Typen: " + field);
+        }
+
         //First building
-        if(buildByActivePlayer.isEmpty() &&
-                (freeFieldsOfCurrentType.isEmpty() || freeFieldsOfCurrentType.contains(id))
+        if(buildByActivePlayer.isEmpty() && freeFieldsOfCurrentType.contains(id)
         ){
             field.setOwner(currentPID);
             field.setOwnerSinceRound(round); // Setze die aktuelle Runde als Besitzrunde
             return;
         }
 
-        if((!freeAdjacentCurrentTypeFields.isEmpty() && freeAdjacentCurrentTypeFields.contains(id))
-                || allFreeAdjacentFields.contains(id)
+        if(
+                freeAdjacentCurrentTypeFields.contains(id) ||
+                freeAdjacentCurrentTypeFields.isEmpty() &&
+                (freeFieldsOfCurrentType.contains(id))
         ){
             field.setOwner(currentPID);
             field.setOwnerSinceRound(round); // Setze die aktuelle Runde als Besitzrunde
             return;
         }
 
-        if(!freeFieldsOfCurrentType.isEmpty() && (field.getType() != currenCard)) {
-            throw new IllegalStateException("Feld hat falschen FeldTypen: " + field);
+        if(field.getType() != currentCard) {
+            throw new IllegalStateException("Feld hat falschen FeldTypen: " + field.getType() + " statt "+ currentCard);
         }
 
 
         if(!freeAdjacentCurrentTypeFields.isEmpty()  && !freeAdjacentCurrentTypeFields.contains(id)
                 || !allFreeAdjacentFields.isEmpty() && !allFreeAdjacentFields.contains(id)
         ){
-            throw new IllegalStateException("Feld an nicht erlaubter Position:" + field);
+            throw new IllegalStateException("Feld an nicht erlaubter Position: " + field.getId()+ " "
+                    +freeAdjacentCurrentTypeFields + " " + allFreeAdjacentFields );
         }
 
         //Failsafe
@@ -239,7 +257,8 @@ public class GameBoard {
     public List<Integer> getFieldsBuiltBy(String id){
         List<Integer> fieldsByPlayer = new ArrayList<>();
         for(int i = 0; i < fields.length; i++){
-            if(fields[i].getOwner().equals(id)){fieldsByPlayer.add(i);}
+            TerrainField field = fields[i];
+            if(field.getOwner() != null && field.getOwner().equals(id)){fieldsByPlayer.add(i);}
         }
         return fieldsByPlayer;
     }

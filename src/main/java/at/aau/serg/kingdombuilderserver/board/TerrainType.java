@@ -1,32 +1,40 @@
 package at.aau.serg.kingdombuilderserver.board;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public enum TerrainType {
-    GRASS(true,1),
-    CANYON(true,2),
-    DESERT(true,3),
-    FLOWERS(true,4),
-    FOREST(true,5),
-    WATER(false,6),
-    MOUNTAIN(false,7),
-    SPECIALABILITY(false,8),
-    CITY(false,9);
+    GRASS(true),
+    CANYON(true),
+    DESERT(true),
+    FLOWERS(true),
+    FOREST(true),
+    WATER(false),
+    MOUNTAIN(false),
+    SPECIALABILITY(false),
+    CITY(false);
 
     public final boolean isBuildable;
-    public final int index;
 
-    TerrainType(boolean isBuildable, int index) {
+    TerrainType(boolean isBuildable) {
         this.isBuildable = isBuildable;
-        this.index = index;
     }
 
     public static TerrainType fromInt(int value) {
-        for (TerrainType type : TerrainType.values()) {
-            if (type.ordinal() == value) {return type;}
-        }
-        throw new IllegalArgumentException("Unknown terrain type: " + value);
+       switch (value){
+           case 0: return GRASS;
+           case 1: return CANYON;
+           case 2: return DESERT;
+           case 3: return FLOWERS;
+           case 4: return FOREST;
+           case 5: return WATER;
+           case 6: return MOUNTAIN;
+           case 7: return SPECIALABILITY;
+           case 8: return CITY;
+           default: throw new IllegalArgumentException("Unknown terrain type: " + value);
+       }
     }
 
     public int toInt(){
-        return this.ordinal();
+        return this.ordinal()+1;
     }
 }

@@ -26,6 +26,7 @@ public class GameController {
 
     private final Random random = new Random();
 
+
     private void broadcastGameUpdate(Room room){
         logger.info("Broadcasting GameUpdate for game: {}", room.getId());
         System.out.println("Broadcasting GameUpdate for game: " + room.getId());
@@ -67,6 +68,7 @@ public class GameController {
             Player activePlayer = gameManager.getActivePlayer();
 
             if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
+                activePlayer.setCurrentCard(null);
                 // Logik zum Beenden des Zuges, z.B. Wechsel zum nächsten Spieler
                 gameManager.setActivePlayer(room.getNextPlayer(activePlayer));
                 gameManager.nextRound();
@@ -94,7 +96,8 @@ public class GameController {
         if (rooms.containsKey(gameId)) {
             if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
                 logger.info("Card drawn by player {} in game {}", action.getPlayerId(), action.getGameId());
-                TerrainType terrainCardType = TerrainType.fromInt(random.nextInt(5));
+                TerrainType terrainCardType = TerrainType.fromInt(random.nextInt(5)); //TODO(): Send ENUM instead of int
+                room.getGameManager().getActivePlayer().setCurrentCard(terrainCardType);
                 broadcastTerrainCardType(action.getGameId(), terrainCardType.toInt());
                 broadcastGameUpdate(rooms.get(gameId));
             }else{
@@ -129,4 +132,5 @@ public class GameController {
         logger.info("Broadcasting terrain type for game: {}", gameId + terrainCardType);
         messagingTemplate.convertAndSend("/topic/game/card/"+gameId, terrainCardType);
     }
+
 }
