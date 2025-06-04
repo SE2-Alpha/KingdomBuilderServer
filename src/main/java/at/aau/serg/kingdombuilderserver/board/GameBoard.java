@@ -84,8 +84,6 @@ public class GameBoard {
     }
 
     /*
-    TODO():
-    -Removing Houses: Check if remaining houses of current round are on legal positions, if not, remove
     -Special House placing (Farm, Oracle, Tavern, Tower): Separate function?
             - Farm: Build one additional settlement on Grass (adjacent if possible)
             - Oracle: Build one additional settlement of the same type as required Field type (Draw Card, must be adjacent)
@@ -197,15 +195,6 @@ public class GameBoard {
         return false;
     }
 
-    public List<Integer> getNeighbours(TerrainField field) {
-        int[] neighboursArray = TerrainField.getNeighbours(field.getId());
-        List<Integer> neighbours = new ArrayList<>();
-        for(int n:neighboursArray) {
-            neighbours.add(n);
-        }
-        return neighbours;
-    }
-
     /**
      * Suche alle Nachbarfelder in bezug auf ein zentrales Feld
      * @return ID-Liste der Nachbarfelder
@@ -272,13 +261,6 @@ public class GameBoard {
         for(int i = 0; i < fields.length; i++){
             TerrainField field = fields[i];
             if(field.getOwner() != null && field.getOwner().equals(id)){fieldsByPlayer.add(i);}
-        }
-        return fieldsByPlayer;
-    }
-    public List<Integer> getFieldsBuiltBy(String id, int round){
-        List<Integer> fieldsByPlayer = new ArrayList<>();
-        for(Integer field : getFieldsBuiltBy(id)){
-            if(fields[field].getOwnerSinceRound() == round){fieldsByPlayer.add(field);}
         }
         return fieldsByPlayer;
     }

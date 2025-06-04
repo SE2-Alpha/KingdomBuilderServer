@@ -14,7 +14,7 @@ class GameManagerTest {
     private GameManager gameManager;
     private GameBoard mockGameBoard;
     private Player mockPlayer;
-    private List<Integer> activePlayers;
+    private List<Integer> fieldBuffer;
 
     @BeforeEach
     void setUp() {
@@ -27,6 +27,9 @@ class GameManagerTest {
 
         // Aktiven Spieler setzen
         gameManager.setActivePlayer(mockPlayer);
+
+        //Liste platzierter Gebäude setzen
+        gameManager.setActiveBuildingsSequence(fieldBuffer);
     }
 
     @Test
@@ -37,7 +40,7 @@ class GameManagerTest {
         gameManager.placeHouse(position);
 
         // Überprüfen, ob placeHouse korrekt aufgerufen wurde
-        verify(mockGameBoard, times(1)).placeHouse(mockPlayer,activePlayers, position, 0);
+        verify(mockGameBoard, times(1)).placeHouse(mockPlayer, fieldBuffer, position, 0);
     }
 
     @Test
@@ -45,9 +48,7 @@ class GameManagerTest {
         GameHousePosition position = new GameHousePosition(2, 4);
         when(mockGameBoard.isPositionValid(position)).thenReturn(false);
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
-            gameManager.placeHouse(position);
-        });
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> gameManager.placeHouse(position));
         assertEquals("Ungültige Position für das Platzieren des Hauses: " + position, ex.getMessage());
 
         // Sicherstellen, dass placeHouse NICHT aufgerufen wurde

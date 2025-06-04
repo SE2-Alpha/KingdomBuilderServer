@@ -11,7 +11,6 @@ import java.util.List;
 public class GameManager {
 
     @Getter
-    @Setter
     private final GameBoard gameBoard;
     @Getter
     @Setter
