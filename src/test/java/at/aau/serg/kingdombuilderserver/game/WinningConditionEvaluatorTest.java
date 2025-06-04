@@ -1,6 +1,8 @@
 package at.aau.serg.kingdombuilderserver.game;
 
 import at.aau.serg.kingdombuilderserver.board.GameBoard;
+import at.aau.serg.kingdombuilderserver.board.TerrainField;
+import at.aau.serg.kingdombuilderserver.board.TerrainType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,6 +24,7 @@ public class WinningConditionEvaluatorTest {
     @BeforeEach
     void setUp() {
         board = new GameBoard();
+        board.buildGameBoard();
         player1 = new Player("1", "Player1");
         player2 = new Player("2", "Player2");
         player3 = new Player("3", "Player3");
@@ -40,7 +43,12 @@ public class WinningConditionEvaluatorTest {
     @Test
     void testEvaluateWinnersMultiple() {
 
+        players.remove(player1);
         players.remove(player3);
+
+        Set<Integer> sharedFields = Set.of(7, 9, 28, 46, 65, 90, 103, 141, 199, 203);
+        player2.setHouseFieldIds(sharedFields);
+        player4.setHouseFieldIds(sharedFields);
 
         List<Player> winners = evaluator.evaluateWinner();
 
@@ -106,7 +114,7 @@ public class WinningConditionEvaluatorTest {
     }
 
     @Test
-    void testEvaluateMiners(){}
+    void testEvaluateMiners() {}
 
     @Test
     void testEvaluateCastleFields(){}
