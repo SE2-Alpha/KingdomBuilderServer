@@ -66,7 +66,44 @@ public class WinningConditionEvaluatorTest {
     }
 
     @Test
-    void testEvaluateHermits(){}
+    void testEvaluateHermits_SingleFieldGroup() {
+        // Nur 1 Haus = 1 Gruppe
+        player1.setHouseFieldIds(Set.of(10));
+        evaluator = new WinningConditionEvaluator(board, players);
+
+        assertEquals(1, evaluator.evaluateHermits(player1));
+    }
+
+    @Test
+    void testEvaluateHermits_MultipleFieldGroups() {
+        // Spieler mit 2 getrennten Gruppen: {0, 1, 2}, {100}
+        player1.setHouseFieldIds(Set.of(0, 1, 2, 100));
+        evaluator = new WinningConditionEvaluator(board, players);
+
+        int points = evaluator.evaluateHermits(player1);
+        // Erwartet: 2 Gruppen => 2 Punkte
+        assertEquals(2, points);
+    }
+
+    @Test
+    void testEvaluateHermits_MultipleIsolatedFields() {
+        // Keine Nachbarn, alle Felder einzeln
+        player1.setHouseFieldIds(Set.of(1, 10, 100, 200));
+        evaluator = new WinningConditionEvaluator(board, players);
+
+        // 4 einzelne Gruppen
+        assertEquals(4, evaluator.evaluateHermits(player1));
+    }
+
+    @Test
+    void testEvaluateHermits_LargeConnectedGroup() {
+        // Zusammenhängende Felder (z. B. horizontal)
+        player1.setHouseFieldIds(Set.of(10, 11, 12, 13, 14));
+        evaluator = new WinningConditionEvaluator(board, players);
+
+        // Nur 1 große Gruppe
+        assertEquals(1, evaluator.evaluateHermits(player1));
+    }
 
     @Test
     void testEvaluateMiners(){}
