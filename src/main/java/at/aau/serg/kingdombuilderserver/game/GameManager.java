@@ -34,12 +34,27 @@ public class GameManager {
     }
 
     public void placeHouse(GameHousePosition position) {
+        if (activePlayer == null) {
+            System.err.println("Kein aktiver Spieler ausgewählt, um ein Haus zu platzieren.");
+            return;
+        }
+        if (!gameBoard.isPositionValid(position)) {
+            System.err.println("Ungültige Position (außerhalb des Spielfelds): " + position + " für Spieler " + activePlayer.getId());
+            return;
+        }
         if (gameBoard.isPositionValid(position)) {
             gameBoard.placeHouse(activePlayer, position, roundCounter);
 
             activePlayer.getHousesPlacedThisTurn().add(position);
         } else {
             throw new IllegalArgumentException("Ungültige Position für das Platzieren des Hauses: " + position);
+        }
+        if(activePlayer != null && isPositionValidForPlayer(activePlayer, position)) {
+            activePlayer.getHousesPlacedThisTurn().add(position);
+            activePlayer.decreaseSettlementsBy(1); // Siedlungen des Spieler reduzieren
+            System.out.println("Player" + activePlayer.getId() + " placed house at " + position + ". Remaining: " + activePlayer.getRemainingSettlements());
+        } else {
+            System.err.println("Invalid house placement attempt by " + (activePlayer != null ? activePlayer.getId() : "null") + " at " + position);
         }
     }
 

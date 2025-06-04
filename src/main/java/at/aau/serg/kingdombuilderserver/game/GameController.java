@@ -186,6 +186,5 @@ public class GameController {
             } else {
             logger.warn("Game not found for gameId: {}", action.getGameId());
         }
-        }
-
+    }
 }
