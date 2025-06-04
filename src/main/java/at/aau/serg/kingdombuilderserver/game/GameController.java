@@ -1,5 +1,6 @@
 package at.aau.serg.kingdombuilderserver.game;
 
+import at.aau.serg.kingdombuilderserver.messaging.dtos.CheatReportDTO;
 import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerActionDTO;
 import at.aau.serg.kingdombuilderserver.messaging.dtos.RoomLobbyDTO;
 import io.micrometer.observation.GlobalObservationConvention;
@@ -185,6 +186,28 @@ public class GameController {
             }
             } else {
             logger.warn("Game not found for gameId: {}", action.getGameId());
+        }
+    }
+    @MessageMapping("/game/reportCheat")
+    public void reportCheat(@Payload CheatReportDTO report) {
+        logger.info("Received cheat report: {}", report);
+        String gameId = report.getGameId();
+
+        if (rooms.containsKey(gameId)) {
+            Room room = rooms.get(gameId);
+            GameManager gameManager = room.getGameManager();
+            if (gameManager == null) {
+                logger.error("GameManager not found for room: {}", gameId);
+                return;
+            }
+
+            // Prüfen, ob gerade Meldungen erwartet werden
+            if (gameManager.isAwaitingCheatReports()){
+                Player reporter = room.gePlayerById(report.getReporterPlayerId());
+                Player reported = room.gePlayerById(report.getReportedPlayerId());
+
+
+            }
         }
     }
 }

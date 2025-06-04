@@ -3,6 +3,7 @@ package at.aau.serg.kingdombuilderserver.messaging.dtos;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter @Setter
 public class CheatReportDTO {
     private String gameId;
     private String reporterPlayerId; // ID des Spielers, der den Cheat meldet

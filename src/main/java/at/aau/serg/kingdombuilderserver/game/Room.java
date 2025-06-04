@@ -74,4 +74,18 @@ public class Room {
         int nextIndex = (currentIndex + 1) % players.size();
         return players.get(nextIndex);
     }
+
+    public Player gePlayerById(String playerId) {
+        if (playerId == null || playerId.isEmpty()){
+            logger.warn("getPlayerById called with null or empty playerId.");
+            return null;
+        }
+        for (Player player : this.players){
+            if (player.getId().equals(playerId)){
+                return player; // Spieler gefunden
+            }
+        }
+        logger.debug("Player with id {} not found in room {}.", playerId, this.id);
+        return null; // Spieler nicht in diesem Raum gefunden
+    }
 }
