@@ -6,15 +6,19 @@ import at.aau.serg.kingdombuilderserver.board.quadrants.QuadrantTower;
 import at.aau.serg.kingdombuilderserver.board.quadrants.QuadrantFields;
 import at.aau.serg.kingdombuilderserver.game.GameHousePosition;
 import at.aau.serg.kingdombuilderserver.game.Player;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
 
 import java.util.*;
 import java.util.function.Supplier;
 
 public class GameBoard {
     private static final int SIZE = 400; // 20x20
+    @Getter
     private final TerrainField[] fields = new TerrainField[SIZE];
 
-
+    @JsonIgnore
+    private Random rand = new Random();
 
     // Alle verfügbaren Quadranten (hier z.B. 4, erweiterbar)
     private static final List<Supplier<Quadrant>> QUADRANT_SUPPLIERS = List.of(
@@ -31,7 +35,6 @@ public class GameBoard {
         Collections.shuffle(pool);
         List<Quadrant> quadrants = pool.subList(0, 4).stream().map(Supplier::get).toList();
 
-        Random rand = new Random();
         // 2. Für jeden Quadranten eine Zufallsrotation wählen (0, 90, 180, 270 Grad)
         List<Integer> rotations = List.of(rand.nextInt(4), rand.nextInt(4), rand.nextInt(4), rand.nextInt(4));
 
@@ -69,11 +72,6 @@ public class GameBoard {
                 fields[id] = new TerrainField(bigBoard[r][c], id);
             }
         }
-    }
-
-    // Getter für das Feld-Array, etc., (needed for JSON-conversion)
-    public TerrainField[] getFields() {
-        return fields;
     }
 
     public boolean isPositionValid(GameHousePosition position) {
