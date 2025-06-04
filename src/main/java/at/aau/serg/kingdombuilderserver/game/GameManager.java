@@ -4,6 +4,9 @@ import at.aau.serg.kingdombuilderserver.board.GameBoard;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class GameManager {
 
@@ -15,6 +18,9 @@ public class GameManager {
     private Player activePlayer;
     @Getter
     private int roundCounter = 0;
+    @Getter
+    @Setter
+    private List<Integer> activeBuildingsSequence = new ArrayList<>();
 
     public GameManager() {
         // Private constructor to prevent instantiation
@@ -29,7 +35,7 @@ public class GameManager {
 
     public void placeHouse(GameHousePosition position) {
         if (gameBoard.isPositionValid(position)) {
-            gameBoard.placeHouse(activePlayer, position, roundCounter);
+            gameBoard.placeHouse(activePlayer,activeBuildingsSequence, position, roundCounter);
         } else {
             throw new IllegalArgumentException("Ungültige Position für das Platzieren des Hauses: " + position);
         }

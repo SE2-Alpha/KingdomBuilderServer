@@ -4,6 +4,8 @@ import at.aau.serg.kingdombuilderserver.board.GameBoard;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -12,6 +14,7 @@ class GameManagerTest {
     private GameManager gameManager;
     private GameBoard mockGameBoard;
     private Player mockPlayer;
+    private List<Integer> activePlayers;
 
     @BeforeEach
     void setUp() {
@@ -34,7 +37,7 @@ class GameManagerTest {
         gameManager.placeHouse(position);
 
         // Überprüfen, ob placeHouse korrekt aufgerufen wurde
-        verify(mockGameBoard, times(1)).placeHouse(mockPlayer, position, 0);
+        verify(mockGameBoard, times(1)).placeHouse(mockPlayer,activePlayers, position, 0);
     }
 
     @Test
@@ -48,7 +51,7 @@ class GameManagerTest {
         assertEquals("Ungültige Position für das Platzieren des Hauses: " + position, ex.getMessage());
 
         // Sicherstellen, dass placeHouse NICHT aufgerufen wurde
-        verify(mockGameBoard, never()).placeHouse(any(), any(), anyInt());
+        verify(mockGameBoard, never()).placeHouse(any(),any(), any(), anyInt());
     }
 
     @Test

@@ -92,7 +92,7 @@ public class GameBoard {
             - Tavern: Build one additional settlement on the end of a straight line of at least 3 settlements
             - Tower: Build one Settlement on the Edge of the Board (adjacent if possible)
      */
-    public void placeHouse(Player activePlayer, GameHousePosition position, int round) {
+    public void placeHouse(Player activePlayer,List<Integer> activeList, GameHousePosition position, int round) {
         if (activePlayer == null || position == null || activePlayer.getCurrentCard() == null) {
             int errcode = 1000;
             if(activePlayer == null) errcode +=1; else if(activePlayer.getCurrentCard() == null) errcode +=100;
@@ -103,7 +103,6 @@ public class GameBoard {
 
         TerrainType currentCard = activePlayer.getCurrentCard();
         String currentPID = activePlayer.getId();
-        boolean fieldRemoved = false;
 
         int id = position.getY() * 20 + position.getX(); // Umrechnung in 1D-Index
         TerrainField field = fields[id];
@@ -114,11 +113,8 @@ public class GameBoard {
 
         if (field.getOwner() != null) {
             if(field.getOwner().equals(currentPID) && field.getOwnerSinceRound() == round){
-                //TODO(): Check for other Illegal buildings after removing
-                field.setOwner(null);
-                field.setOwnerSinceRound(-1);
-                fieldRemoved = true;
-                //no Return
+                removeLegally(field,activeList);
+                return;
             }else{
                 throw new IllegalStateException("Feld ist bereits von einem anderen Spieler besetzt: " + field);
             }
@@ -128,30 +124,7 @@ public class GameBoard {
         List<Integer> builtByActivePlayer = getFieldsBuiltBy(currentPID);
         List<Integer> allFreeAdjacentFields = getAdjacentFields(builtByActivePlayer);
         List<Integer> freeAdjacentCurrentTypeFields = getAdjacentFields(builtByActivePlayer, freeFieldsOfCurrentType);
-        List<Integer> fieldsBuiltCurrentRound = getFieldsBuiltBy(currentPID, round);
-        List<Integer> fieldsBuiltPastRounds = new ArrayList<>(builtByActivePlayer);
-        fieldsBuiltPastRounds.removeAll(fieldsBuiltCurrentRound);
 
-
-        if(fieldRemoved){//TODO(): finalize
-            if(builtByActivePlayer.size()<2){return;}
-            boolean isAdjacent = false;
-            for(int f: fieldsBuiltCurrentRound){
-                for(int n: getNeighbours(fields[f])){
-                    if (fieldsBuiltPastRounds.contains(n)) {
-                        isAdjacent = true;
-                        break;
-                    }
-                }
-                if(!isAdjacent && !freeAdjacentCurrentTypeFields.isEmpty()){
-                    fields[f].setOwner(null);
-                    fields[f].setOwnerSinceRound(-1);
-                    return;
-                }
-            }
-            //Always return (End Remove house Action)
-            return;
-        }
 
 
 
@@ -163,8 +136,7 @@ public class GameBoard {
         //First building
         if(builtByActivePlayer.isEmpty() && freeFieldsOfCurrentType.contains(id)
         ){
-            field.setOwner(currentPID);
-            field.setOwnerSinceRound(round); // Setze die aktuelle Runde als Besitzrunde
+            placeLegally(field,currentPID,round,activeList);
             return;
         }
 
@@ -173,8 +145,7 @@ public class GameBoard {
                 freeAdjacentCurrentTypeFields.isEmpty() &&
                 (freeFieldsOfCurrentType.contains(id))
         ){
-            field.setOwner(currentPID);
-            field.setOwnerSinceRound(round); // Setze die aktuelle Runde als Besitzrunde
+            placeLegally(field,currentPID,round,activeList);
             return;
         }
 
@@ -192,6 +163,18 @@ public class GameBoard {
 
         //Failsafe
         throw new IllegalStateException("Feld konnte nicht bebaut werden: " + field);
+    }
+
+    public void placeLegally(TerrainField field, String PlayerId, int round,List<Integer> buffer){
+        field.setOwner(PlayerId);
+        field.setOwnerSinceRound(round);
+        buffer.add(round);
+    }
+
+    public void removeLegally(TerrainField field,List<Integer> buffer){
+        field.setOwner(null);
+        field.setOwnerSinceRound(-1);
+        buffer.subList(field.getId(),buffer.size()).clear();
     }
 
     /**

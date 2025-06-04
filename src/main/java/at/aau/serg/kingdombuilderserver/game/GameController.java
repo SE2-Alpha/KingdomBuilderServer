@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -66,9 +67,11 @@ public class GameController {
             Room room = rooms.get(gameId);
             GameManager gameManager = room.getGameManager();
             Player activePlayer = gameManager.getActivePlayer();
+            List<Integer> activeBuildings = gameManager.getActiveBuildingsSequence();
 
             if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
                 activePlayer.setCurrentCard(null);
+                activeBuildings.clear();
                 // Logik zum Beenden des Zuges, z.B. Wechsel zum nächsten Spieler
                 gameManager.setActivePlayer(room.getNextPlayer(activePlayer));
                 gameManager.nextRound();
