@@ -59,10 +59,15 @@ public class WinningConditionEvaluatorTest {
 
     @Test
     void testEvaluateWinnersSingle() {
+
+        player1.setHouseFieldIds(Set.of());
+        player2.setHouseFieldIds(Set.of());
+        player3.setHouseFieldIds(Set.of());
+
         List<Player> winners = evaluator.evaluateWinner();
 
         assertEquals(1, winners.size());
-        assertTrue(winners.contains(player3));
+        assertTrue(winners.contains(player4));
     }
 
     @Test
@@ -114,7 +119,50 @@ public class WinningConditionEvaluatorTest {
     }
 
     @Test
-    void testEvaluateMiners() {}
+    void testEvaluateMiners_OneHOuseMultipleMountains() {
+        // Setup Spielfeld mit Bergen neben Häusern
+        TerrainField[] fields = board.getFields();
+        // Beispiel: Haus auf Feld 21, Berge auf 20 und 22
+        player1.setHouseFieldIds(Set.of(21));
+        fields[20].setType(TerrainType.MOUNTAIN);
+        fields[22].setType(TerrainType.MOUNTAIN);
+
+        evaluator = new WinningConditionEvaluator(board, players);
+        int points = evaluator.evaluateMiners(player1);
+
+        // Erwartet: Nur 1 Punkt, auch wenn mehrere Berge angrenzen
+        assertEquals(1, points);
+    }
+
+    @Test
+    void testEvaluateMiners_MultipleHousesOneMountain() {
+        TerrainField[] fields = board.getFields();
+
+        // Häuser auf beiden Seiten eines Berges
+        player1.setHouseFieldIds(Set.of(20, 22));
+        fields[21].setType(TerrainType.MOUNTAIN);
+
+        evaluator = new WinningConditionEvaluator(board, players);
+
+        // Beide Häuser grenzen an denselben Berg => 2 Punkte -> ein Punkt pro Siedlung
+        assertEquals(2, evaluator.evaluateMiners(player1));
+    }
+
+    @Test
+    void testEvaluateMiners_MultipleHousesDifferentMountains() {
+        TerrainField[] fields = board.getFields();
+
+        // Zwei Häuser bei zwei verschiedenen Bergen
+        player1.setHouseFieldIds(Set.of(30, 40));
+        fields[29].setType(TerrainType.MOUNTAIN);
+        fields[41].setType(TerrainType.MOUNTAIN);
+
+        evaluator = new WinningConditionEvaluator(board, players);
+
+        // Zwei verschiedene Berge angrenzend => 2 Punkte
+        assertEquals(2, evaluator.evaluateMiners(player1));
+    }
+
 
     @Test
     void testEvaluateCastleFields(){}
