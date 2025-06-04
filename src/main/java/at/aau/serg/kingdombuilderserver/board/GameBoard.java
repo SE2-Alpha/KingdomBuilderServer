@@ -126,9 +126,6 @@ public class GameBoard {
         List<Integer> freeAdjacentCurrentTypeFields = getAdjacentFields(builtByActivePlayer, freeFieldsOfCurrentType);
 
 
-
-
-
         if(freeFieldsOfCurrentType.isEmpty()){//TODO(): Check available Fields when pulling Card
             throw new IllegalStateException("Es Existiert kein freies Feld mit richtigen Typen: " + field);
         }
@@ -168,13 +165,20 @@ public class GameBoard {
     public void placeLegally(TerrainField field, String PlayerId, int round,List<Integer> buffer){
         field.setOwner(PlayerId);
         field.setOwnerSinceRound(round);
-        buffer.add(round);
+        buffer.add(field.getId());
     }
 
     public void removeLegally(TerrainField field,List<Integer> buffer){
-        field.setOwner(null);
-        field.setOwnerSinceRound(-1);
-        buffer.subList(field.getId(),buffer.size()).clear();
+        int index = buffer.indexOf(field.getId());
+        if(index == -1) {
+            throw new RuntimeException("Field "+ field +" not in buffer array " + buffer);
+        }
+        List<Integer> choppingBlock = buffer.subList(index,buffer.size());
+        for(Integer f : choppingBlock){
+            fields[f].setOwner(null);
+            fields[f].setOwnerSinceRound(-1);
+        }
+        buffer.subList(index,buffer.size()).clear();
     }
 
     /**
