@@ -206,8 +206,24 @@ public class GameController {
                 Player reporter = room.gePlayerById(report.getReporterPlayerId());
                 Player reported = room.gePlayerById(report.getReportedPlayerId());
 
-
+                if (reporter != null && reported != null) {
+                // Sicherstellen, dass der gemeldete Spieler der aktive Spier ist (optional, aber sinnvoll)
+                if (gameManager.getActivePlayer() != null && gameManager.getActivePlayer().getId().equals(reported.getId())) {
+                    // Die eigentliche Aufzeichnung des Reports geschieht im Gamemanager
+                    logger.info("Player {} reported player {} for cheating in game {}", reporter.getId(), reported.getId(), gameId);
+                } else {
+                    logger.warn("Cheat report invalid: Reported player {} is not the current active player in game {}.", reported.getId(), gameId);
+                }
+            } else {
+                logger.warn("Reporter {} or reported player {} not found in game {}.", report.getReporterPlayerId(), report.getReportedPlayerId(), gameId);
             }
+        } else {
+            logger.warn("Cheat report received for game {} but not currently awaiting reports", gameId);
+        }
+        // Kein broadcastGameUpdate hier, da dies die 3-Sekunden-Phase stören könnte.
+        // Die Auswertung erfolgt gesammelt in processCheatReportOutcome.
+    } else {
+        logger.warn("Game not found for gameId in cheat report: {}", report.getGameId());
         }
     }
 }
