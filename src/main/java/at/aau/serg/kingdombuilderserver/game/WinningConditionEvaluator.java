@@ -1,6 +1,7 @@
 package at.aau.serg.kingdombuilderserver.game;
 
 import at.aau.serg.kingdombuilderserver.board.GameBoard;
+import at.aau.serg.kingdombuilderserver.board.TerrainField;
 import at.aau.serg.kingdombuilderserver.board.TerrainType;
 
 import java.util.*;
@@ -77,13 +78,11 @@ public class WinningConditionEvaluator {
         visited.add(id);
         group.add(id);
 
-        /*  wieder "ein"kommentieren, sobald Methode getNeighbours() vorhanden sind
-        for (int neighbor : getNeighbours(id)) {
+        for (int neighbor : TerrainField.getNeighbours(id)) {
             if (houses.contains(neighbor)) {
                 findConnectedGroup(neighbor, houses, group, visited);
             }
         }
-         */
     }
 
     /**
@@ -95,9 +94,8 @@ public class WinningConditionEvaluator {
     public int evaluateMiners(Player player) {
         int points = 0;
 
-        /* wieder "ein"kommentieren, sobald Methode getNeighbours() vorhanden sind
         for (int houseId : player.getHouseFieldIds()) {
-            int[] neighbours = getNeighbours(houseId);
+            int[] neighbours = TerrainField.getNeighbours(houseId);
 
             for (int neighbourId : neighbours) {
                 if (neighbourId >= 0 && neighbourId < 400 &&
@@ -107,7 +105,6 @@ public class WinningConditionEvaluator {
                 }
             }
         }
-         */
 
         return points;
     }
@@ -140,10 +137,9 @@ public class WinningConditionEvaluator {
     public int evaluateCastleFields(Player player) {
         int points = 0;
 
-        /*  wieder "ein"kommentieren, sobald Methode getNeighbours() vorhanden sind
         for (int id = 0; id < 400; id++) {
             if (board.getFieldType(id) == TerrainType.CITY) {
-                int[] neighbours = getNeighbours(id);
+                int[] neighbours = TerrainField.getNeighbours(id);
 
                 for (int neighbourId : neighbours) {
                     // Sicherstellen, dass die Nachbar-ID gültig ist
@@ -156,7 +152,6 @@ public class WinningConditionEvaluator {
             }
         }
 
-         */
         return points;
     }
 }
