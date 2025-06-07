@@ -99,6 +99,12 @@ public class GameController {
                         gameManager.cleanupTurn();
 
                         Player nextPlayer = room.getNextPlayer(activePlayer);
+                        if (nextPlayer != null && nextPlayer.isSkippedTurn()) {
+                            logger.info("Player " + nextPlayer.getId() + " is skipping their turn.");
+                            nextPlayer.setSkippedTurn(false); // WICHTIG: Flag für die Zukunft zurücksetzen
+                            nextPlayer = room.getNextPlayer(nextPlayer); // Erneut aufrufen, um den Übernächsten Spieler zu bekommen
+                        }
+
                         gameManager.setActivePlayer(nextPlayer);
                         if (nextPlayer != null) {
                             gameManager.nextRound();
