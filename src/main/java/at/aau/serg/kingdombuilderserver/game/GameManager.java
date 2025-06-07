@@ -72,13 +72,64 @@ public class GameManager {
     }
 
     public void processCheatReportOutcome(){
-        Player active = getActivePlayer();
+        if (activePlayer == null) {
+            System.err.println("processCheatReportOutcome called with no active players");
+            return;
+        }
+        String activePlayerId = activePlayer.getId();
+        boolean playerActuallyCheated = activePlayer.hasCheated();
+        List<String> reporters = cheatReportsThisTurn.getOrDefault(activePlayerId, new ArrayList<>());
 
-        if (active.hasCheated() && !reports.isEmpty()){
-            // Cheat wurde korrekt erkannt
-            for (GameHousePosition pos: active.getHousesPlacedThisTurn()){
+        if (playerActuallyCheated){
+            if(!reporters.isEmpty()){
+                // Falls: Erfolgreich erwischt!
+                System.err.println("Player " + activePlayerId + " was caught cheating by " + reporters.size() + " player(s).");
+
+                // 1. Alle Häuser dieser Runde entfernen
+                for (GameHousePosition pos: activePlayer.getHousesPlacedThisTurn()){
+                    // gameBoard.removeHouse(pos);
+                    System.out.println("Removing cheated house at " + pos + " for player " + activePlayerId);
+                }
+                activePlayer.getHousesPlacedThisTurn().clear(); // Liste der Häuser leeren
+                activePlayer.decreaseSettlementsBy(0); // Später ändern zu increaseSettlementsBy(anzahlEntfernterHäuser)
+
+                // 2. Gold an die Entlarvenden übertragen
+                for (String reporterId : reporters) {
+                    Player reporter = getPlayerById(reporterId);
+                    if (reporter != null) {
+                        reporter.setGold(reporter.getGold() + 5);
+                        System.out.println("Player " + reporterId + " receives 5 gold for reporting.");
+                    }
+                }
+            } else {
+                // Fall: Erfolgreich geschummelt (geschummelt, aber nicht erwischt)
+                System.out.println("Player " + activePlayerId + " successfully cheated (was not reported).");
+                // Häuser bleiben, kein Goldtransfer
+            }
+        } else { // Spieler hat NICHT geschummelt
+            if (!reporters.isEmpty()) {
+                // Fall: Fälschlicherweise beschuldigt
+                System.out.println("Player " + activePlayerId + " was falsely accused by " + reporters.size() + " player(s).");
+                for (String accuserId : reporters) {
+                    Player accuser = getPlayerById(accuserId);
+                    if (accuser != null) {
+                        // 1. Beschuldigter bekommt Gold vom Anschuldigenden
+                        int goldTransfer = Math.min(accuser.getGold(), 5); // Nicht mehr als der Ankläger hat
+                        activePlayer.setGold(activePlayer.getGold() + goldTransfer);
+                        accuser.setGold(accuser.getGold() - goldTransfer);
+                        System.out.println("Player " + activePlayerId + " receives " + goldTransfer + " gold from accuser " + accuserId);
+
+                        // 2. Reporter setzt eine Runde aus
+                        accuser.setSkippedTurn(true);
+                        System.out.println("Player " + accuserId + " will skip next turn.");
+                    }
+                }
+            } else {
+                // Fall: Normaler Zug (nicht geschummelt, nicht gemeldet)
+                System.out.println("Player " + activePlayerId + " completed turn normally (no cheating, no reports).");
             }
         }
+        // Wichtig: hasCheated für den nächsten Zug zurücksetzen, geschieht in cleanupTurn
     }
     public void setAwaitingCheatReports(boolean awaitingCheatReports){
         this.awaitingCheatReports = awaitingCheatReports;
