@@ -116,4 +116,12 @@ public class GameManager {
         return null;
     }
 
+    private boolean isPositionValidForPlayer(Player player, GameHousePosition position) {
+        if (player.getRemainingSettlements() <= 0) {
+            System.err.println("Spieler hat keine Siedlungen mehr übrig.");
+            return false;
+        }
+        return true;
+    }
+
 }

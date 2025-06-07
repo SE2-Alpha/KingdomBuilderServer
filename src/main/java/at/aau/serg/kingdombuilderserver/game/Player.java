@@ -56,5 +56,7 @@ public class Player {
     public List <GameHousePosition> getHousePlacedThisTurn(){
         return housesPlacedThisTurn;
     }
+    public void addGold(int amount) { this.gold += amount; }
 
+    public void decreaseGold(int amount) { this.gold -= amount; }
 }
