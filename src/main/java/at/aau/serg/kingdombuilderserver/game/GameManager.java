@@ -19,18 +19,23 @@ public class GameManager {
     private int roundCounter = 0;
     @Getter
     private boolean awaitingCheatReports = false;
+    private final List<Player> allPlayers;
     private Set<String> reports = new HashSet<>();
     private Map<String, List<String>> cheatReportsThisTurn;
 
-    public GameManager() {
+    public GameManager(List<Player> players) {
         // Private constructor to prevent instantiation
         this.gameBoard = new GameBoard();
         gameBoard.buildGameBoard();
+        this.allPlayers = players;
+        this.cheatReportsThisTurn = new HashMap<>();
     }
 
     // Zusätzlicher Konstruktor NUR FÜR TESTS (package-private)
-    GameManager(GameBoard gameBoard) {
+    GameManager(GameBoard gameBoard, List<Player> allPlayers) {
         this.gameBoard = gameBoard;
+        this.allPlayers = allPlayers;
+        this.cheatReportsThisTurn = new HashMap<>();
     }
 
     public void placeHouse(GameHousePosition position) {
@@ -144,9 +149,9 @@ public class GameManager {
             return;
         }
         if (activePlayer != null && activePlayer.getId().equals(reportedPlayerId)){
-            this.cheatReportsThisTurn.computeIfAbsent(reporterPlayerId, k -> new ArrayList<>()).add(reportedPlayerId);
+            this.cheatReportsThisTurn.computeIfAbsent(reportedPlayerId, k -> new ArrayList<>()).add(reporterPlayerId);
         } else {
-            System.err.println("Attempt to report non-active player is null");
+            System.err.println("Attempt to report non-active player or active player is null");
         }
     }
 
@@ -161,8 +166,13 @@ public class GameManager {
 
     // Hilfmethode, um Spieler anhand der ID zu finden
     private Player getPlayerById(String playerId){
-        if (this.activePlayer != null && this.activePlayer.getId().equals(playerId)) return this.activePlayer;
-        System.err.println("WARNUNG: getPlayerById needs a proper implementation to find any player, not just activePlayer.");
+        if(playerId == null) return null;
+        for (Player player : allPlayers){
+            if(playerId.equals(player.getId())){
+                return player;
+            }
+        }
+        System.err.println("WARNUNG: Spieler mit ID " + playerId + " nicht gefunden.");
         return null;
     }
 

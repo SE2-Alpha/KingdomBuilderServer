@@ -32,7 +32,7 @@ public class Room {
         }
         setPlayerColor();
         this.status = RoomStatus.STARTED;
-        this.gameManager = new GameManager();
+        this.gameManager = new GameManager(this.players);
         this.gameManager.setActivePlayer(players.get(0)); // Set the first player as the active player
         logger.info("Game started in room {}", id);
     }

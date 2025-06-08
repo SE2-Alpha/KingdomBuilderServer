@@ -209,6 +209,7 @@ public class GameController {
 
             // Prüfen, ob gerade Meldungen erwartet werden
             if (gameManager.isAwaitingCheatReports()){
+                gameManager.recordCheatReport(report.getReporterPlayerId(),report.getReportedPlayerId());
                 Player reporter = room.getPlayerById(report.getReporterPlayerId());
                 Player reported = room.getPlayerById(report.getReportedPlayerId());
 

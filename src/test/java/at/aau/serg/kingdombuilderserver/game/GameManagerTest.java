@@ -4,6 +4,9 @@ import at.aau.serg.kingdombuilderserver.board.GameBoard;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -19,8 +22,12 @@ class GameManagerTest {
         mockGameBoard = mock(GameBoard.class);
         mockPlayer = mock(Player.class);
 
+        List<Player> mockPlayerList = new ArrayList<>();
+
+        mockPlayerList.add(mockPlayer);
+
         // Testfreundlichen Konstruktor verwenden
-        gameManager = new GameManager(mockGameBoard);
+        gameManager = new GameManager(mockGameBoard, mockPlayerList);
 
         // Aktiven Spieler setzen
         gameManager.setActivePlayer(mockPlayer);
