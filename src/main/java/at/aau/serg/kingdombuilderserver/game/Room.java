@@ -75,7 +75,7 @@ public class Room {
         return players.get(nextIndex);
     }
 
-    public Player gePlayerById(String playerId) {
+    public Player getPlayerById(String playerId) {
         if (playerId == null || playerId.isEmpty()){
             logger.warn("getPlayerById called with null or empty playerId.");
             return null;

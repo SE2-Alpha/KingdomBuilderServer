@@ -209,8 +209,8 @@ public class GameController {
 
             // Prüfen, ob gerade Meldungen erwartet werden
             if (gameManager.isAwaitingCheatReports()){
-                Player reporter = room.gePlayerById(report.getReporterPlayerId());
-                Player reported = room.gePlayerById(report.getReportedPlayerId());
+                Player reporter = room.getPlayerById(report.getReporterPlayerId());
+                Player reported = room.getPlayerById(report.getReportedPlayerId());
 
                 if (reporter != null && reported != null) {
                 // Sicherstellen, dass der gemeldete Spieler der aktive Spier ist (optional, aber sinnvoll)

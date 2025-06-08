@@ -140,14 +140,13 @@ public class GameManager {
 
     public void recordCheatReport(String reporterPlayerId, String reportedPlayerId){
         if(!awaitingCheatReports){
-            // Logik, falss außerhalb der Zeitfenster gemeldet wird (sollte nicht passieren, wenn Controller prüft)
             System.err.println("Attempt to record cheat report outside of allowed window");
             return;
         }
         if (activePlayer != null && activePlayer.getId().equals(reportedPlayerId)){
-            this.cheatReportsThisTurn.computeIfAbsent(reportedPlayerId, k -> new ArrayList<>()).add(reportedPlayerId);
-        }else{
-            System.err.println("Attempt to report non-active player or active player is null.");
+            this.cheatReportsThisTurn.computeIfAbsent(reporterPlayerId, k -> new ArrayList<>()).add(reportedPlayerId);
+        } else {
+            System.err.println("Attempt to report non-active player is null");
         }
     }
 
