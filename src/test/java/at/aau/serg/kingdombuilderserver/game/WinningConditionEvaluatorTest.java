@@ -14,12 +14,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class WinningConditionEvaluatorTest {
 
     private WinningConditionEvaluator evaluator;
+    private WinningConditionEvaluator evaluator2;
     private Player player1;
     private Player player2;
     private Player player3;
     private Player player4;
     private List<Player> players;
     GameBoard board;
+    GameBoard boardGrass;
 
     @BeforeEach
     void setUp() {
@@ -38,6 +40,15 @@ public class WinningConditionEvaluatorTest {
         player4.setHouseFieldIds(Set.of(6, 29, 35, 60, 119, 130, 162, 188, 240, 301));
 
         evaluator = new WinningConditionEvaluator(board, players);
+
+        boardGrass = new GameBoard();
+        boardGrass.buildGameBoard();
+
+        for (int i = 0; i < boardGrass.getFields().length; i++) {
+            boardGrass.getFields()[i] = new TerrainField(TerrainType.GRASS, i);
+        }
+
+        evaluator2 = new WinningConditionEvaluator(boardGrass, players);
     }
 
     @Test
@@ -186,5 +197,82 @@ public class WinningConditionEvaluatorTest {
     }
 
     @Test
-    void testEvaluateCastleFields(){}
+    void testEvaluateCastleFields() {
+        TerrainField[] fields = boardGrass.getFields();
+
+        fields[100].setType(TerrainType.CITY); // CITY-Feld
+        player1.setHouseFieldIds(Set.of(101)); // Direkt angrenzendes Haus
+
+        evaluator2 = new WinningConditionEvaluator(boardGrass, players);
+        int points = evaluator2.evaluateCastleFields(player1);
+
+        assertEquals(3, points); // 1 Burg angrenzend => 3 Punkte
+    }
+
+    @Test
+    void testEvaluateCastleFields_MultipleAdjacent() {
+        TerrainField[] fields = boardGrass.getFields();
+
+        fields[100].setType(TerrainType.CITY);
+        fields[200].setType(TerrainType.CITY);
+        player1.setHouseFieldIds(Set.of(101, 201));
+
+        evaluator2 = new WinningConditionEvaluator(boardGrass, players);
+        int points = evaluator2.evaluateCastleFields(player1);
+
+        assertEquals(6, points); // 2 Burgen => 6 Punkte
+    }
+
+    @Test
+    void testEvaluateCastleFields_NotAdjacent() {
+        TerrainField[] fields = boardGrass.getFields();
+
+        fields[100].setType(TerrainType.CITY);
+        player1.setHouseFieldIds(Set.of(150)); // Kein Nachbar
+
+        evaluator2 = new WinningConditionEvaluator(boardGrass, players);
+        int points = evaluator2.evaluateCastleFields(player1);
+
+        assertEquals(0, points); // Kein angrenzendes Haus
+    }
+
+    @Test
+    void testEvaluateCastleFields_HouseSurroundedByMultipleCastles() {
+        TerrainField[] fields = boardGrass.getFields();
+
+        fields[120].setType(TerrainType.CITY);
+        fields[122].setType(TerrainType.CITY);
+        player1.setHouseFieldIds(Set.of(121)); // Dazwischen
+
+        evaluator2 = new WinningConditionEvaluator(boardGrass, players);
+
+        assertEquals(6, evaluator2.evaluateCastleFields(player1)); // Beide Burgen angrenzend
+    }
+
+    @Test
+    void testEvaluateCastleFields_MultipleHousesSameCastle() {
+        TerrainField[] fields = boardGrass.getFields();
+
+        fields[100].setType(TerrainType.CITY);
+        player1.setHouseFieldIds(Set.of(99, 101)); // Beide an gleiche Burg
+
+        evaluator2 = new WinningConditionEvaluator(boardGrass, players);
+
+        assertEquals(3, evaluator2.evaluateCastleFields(player1)); // Nur einmal zählen
+    }
+
+    @Test
+    void testEvaluateCastleFields_HousesNearDifferentCastles() {
+        TerrainField[] fields = boardGrass.getFields();
+
+        fields[50].setType(TerrainType.CITY);
+        fields[150].setType(TerrainType.CITY);
+        player1.setHouseFieldIds(Set.of(49, 151));
+
+        evaluator2 = new WinningConditionEvaluator(boardGrass, players);
+
+        assertEquals(6, evaluator2.evaluateCastleFields(player1)); // 2 Burgen angrenzend
+    }
+
+
 }
