@@ -1,6 +1,7 @@
 package at.aau.serg.kingdombuilderserver.game;
 
 import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerActionDTO;
+import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerScoreDTO;
 import at.aau.serg.kingdombuilderserver.messaging.dtos.RoomLobbyDTO;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -10,10 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class GameController {
@@ -124,4 +123,28 @@ public class GameController {
         logger.info("Broadcasting terrain type for game: {}", gameId + terrainCardType);
         messagingTemplate.convertAndSend("/topic/game/card/"+gameId, terrainCardType);
     }
+
+    @MessageMapping("/game/getScores")
+    @SendTo("/topic/game/scores")
+    public List<PlayerScoreDTO> sendPlayerScores(@Payload String gameId) {
+        if (rooms.containsKey(gameId)) {
+            Room room = rooms.get(gameId);
+            GameManager gameManager = room.getGameManager();
+            List<Player> players = room.getPlayers();
+
+            WinningConditionEvaluator evaluator = new WinningConditionEvaluator(
+                    gameManager.getGameBoard(), players
+            );
+
+            Map<String, Integer> scores = evaluator.getPlayerPoints();
+
+            return scores.entrySet().stream()
+                    .map(entry -> new PlayerScoreDTO(entry.getKey(), entry.getValue()))
+                    .collect(Collectors.toList());
+        } else {
+            logger.warn("Game not found for gameId: {}", gameId);
+            return Collections.emptyList();
+        }
+    }
+
 }
