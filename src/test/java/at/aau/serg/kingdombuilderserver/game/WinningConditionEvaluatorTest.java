@@ -71,14 +71,6 @@ public class WinningConditionEvaluatorTest {
     }
 
     @Test
-    void testEvaluateDiscoverers() {
-        int points1 = evaluator.evaluateDiscoverers(player1);
-        int points3 = evaluator.evaluateDiscoverers(player3);
-        assertEquals(4, points1);
-        assertEquals(10, points3);
-    }
-
-    @Test
     void testEvaluateHermits_SingleFieldGroup() {
         // Nur 1 Haus = 1 Gruppe
         player1.setHouseFieldIds(Set.of(10));
@@ -163,6 +155,35 @@ public class WinningConditionEvaluatorTest {
         assertEquals(2, evaluator.evaluateMiners(player1));
     }
 
+    @Test
+    void testEvaluateDiscoverers() {
+        int points1 = evaluator.evaluateDiscoverers(player1);
+        int points3 = evaluator.evaluateDiscoverers(player3);
+        assertEquals(4, points1);
+        assertEquals(10, points3);
+    }
+
+    @Test
+    void testEvaluateDiscoverers_Empty() {
+        player1.setHouseFieldIds(Set.of());
+        evaluator = new WinningConditionEvaluator(board, players);
+
+        assertEquals(0, evaluator.evaluateDiscoverers(player1));
+    }
+
+    @Test
+    void testEvaluateDiscoverers_AllRows() {
+        Set<Integer> allRowFields = new HashSet<>();
+        for (int i = 0; i < board.getFields().length; i += 30) {
+            allRowFields.add(i); // z.B. 0, 30, 60, ..., falls 30 Spalten
+        }
+        player1.setHouseFieldIds(allRowFields);
+
+        evaluator = new WinningConditionEvaluator(board, players);
+
+        // Anzahl unterschiedlicher Y-Koordinaten
+        assertEquals(allRowFields.size(), evaluator.evaluateDiscoverers(player1));
+    }
 
     @Test
     void testEvaluateCastleFields(){}
