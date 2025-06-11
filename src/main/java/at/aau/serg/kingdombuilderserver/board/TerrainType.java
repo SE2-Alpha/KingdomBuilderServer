@@ -33,6 +33,6 @@ public enum TerrainType {
     }
 
     public int toInt(){
-        return this.ordinal()+1;
+        return this.ordinal();
     }
 }
