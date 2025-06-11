@@ -6,7 +6,6 @@ import at.aau.serg.kingdombuilderserver.board.quadrants.QuadrantTavern;
 import at.aau.serg.kingdombuilderserver.board.quadrants.QuadrantTower;
 import at.aau.serg.kingdombuilderserver.game.GameHousePosition;
 import at.aau.serg.kingdombuilderserver.game.Player;
-import at.aau.serg.kingdombuilderserver.game.Room;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,9 +20,7 @@ public class GameBoard {
     private final TerrainField[] fields = new TerrainField[SIZE];
 
     @JsonIgnore
-    private Random rand = new Random();
-
-    private static final Logger logger = LoggerFactory.getLogger(GameBoard.class);
+    private final Random rand = new Random();
 
     // Alle verfügbaren Quadranten (hier z.B. 4, erweiterbar)
     private static final List<Supplier<Quadrant>> QUADRANT_SUPPLIERS = List.of(
@@ -155,7 +152,7 @@ public class GameBoard {
             System.out.println("Built field "+field.getId());
             return;
         }
-        if(freeFieldsOfCurrentType.isEmpty()){//TODO(): Check available Fields when pulling Card
+        if(freeFieldsOfCurrentType.isEmpty()){//When all fields of current Type are occupied (unlikely) allow player to place on any neighboring field
             if(allFreeAdjacentFields.contains(id)){
                 placeLegally(field,currentPID,round,activeList);
                 System.out.println("Built field "+field.getId());
@@ -249,18 +246,6 @@ public class GameBoard {
         int[] neighbours = TerrainField.getNeighbours(center);
         for(int neighbour : neighbours) {
             if(candidates.contains(neighbour)) {adjacentFields.add(neighbour);}
-        }
-        return adjacentFields.stream().toList();
-    }
-
-    /**
-     * Suche alle Nachbarfelder in bezug auf einer Liste von Feldern
-     * @return ID-Liste der Nachbarfelder
-     */
-    public List<Integer> getAdjacentFields(List<Integer> ownedFields, List<Integer> candidates){
-        Set<Integer> adjacentFields = new HashSet<>();
-        for(int field : ownedFields) {
-            adjacentFields.addAll(getAdjacentFields(field,candidates));
         }
         return adjacentFields.stream().toList();
     }
