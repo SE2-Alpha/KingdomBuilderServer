@@ -1,21 +1,40 @@
 package at.aau.serg.kingdombuilderserver.board;
 
+import at.aau.serg.kingdombuilderserver.game.GameHousePosition;
+import at.aau.serg.kingdombuilderserver.game.Player;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameBoardTest {
     private GameBoard gameBoardTest;
+    private TerrainField field;
     private TerrainField field1;
     private TerrainField field2;
     private TerrainField field3;
     private TerrainField field4;
+    private Player player;
+    private List<Integer> list;
+
 
     @BeforeEach
     void setUp(){
         gameBoardTest = new GameBoard();
         gameBoardTest.buildGameBoard();
+        player = new Player("123","Player");
+        list = new ArrayList<>();
+    }
+
+    @AfterEach
+    void tearDown(){
+        gameBoardTest = null;
+        player = null;
+        list = null;
     }
 
     @Test
@@ -121,6 +140,104 @@ class GameBoardTest {
         TerrainField field7 = gameBoardTest.getFieldByRowAndCol(0, 0);
         TerrainField field8 = gameBoardTest.getFieldByRowAndCol(5, 5);
         assertFalse(gameBoardTest.areFieldsAdjacent(field7, field8));
+    }
+
+    @Test
+    void isPositionValidTrueTest(){
+        GameHousePosition pos1 = new GameHousePosition(15,15);
+        GameHousePosition pos2 = new GameHousePosition(0,12);
+        assertTrue(gameBoardTest.isPositionValid(pos1));
+        assertTrue(gameBoardTest.isPositionValid(pos2));
+    }
+
+    @Test
+    void isPositionValidFalseTest(){
+        GameHousePosition pos1 = new GameHousePosition(21,40);
+        GameHousePosition pos2 = new GameHousePosition(-1,-1);
+        assertFalse(gameBoardTest.isPositionValid(pos1));
+        assertFalse(gameBoardTest.isPositionValid(pos2));
+    }
+
+    @Test
+    void isPositionValidNullTest(){
+        GameHousePosition pos1 = null;
+        assertFalse(gameBoardTest.isPositionValid(pos1));
+    }
+
+    @Test
+    void placeLegallyTest(){
+        field  = gameBoardTest.getFieldByRowAndCol(1,1); //ID 21 corresponds to (1,1)
+        gameBoardTest.placeLegally(field,player.getId(),5,list);
+        assertEquals(21, field.getId());
+        assertEquals(player.getId(),gameBoardTest.getFieldByRowAndCol(1,1).getOwner());
+        assertEquals(5,gameBoardTest.getFieldByRowAndCol(1,1).getOwnerSinceRound());
+        assertTrue(list.contains(field.getId()));
+    }
+
+    @Test
+    void removeLegallySuccessTest(){
+        field  = gameBoardTest.getFieldByRowAndCol(1,1); //ID 21 corresponds to (1,1)
+        gameBoardTest.placeLegally(field,player.getId(),5,list);
+        gameBoardTest.removeLegally(field,list);
+        assertNull(field.getOwner());
+        assertEquals(-1,field.getOwnerSinceRound());
+        assertFalse(list.contains(field.getId()));
+    }
+
+    @Test
+    void removeLegallyFailTest(){
+        field  = gameBoardTest.getFieldByRowAndCol(1,1); //ID 21 corresponds to (1,1)
+        gameBoardTest.placeLegally(field,player.getId(),5,list);
+        list.clear();
+        assertThrows(RuntimeException.class, () -> gameBoardTest.removeLegally(field,list));
+
+    }
+
+    @Test
+    void placeHouseFails1Test(){
+        player.setCurrentCard(TerrainType.MOUNTAIN);
+        GameHousePosition pos = null;
+        assertThrows(IllegalArgumentException.class, () -> gameBoardTest.placeHouse(player,list,pos,5));
+    }
+    @Test
+    void placeHouseFails2Test(){
+        player.setCurrentCard(TerrainType.MOUNTAIN);
+        GameHousePosition pos = new GameHousePosition(40,30);
+        assertThrows(IllegalArgumentException.class, () -> gameBoardTest.placeHouse(player,list,pos,5));
+    }
+
+    @Test
+    void placeHouseFails3Test(){
+        GameHousePosition pos = new GameHousePosition(1,1);
+        field = gameBoardTest.getFieldByRowAndCol(1,1);
+        field.setOwner("123123123");
+        player.setCurrentCard(field.getType());
+        assertThrows(IllegalStateException.class, () -> gameBoardTest.placeHouse(player,list,pos,5));
+    }
+
+    @Test
+    void placeHouseFails4Test(){
+        GameHousePosition pos = new GameHousePosition(1,1);
+        field = gameBoardTest.getFieldByRowAndCol(1,1);
+        field.setType(TerrainType.SPECIALABILITY);
+        player.setCurrentCard(field.getType());
+        assertThrows(IllegalStateException.class, () -> gameBoardTest.placeHouse(player,list,pos,5));
+    }
+
+    @Test
+    void placeHouseSuccessTest(){
+        GameHousePosition pos = new GameHousePosition(5,5);
+        field =  gameBoardTest.getFieldByRowAndCol(5,5);
+        player.setCurrentCard(field.getType());
+        assertDoesNotThrow(() -> gameBoardTest.placeHouse(player,list,pos,5));
+
+    }
+
+    @Test
+    void getAdjacentFields1Test(){//Parameters int + List
+        list.add(5);
+        List<Integer> list2 = gameBoardTest.getAdjacentFields(4,list);
+        assertTrue(list2.contains(5));
     }
 
 }

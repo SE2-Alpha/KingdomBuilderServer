@@ -102,6 +102,9 @@ public class GameBoard {
             throw new IllegalArgumentException("Aktiver Spieler, Position und Karte dürfen nicht null sein. " + errcode);
         }
 
+        if(!isPositionValid(position)){
+            throw new IllegalArgumentException("Kann hier nichts platzieren " + position);
+        }
         TerrainType currentCard = activePlayer.getCurrentCard();
         String currentPID = activePlayer.getId();
 
