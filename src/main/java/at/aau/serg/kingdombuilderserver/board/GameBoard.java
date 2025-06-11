@@ -114,6 +114,10 @@ public class GameBoard {
             throw new IllegalArgumentException("Spieler hat keine Gebäude übrig " + activePlayer);
         }
 
+        if(activeList != null && activeList.size() == 3){
+            throw new IllegalArgumentException("Spieler hat schon 3 Gebäude Platziert " + activePlayer);
+        }
+
         if(!isPositionValid(position)){
             throw new IllegalArgumentException("Kann hier nichts platzieren " + position);
         }
