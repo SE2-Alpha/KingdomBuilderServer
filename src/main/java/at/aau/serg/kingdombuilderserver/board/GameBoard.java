@@ -102,10 +102,11 @@ public class GameBoard {
      * @param round current round number (by GameManager)
      */
     public void placeHouse(Player activePlayer,List<Integer> activeList, GameHousePosition position, int round) {
-        if (activePlayer == null || position == null || activePlayer.getCurrentCard() == null) {
-            int errcode = 1000;
-            if(activePlayer == null) errcode +=1; else if(activePlayer.getCurrentCard() == null) errcode +=100;
-            if(position == null) errcode +=10;
+        if (activePlayer == null || position == null || activePlayer.getCurrentCard() == null || activeList == null) {
+            int errcode = 0;
+            if(activeList == null) errcode +=1;
+            if(activePlayer == null) errcode +=10; else if(activePlayer.getCurrentCard() == null) errcode +=100;
+            if(position == null) errcode +=1000;
 
             throw new IllegalArgumentException("Aktiver Spieler, Position und Karte dürfen nicht null sein. " + errcode);
         }
@@ -114,7 +115,7 @@ public class GameBoard {
             throw new IllegalArgumentException("Spieler hat keine Gebäude übrig " + activePlayer);
         }
 
-        if(activeList != null && activeList.size() == 3){
+        if(activeList.size() == 3){
             throw new IllegalArgumentException("Spieler hat schon 3 Gebäude Platziert " + activePlayer);
         }
 

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -211,6 +212,7 @@ class GameBoardTest {
         GameHousePosition pos = new GameHousePosition(1,1);
         field = gameBoardTest.getFieldByRowAndCol(1,1);
         field.setOwner("123123123");
+        field.setType(TerrainType.GRASS);
         player.setCurrentCard(field.getType());
         assertThrows(IllegalStateException.class, () -> gameBoardTest.placeHouse(player,list,pos,5));
     }
@@ -235,6 +237,24 @@ class GameBoardTest {
     }
 
     @Test
+    void placeHouseFails6Test(){//Fail on 3 buildings placed
+        GameHousePosition pos = new GameHousePosition(1,1);
+        field = gameBoardTest.getFieldByRowAndCol(1,1);
+        field.setType(TerrainType.GRASS);
+        list.addAll(Arrays.asList(0,1,2));
+        assertThrows(IllegalArgumentException.class, () -> gameBoardTest.placeHouse(player,list,pos,5));
+    }
+
+    @Test
+    void placeHouseFails7Test(){//Fail on Wrong Type
+        GameHousePosition pos = new GameHousePosition(1,1);
+        field = gameBoardTest.getFieldByRowAndCol(1,1);
+        field.setType(TerrainType.GRASS);
+        player.setCurrentCard(TerrainType.FOREST);
+        assertThrows(IllegalStateException.class, () -> gameBoardTest.placeHouse(player,list,pos,5));
+    }
+
+    @Test
     void placeHouseSuccess1Test(){//Success Removing house
         GameHousePosition pos = new GameHousePosition(1,1);
         field = gameBoardTest.getFieldByRowAndCol(1,1);
@@ -252,6 +272,7 @@ class GameBoardTest {
     void placeHouseSuccess2Test(){//Success Placing house
         GameHousePosition pos = new GameHousePosition(5,5);
         field =  gameBoardTest.getFieldByRowAndCol(5,5);
+        field.setType(TerrainType.GRASS);
         player.setCurrentCard(field.getType());
         assertDoesNotThrow(() -> gameBoardTest.placeHouse(player,list,pos,5));
 

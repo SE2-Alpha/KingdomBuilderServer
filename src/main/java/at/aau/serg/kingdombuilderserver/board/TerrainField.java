@@ -94,5 +94,4 @@ public class TerrainField {
         this.type = type;
         this.id = id;
     }
-    // Getter/Setter, etc.
 }
