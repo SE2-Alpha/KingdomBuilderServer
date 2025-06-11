@@ -6,8 +6,6 @@ import at.aau.serg.kingdombuilderserver.board.quadrants.QuadrantTavern;
 import at.aau.serg.kingdombuilderserver.board.quadrants.QuadrantTower;
 import at.aau.serg.kingdombuilderserver.game.GameHousePosition;
 import at.aau.serg.kingdombuilderserver.game.Player;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 
@@ -112,6 +110,10 @@ public class GameBoard {
             throw new IllegalArgumentException("Aktiver Spieler, Position und Karte dürfen nicht null sein. " + errcode);
         }
 
+        if(activePlayer.getRemainingSettlements() == 0){
+            throw new IllegalArgumentException("Spieler hat keine Gebäude übrig " + activePlayer);
+        }
+
         if(!isPositionValid(position)){
             throw new IllegalArgumentException("Kann hier nichts platzieren " + position);
         }
@@ -127,7 +129,7 @@ public class GameBoard {
 
         if (field.getOwner() != null) {
             if(field.getOwner().equals(currentPID) && field.getOwnerSinceRound() == round){
-                removeLegally(field,activeList);
+                removeLegally(field,activeList,activePlayer);
                 return;
             }else{
                 throw new IllegalStateException("Feld ist bereits von einem anderen Spieler besetzt: " + field);
@@ -138,23 +140,25 @@ public class GameBoard {
         List<Integer> builtByActivePlayer = getFieldsBuiltBy(currentPID);
         List<Integer> allFreeAdjacentFields = getAdjacentFields(builtByActivePlayer);
         List<Integer> freeAdjacentCurrentTypeFields = getIntersection(allFreeAdjacentFields, freeFieldsOfCurrentType);
-        //Info dump
-        System.out.println("My Field-ID: "+ id);
-        System.out.println("freeFieldsOfCurrentType: "+freeFieldsOfCurrentType);
-        System.out.println("builtByActivePlayer: "+builtByActivePlayer);
-        System.out.println("allFreeAdjacentFields: "+allFreeAdjacentFields);
-        System.out.println("freeAdjacentCurrentTypeFields: "+freeAdjacentCurrentTypeFields);
+
+
+//        Info dump
+//        System.out.println("My Field-ID: "+ id);
+//        System.out.println("freeFieldsOfCurrentType: "+freeFieldsOfCurrentType);
+//        System.out.println("builtByActivePlayer: "+builtByActivePlayer);
+//        System.out.println("allFreeAdjacentFields: "+allFreeAdjacentFields);
+//        System.out.println("freeAdjacentCurrentTypeFields: "+freeAdjacentCurrentTypeFields);
 
         //First building
         if(builtByActivePlayer.isEmpty() && freeFieldsOfCurrentType.contains(id)
         ){
-            placeLegally(field,currentPID,round,activeList);
+            placeLegally(field,activePlayer,round,activeList);
             System.out.println("Built field "+field.getId());
             return;
         }
         if(freeFieldsOfCurrentType.isEmpty()){//When all fields of current Type are occupied (unlikely) allow player to place on any neighboring field
             if(allFreeAdjacentFields.contains(id)){
-                placeLegally(field,currentPID,round,activeList);
+                placeLegally(field,activePlayer,round,activeList);
                 System.out.println("Built field "+field.getId());
                 return;
             }else{
@@ -168,7 +172,7 @@ public class GameBoard {
                 freeAdjacentCurrentTypeFields.isEmpty() &&
                 (freeFieldsOfCurrentType.contains(id))
         ){
-            placeLegally(field,currentPID,round,activeList);
+            placeLegally(field,activePlayer,round,activeList);
             System.out.println("Built field "+field.getId());
             return;
         }
@@ -192,14 +196,15 @@ public class GameBoard {
     /**
      * Place building, set owner and round in field, add field-ID to current list (by GameManager)
      * @param field position of new house
-     * @param PlayerId ID of active Player (by GameManager)
+     * @param player active Player (by GameManager)
      * @param round int round number
      * @param buffer list of houses built in current round
      */
-    public void placeLegally(TerrainField field, String PlayerId, int round,List<Integer> buffer){
-        field.setOwner(PlayerId);
+    public void placeLegally(TerrainField field, Player player, int round,List<Integer> buffer){
+        field.setOwner(player.getId());
         field.setOwnerSinceRound(round);
         buffer.add(field.getId());
+        player.decreaseSettlementsBy(1);
     }
 
     /**
@@ -207,7 +212,7 @@ public class GameBoard {
      * @param field field to be cleared
      * @param buffer list of houses built in current round
      */
-    public void removeLegally(TerrainField field,List<Integer> buffer){
+    public void removeLegally(TerrainField field,List<Integer> buffer, Player player){
         int index = buffer.indexOf(field.getId());
         if(index == -1) {
             throw new RuntimeException("Field "+ field +" not in buffer array " + buffer);
@@ -219,6 +224,8 @@ public class GameBoard {
             fields[f].setOwnerSinceRound(-1);
         }
         buffer.subList(index,buffer.size()).clear();
+        player.increaseSettlementsBy(buffer.size());
+
     }
 
     /**

@@ -167,7 +167,7 @@ class GameBoardTest {
     @Test
     void placeLegallyTest(){
         field  = gameBoardTest.getFieldByRowAndCol(1,1); //ID 21 corresponds to (1,1)
-        gameBoardTest.placeLegally(field,player.getId(),5,list);
+        gameBoardTest.placeLegally(field,player,5,list);
         assertEquals(21, field.getId());
         assertEquals(player.getId(),gameBoardTest.getFieldByRowAndCol(1,1).getOwner());
         assertEquals(5,gameBoardTest.getFieldByRowAndCol(1,1).getOwnerSinceRound());
@@ -177,8 +177,8 @@ class GameBoardTest {
     @Test
     void removeLegallySuccessTest(){
         field  = gameBoardTest.getFieldByRowAndCol(1,1); //ID 21 corresponds to (1,1)
-        gameBoardTest.placeLegally(field,player.getId(),5,list);
-        gameBoardTest.removeLegally(field,list);
+        gameBoardTest.placeLegally(field,player,5,list);
+        gameBoardTest.removeLegally(field,list,player);
         assertNull(field.getOwner());
         assertEquals(-1,field.getOwnerSinceRound());
         assertFalse(list.contains(field.getId()));
@@ -187,9 +187,9 @@ class GameBoardTest {
     @Test
     void removeLegallyFailTest(){
         field  = gameBoardTest.getFieldByRowAndCol(1,1); //ID 21 corresponds to (1,1)
-        gameBoardTest.placeLegally(field,player.getId(),5,list);
+        gameBoardTest.placeLegally(field,player,5,list);
         list.clear();
-        assertThrows(RuntimeException.class, () -> gameBoardTest.removeLegally(field,list));
+        assertThrows(RuntimeException.class, () -> gameBoardTest.removeLegally(field,list,player));
 
     }
 
