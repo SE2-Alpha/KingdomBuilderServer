@@ -90,9 +90,8 @@ public class GameBoard {
             - Tavern: Build one additional settlement on the end of a straight line of at least 3 settlements
             - Tower: Build one Settlement on the Edge of the Board (adjacent if possible)
      */
-    public void placeHouseSpecial(Player activePlayer,List<Integer> activeList, GameHousePosition position, int round){
-        //TODO(): Special action implementation
-    }
+
+    //TODO(): Special action implementation
 
     /**
      * Check if house can be placed given parameters and places if possible
