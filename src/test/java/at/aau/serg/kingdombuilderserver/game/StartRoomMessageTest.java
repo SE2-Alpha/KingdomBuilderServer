@@ -15,11 +15,22 @@ public class StartRoomMessageTest {
 
     @BeforeEach
     void setUp(){
+        player1 = new Player("1","Player1");
+        player2 = new Player("2","Player2");
+        player3 = new Player("3","Player3");
         room = new Room("12345","New Room");
         room.addPlayer(player1);
         room.addPlayer(player2);
         room.addPlayer(player3);
         RoomList.list.put(room.getId(), room);
+    }
+    @AfterEach
+    void tearDown(){
+        RoomList.list.remove(room.getId());
+        room = null;
+        player1 = null;
+        player2 = null;
+        player3 = null;
     }
 
     @Test
@@ -34,11 +45,4 @@ public class StartRoomMessageTest {
         StartRoomMessage startRoomMessage = new StartRoomMessage(room.getId());
         assertInstanceOf(String.class, startRoomMessage.toString());
     }
-
-    @AfterEach
-    void tearDown(){
-        RoomList.list.remove(room.getId());
-        room = null;
-    }
-
 }
