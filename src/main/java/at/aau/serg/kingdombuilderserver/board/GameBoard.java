@@ -91,7 +91,7 @@ public class GameBoard {
             - Tower: Build one Settlement on the Edge of the Board (adjacent if possible)
      */
 
-    //TODO(): Special action implementation
+    //TODO Special action implementation
 
     /**
      * Check if house can be placed given parameters and places if possible
@@ -114,7 +114,7 @@ public class GameBoard {
             throw new IllegalArgumentException("Spieler hat keine Gebäude übrig " + activePlayer);
         }
 
-        if(activeList.size() == 3){
+        if(activeList.size() >= 3){
             throw new IllegalArgumentException("Spieler hat schon 3 Gebäude Platziert " + activePlayer);
         }
 

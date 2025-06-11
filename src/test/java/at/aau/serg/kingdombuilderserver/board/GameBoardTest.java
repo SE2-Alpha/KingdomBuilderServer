@@ -200,6 +200,7 @@ class GameBoardTest {
         GameHousePosition pos = null;
         assertThrows(IllegalArgumentException.class, () -> gameBoardTest.placeHouse(player,list,pos,5));
     }
+
     @Test
     void placeHouseFails2Test(){//Fails at invalid position
         player.setCurrentCard(TerrainType.MOUNTAIN);
@@ -242,6 +243,7 @@ class GameBoardTest {
         field = gameBoardTest.getFieldByRowAndCol(1,1);
         field.setType(TerrainType.GRASS);
         list.addAll(Arrays.asList(0,1,2));
+        player.setCurrentCard(field.getType());
         assertThrows(IllegalArgumentException.class, () -> gameBoardTest.placeHouse(player,list,pos,5));
     }
 
