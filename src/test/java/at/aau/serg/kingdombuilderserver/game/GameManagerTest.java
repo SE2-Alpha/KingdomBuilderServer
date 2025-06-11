@@ -4,6 +4,7 @@ import at.aau.serg.kingdombuilderserver.board.GameBoard;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,7 +26,7 @@ class GameManagerTest {
 
         // Testfreundlichen Konstruktor verwenden
         gameManager = new GameManager(mockGameBoard);
-
+        fieldBuffer = new ArrayList<>();
         // Aktiven Spieler setzen
         gameManager.setActivePlayer(mockPlayer);
 
