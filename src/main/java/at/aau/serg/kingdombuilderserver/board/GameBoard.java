@@ -6,13 +6,13 @@ import at.aau.serg.kingdombuilderserver.board.quadrants.QuadrantTavern;
 import at.aau.serg.kingdombuilderserver.board.quadrants.QuadrantTower;
 import at.aau.serg.kingdombuilderserver.game.GameHousePosition;
 import at.aau.serg.kingdombuilderserver.game.Player;
+import at.aau.serg.kingdombuilderserver.game.Room;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class GameBoard {
@@ -22,6 +22,8 @@ public class GameBoard {
 
     @JsonIgnore
     private Random rand = new Random();
+
+    private static final Logger logger = LoggerFactory.getLogger(GameBoard.class);
 
     // Alle verfügbaren Quadranten (hier z.B. 4, erweiterbar)
     private static final List<Supplier<Quadrant>> QUADRANT_SUPPLIERS = List.of(
@@ -93,6 +95,17 @@ public class GameBoard {
             - Tavern: Build one additional settlement on the end of a straight line of at least 3 settlements
             - Tower: Build one Settlement on the Edge of the Board (adjacent if possible)
      */
+    public void placeHouseSpecial(Player activePlayer,List<Integer> activeList, GameHousePosition position, int round){
+        //TODO(): Special action implementation
+    }
+
+    /**
+     * Check if house can be placed given parameters and places if possible
+     * @param activePlayer currently active player (by GameManager)
+     * @param activeList List of IDs of houses placed this round by active player
+     * @param position clicked position on wich house will be built if possible
+     * @param round current round number (by GameManager)
+     */
     public void placeHouse(Player activePlayer,List<Integer> activeList, GameHousePosition position, int round) {
         if (activePlayer == null || position == null || activePlayer.getCurrentCard() == null) {
             int errcode = 1000;
@@ -127,18 +140,30 @@ public class GameBoard {
         List<Integer> freeFieldsOfCurrentType = getFreeFieldsOfType(currentCard);
         List<Integer> builtByActivePlayer = getFieldsBuiltBy(currentPID);
         List<Integer> allFreeAdjacentFields = getAdjacentFields(builtByActivePlayer);
-        List<Integer> freeAdjacentCurrentTypeFields = getAdjacentFields(builtByActivePlayer, freeFieldsOfCurrentType);
-
-
-        if(freeFieldsOfCurrentType.isEmpty()){//TODO(): Check available Fields when pulling Card
-            throw new IllegalStateException("Es Existiert kein freies Feld mit richtigen Typen: " + field);
-        }
+        List<Integer> freeAdjacentCurrentTypeFields = getIntersection(allFreeAdjacentFields, freeFieldsOfCurrentType);
+        //Info dump
+        System.out.println("My Field-ID: "+ id);
+        System.out.println("freeFieldsOfCurrentType: "+freeFieldsOfCurrentType);
+        System.out.println("builtByActivePlayer: "+builtByActivePlayer);
+        System.out.println("allFreeAdjacentFields: "+allFreeAdjacentFields);
+        System.out.println("freeAdjacentCurrentTypeFields: "+freeAdjacentCurrentTypeFields);
 
         //First building
         if(builtByActivePlayer.isEmpty() && freeFieldsOfCurrentType.contains(id)
         ){
             placeLegally(field,currentPID,round,activeList);
+            System.out.println("Built field "+field.getId());
             return;
+        }
+        if(freeFieldsOfCurrentType.isEmpty()){//TODO(): Check available Fields when pulling Card
+            if(allFreeAdjacentFields.contains(id)){
+                placeLegally(field,currentPID,round,activeList);
+                System.out.println("Built field "+field.getId());
+                return;
+            }else{
+                throw new IllegalStateException("Gezogener FeldTyp ist voll und feld grenzt nicht an bebautes feld" + allFreeAdjacentFields);
+            }
+
         }
 
         if(
@@ -147,6 +172,7 @@ public class GameBoard {
                 (freeFieldsOfCurrentType.contains(id))
         ){
             placeLegally(field,currentPID,round,activeList);
+            System.out.println("Built field "+field.getId());
             return;
         }
 
@@ -158,7 +184,7 @@ public class GameBoard {
         if(!freeAdjacentCurrentTypeFields.isEmpty()  && !freeAdjacentCurrentTypeFields.contains(id)
                 || !allFreeAdjacentFields.isEmpty() && !allFreeAdjacentFields.contains(id)
         ){
-            throw new IllegalStateException("Feld an nicht erlaubter Position: " + field.getId()+ " "
+            throw new IllegalStateException("Feld an nicht erlaubter Position: " + field.getId() + " "
                     +freeAdjacentCurrentTypeFields + " " + allFreeAdjacentFields );
         }
 
@@ -166,17 +192,30 @@ public class GameBoard {
         throw new IllegalStateException("Feld konnte nicht bebaut werden: " + field);
     }
 
+    /**
+     * Place building, set owner and round in field, add field-ID to current list (by GameManager)
+     * @param field position of new house
+     * @param PlayerId ID of active Player (by GameManager)
+     * @param round int round number
+     * @param buffer list of houses built in current round
+     */
     public void placeLegally(TerrainField field, String PlayerId, int round,List<Integer> buffer){
         field.setOwner(PlayerId);
         field.setOwnerSinceRound(round);
         buffer.add(field.getId());
     }
 
+    /**
+     * Removes house from selected field by clearing all relevant field + all buildings placed after it
+     * @param field field to be cleared
+     * @param buffer list of houses built in current round
+     */
     public void removeLegally(TerrainField field,List<Integer> buffer){
         int index = buffer.indexOf(field.getId());
         if(index == -1) {
             throw new RuntimeException("Field "+ field +" not in buffer array " + buffer);
         }
+
         List<Integer> choppingBlock = buffer.subList(index,buffer.size());
         for(Integer f : choppingBlock){
             fields[f].setOwner(null);
@@ -206,11 +245,12 @@ public class GameBoard {
      * @return ID-Liste der Nachbarfelder
      */
     public List<Integer> getAdjacentFields(int center, List<Integer> candidates) {
-        List<Integer> adjacentFields = new ArrayList<>();
-        for(int candidate: candidates) {
-            if(areFieldsAdjacent(fields[center],fields[candidate])){adjacentFields.add(candidate);}
+        Set<Integer> adjacentFields = new HashSet<>();
+        int[] neighbours = TerrainField.getNeighbours(center);
+        for(int neighbour : neighbours) {
+            if(candidates.contains(neighbour)) {adjacentFields.add(neighbour);}
         }
-        return adjacentFields;
+        return adjacentFields.stream().toList();
     }
 
     /**
@@ -218,11 +258,11 @@ public class GameBoard {
      * @return ID-Liste der Nachbarfelder
      */
     public List<Integer> getAdjacentFields(List<Integer> ownedFields, List<Integer> candidates){
-        List<Integer> adjacentFields = new ArrayList<>();
-        for(int ownedField : ownedFields) {
-            adjacentFields.addAll(getAdjacentFields(ownedField,candidates));
+        Set<Integer> adjacentFields = new HashSet<>();
+        for(int field : ownedFields) {
+            adjacentFields.addAll(getAdjacentFields(field,candidates));
         }
-        return adjacentFields;
+        return adjacentFields.stream().toList();
     }
 
     /**
@@ -230,12 +270,12 @@ public class GameBoard {
      * @return ID-Liste der Nachbarfelder
      */
     public List<Integer> getAdjacentFields(List<Integer> ownedFields){
-        List<Integer> adjacentFields = new ArrayList<>();
+        Set<Integer> adjacentFields = new HashSet<>();
         for( TerrainField field : fields) {
             int id = field.getId();
             adjacentFields.addAll(getAdjacentFields(id,ownedFields));
         }
-        return adjacentFields;
+        return adjacentFields.stream().toList();
     }
 
     /**
@@ -250,12 +290,12 @@ public class GameBoard {
      * @return Liste mit indizes freier Felder (evtl. leere Liste)
      */
     public List<Integer> getFreeFieldsOfType(TerrainType type){
-        List<Integer> freeFields = new ArrayList<>();
+        Set<Integer> freeFields = new HashSet<>();
         for(int i = 0; i < fields.length; i++){
             TerrainField f = fields[i];
             if(f.getType() == type && f.getOwner() == null){freeFields.add(i);}
         }
-        return freeFields;
+        return freeFields.stream().toList();
     }
 
     /**
@@ -263,13 +303,19 @@ public class GameBoard {
      * @return Liste der Felder die von Spieler mit id bebaut wurden
      */
     public List<Integer> getFieldsBuiltBy(String id){
-        List<Integer> fieldsByPlayer = new ArrayList<>();
+        Set<Integer> fieldsByPlayer = new HashSet<>();
         for(int i = 0; i < fields.length; i++){
             TerrainField field = fields[i];
             if(field.getOwner() != null && field.getOwner().equals(id)){fieldsByPlayer.add(i);}
         }
-        return fieldsByPlayer;
+        return fieldsByPlayer.stream().toList();
     }
 
-
+    public List<Integer> getIntersection(List<Integer> a, List<Integer> b){
+        Set<Integer> intersection = new HashSet<>();
+        for(int i: a){
+            if(b.contains(i)){intersection.add(i);}
+        }
+        return intersection.stream().toList();
+    }
 }

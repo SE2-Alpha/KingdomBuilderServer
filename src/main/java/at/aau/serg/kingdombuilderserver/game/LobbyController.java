@@ -25,7 +25,7 @@ public class LobbyController {
     @MessageMapping("/lobby/get")
     @SendTo("/topic/lobby")
     public Collection<RoomLobbyDTO> getLobby() {
-        System.out.println("Lobby get"+lobbyService.getAllRooms().size());
+        System.out.println("Lobby has "+lobbyService.getAllRooms().size()+" rooms");
         return lobbyService.getAllRooms()
                 .stream()
                 .map(RoomLobbyDTO::from)
