@@ -270,10 +270,10 @@ public class GameBoard {
      * @return ID-Liste der Nachbarfelder
      */
     public List<Integer> getAdjacentFields(List<Integer> ownedFields){
+        List<Integer> neighbours = TerrainField.getNeighbours(ownedFields);
         Set<Integer> adjacentFields = new HashSet<>();
-        for( TerrainField field : fields) {
-            int id = field.getId();
-            adjacentFields.addAll(getAdjacentFields(id,ownedFields));
+        for(int field : neighbours) {
+            if(!ownedFields.contains(field)) {adjacentFields.add(field);}
         }
         return adjacentFields.stream().toList();
     }
@@ -291,9 +291,8 @@ public class GameBoard {
      */
     public List<Integer> getFreeFieldsOfType(TerrainType type){
         Set<Integer> freeFields = new HashSet<>();
-        for(int i = 0; i < fields.length; i++){
-            TerrainField f = fields[i];
-            if(f.getType() == type && f.getOwner() == null){freeFields.add(i);}
+        for(TerrainField f: fields){
+            if(f.getType() == type && f.getOwner() == null){freeFields.add(f.getId());}
         }
         return freeFields.stream().toList();
     }
@@ -304,17 +303,16 @@ public class GameBoard {
      */
     public List<Integer> getFieldsBuiltBy(String id){
         Set<Integer> fieldsByPlayer = new HashSet<>();
-        for(int i = 0; i < fields.length; i++){
-            TerrainField field = fields[i];
-            if(field.getOwner() != null && field.getOwner().equals(id)){fieldsByPlayer.add(i);}
+        for(TerrainField f: fields){
+            if(f.getOwner() != null && f.getOwner().equals(id)){fieldsByPlayer.add(f.getId());}
         }
         return fieldsByPlayer.stream().toList();
     }
 
-    public List<Integer> getIntersection(List<Integer> a, List<Integer> b){
+    public List<Integer> getIntersection(List<Integer> listA, List<Integer> listB){
         Set<Integer> intersection = new HashSet<>();
-        for(int i: a){
-            if(b.contains(i)){intersection.add(i);}
+        for(int i: listA){
+            if(listB.contains(i)){intersection.add(i);}
         }
         return intersection.stream().toList();
     }
