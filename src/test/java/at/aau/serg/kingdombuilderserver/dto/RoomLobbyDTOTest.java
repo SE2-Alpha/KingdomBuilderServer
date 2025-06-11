@@ -3,7 +3,7 @@ package at.aau.serg.kingdombuilderserver.dto;
 import at.aau.serg.kingdombuilderserver.messaging.dtos.RoomLobbyDTO;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RoomLobbyDTOTest {
 

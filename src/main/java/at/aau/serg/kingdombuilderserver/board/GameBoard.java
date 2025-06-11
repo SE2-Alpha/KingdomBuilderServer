@@ -1,15 +1,18 @@
 package at.aau.serg.kingdombuilderserver.board;
 
+import at.aau.serg.kingdombuilderserver.board.quadrants.QuadrantFields;
 import at.aau.serg.kingdombuilderserver.board.quadrants.QuadrantOasis;
 import at.aau.serg.kingdombuilderserver.board.quadrants.QuadrantTavern;
 import at.aau.serg.kingdombuilderserver.board.quadrants.QuadrantTower;
-import at.aau.serg.kingdombuilderserver.board.quadrants.QuadrantFields;
 import at.aau.serg.kingdombuilderserver.game.GameHousePosition;
 import at.aau.serg.kingdombuilderserver.game.Player;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 import java.util.function.Supplier;
 
 public class GameBoard {

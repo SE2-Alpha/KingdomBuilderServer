@@ -2,12 +2,12 @@ package at.aau.serg.kingdombuilderserver.game;
 
 import at.aau.serg.kingdombuilderserver.board.TerrainType;
 import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerActionDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
