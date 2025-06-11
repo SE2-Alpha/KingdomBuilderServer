@@ -44,4 +44,9 @@ public class Player {
     public void decreaseSettlementsBy(int value){
         remainingSettlements = Math.max(remainingSettlements - Math.abs(value), 0);
     }
+
+    @Override
+    public String toString() {
+        return "ID: " + id + ", Name: " + name + ", Color: " + color + "Settlements: " + remainingSettlements;
+    }
 }
