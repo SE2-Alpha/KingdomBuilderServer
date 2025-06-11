@@ -5,9 +5,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter @Setter
+@Getter
+@Setter
 public class Player {
-    private @Setter(AccessLevel.NONE) String id;
+    @Setter(AccessLevel.NONE)
+    private String id;
     private String name;
     private int color;
     private int remainingSettlements;
@@ -42,6 +44,4 @@ public class Player {
     public void decreaseSettlementsBy(int value){
         remainingSettlements = Math.max(remainingSettlements - Math.abs(value), 0);
     }
-
-
 }
