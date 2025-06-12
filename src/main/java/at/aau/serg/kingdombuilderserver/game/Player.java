@@ -1,5 +1,6 @@
 package at.aau.serg.kingdombuilderserver.game;
 
+import at.aau.serg.kingdombuilderserver.board.TerrainType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,13 +9,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Getter @Setter
+@Getter
+@Setter
 public class Player {
-    private @Setter(AccessLevel.NONE) String id;
+    @Setter(AccessLevel.NONE)
+    private String id;
     private String name;
     private int color;
     private int remainingSettlements;
     private int score;
     private Set<Integer> houseFieldIds = new HashSet<>();
+    private TerrainType currentCard = null; //Card pulled in current turn
 
     public Player(String playerId, String playerName) {
         this.id = playerId;
@@ -55,4 +60,8 @@ public class Player {
         return houseFieldIds.contains(fieldId);
     }
 
+    @Override
+    public String toString() {
+        return "ID: " + id + ", Name: " + name + ", Color: " + color + "Settlements: " + remainingSettlements;
+    }
 }

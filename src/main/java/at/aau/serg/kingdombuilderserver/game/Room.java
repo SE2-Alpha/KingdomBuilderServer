@@ -34,6 +34,7 @@ public class Room {
         this.status = RoomStatus.STARTED;
         this.gameManager = new GameManager();
         this.gameManager.setActivePlayer(players.get(0)); // Set the first player as the active player
+        logger.info("Active Player set to {}",players.get(0));
         logger.info("Game started in room {}", id);
     }
 
