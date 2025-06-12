@@ -198,4 +198,30 @@ public class GameManagerCheatLogicTest {
         // Wichtig: Die Report-Liste für player1 sollte leer sein
         assertTrue(gameManager.getCheatReportsThisTurn().getOrDefault(player1.getId(), List.of()).isEmpty());
     }
+
+    @Test
+    void testNextPlayerLogic_CorrectlySkipsPlayerMarkedToSkip(){
+        Room room = new Room("roomId", "Test Room");
+        Player p1 = new Player("p1", "Alice");
+        Player p2 = new Player("p2", "Bob");
+        Player p3 = new Player("p3", "Charlie");
+        room.addPlayer(p1);
+        room.addPlayer(p2);
+        room.addPlayer(p3);
+
+        p2.setSkippedTurn(true); // Bob soll diese Runde aussetzen
+
+        // Aktueller Spieler ist p1
+        Player activePlayer = p1;
+
+        Player nextPlayer = room.getNextPlayer(activePlayer);
+        if (nextPlayer != null && nextPlayer.isSkippedTurn()){
+            nextPlayer.setSkippedTurn(false);
+            nextPlayer = room.getNextPlayer(nextPlayer);
+        }
+
+        assertNotNull(nextPlayer);
+        assertEquals(p3.getId(), nextPlayer.getId(), "Der nächst Spieler sollte p3 sein, da p2 übersprungen wurde.");
+        assertFalse(p2.isSkippedTurn(), "Das skip-Flag von p2 sollte für die Zukunft zurückgesetzt worden sein.");
+    }
 }
