@@ -3,7 +3,6 @@ package at.aau.serg.kingdombuilderserver.websocket.broker;
 import at.aau.serg.kingdombuilderserver.messaging.dtos.StompMessage;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-
 import org.springframework.stereotype.Controller;
 
 

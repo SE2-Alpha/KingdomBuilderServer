@@ -1,5 +1,6 @@
 package at.aau.serg.kingdombuilderserver.game;
 
+import at.aau.serg.kingdombuilderserver.board.TerrainType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +10,8 @@ import java.util.List;
 
 @Getter @Setter
 public class Player {
-    private @Setter(AccessLevel.NONE) String id;
+    @Setter(AccessLevel.NONE)
+    private String id;
     private String name;
     private int color;
     private int remainingSettlements;
@@ -19,6 +21,7 @@ public class Player {
     private int gold = 0;
     private List<GameHousePosition> housesPlacedThisTurn = new ArrayList<>();
 
+    private TerrainType currentCard = null; //Card pulled in current turn
 
     public Player(String playerId, String playerName) {
         this.id = playerId;
@@ -59,4 +62,8 @@ public class Player {
     public void addGold(int amount) { this.gold += amount; }
 
     public void decreaseGold(int amount) { this.gold -= amount; }
+    @Override
+    public String toString() {
+        return "ID: " + id + ", Name: " + name + ", Color: " + color + "Settlements: " + remainingSettlements;
+    }
 }

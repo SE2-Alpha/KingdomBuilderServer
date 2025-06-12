@@ -4,19 +4,24 @@ import at.aau.serg.kingdombuilderserver.board.GameBoard;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import java.util.*;
 
 
 public class GameManager {
 
     @Getter
-    @Setter
     private final GameBoard gameBoard;
     @Getter
     @Setter
     private Player activePlayer;
     @Getter
     private int roundCounter = 0;
+    @Getter
+    @Setter
+    private List<Integer> activeBuildingsSequence = new ArrayList<>();
     @Getter
     private boolean awaitingCheatReports = false;
     private final List<Player> allPlayers;
@@ -50,6 +55,7 @@ public class GameManager {
             return;
         }
         if (gameBoard.isPositionValid(position)) {
+            gameBoard.placeHouse(activePlayer,activeBuildingsSequence, position, roundCounter);
             gameBoard.placeHouse(activePlayer, position, roundCounter);
 
             activePlayer.getHousesPlacedThisTurn().add(position);
