@@ -139,4 +139,24 @@ public class GameManagerCheatLogicTest {
 
     }
 
+    @Test
+    void testPlayerCheatsAndIsCaughtByMultipleReporters_AllReportersGetGold() {
+        player1.setHasCheated(true);
+        player1.getHousesPlacedThisTurn().add(new GameHousePosition(1, 1));
+
+        // Spieler 2 und Spieler 3 melden den Cheat
+        gameManager.recordCheatReport(player2.getId(), player1.getId());
+        gameManager.recordCheatReport(player3.getId(), player1.getId());
+
+        int initialGoldP2 = player2.getGold();
+        int initialGoldP3 = player3.getGold();
+
+        gameManager.processCheatReportOutcome();
+
+        assertEquals(initialGoldP2 + 5, player2.getGold(), "Spieler 2 sollte 5 Gold als Belohnung erhalten.");
+        assertEquals(initialGoldP3 + 5, player3.getGold(), "Spieler 3 sollte ebenfalls 5 Gold erhalten.");
+        assertTrue(player1.getHousesPlacedThisTurn().isEmpty(), "Die Häuser des Schummlers sollten nur einmal entfernt werden.");
+        assertEquals(10, player1.getGold(), "Der Schummler sollte kein Gold verlieren.");
+    }
+
 }
