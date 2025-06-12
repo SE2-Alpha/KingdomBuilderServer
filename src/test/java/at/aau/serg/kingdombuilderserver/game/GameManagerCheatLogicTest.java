@@ -111,4 +111,17 @@ public class GameManagerCheatLogicTest {
         assertFalse(player2.isSkippedTurn(), "Spieler 2");
     }
 
+    @Test
+    void testCleanupTurn_ResetsPlayerAndGameState(){
+        player1.setHasCheated(true);
+        player1.getHousePlacedThisTurn().add(new GameHousePosition(1,1));
+        gameManager.recordCheatReport(player2.getId(), player1.getId());
+
+        gameManager.cleanupTurn();
+
+        assertFalse(player1.hasCheated(), "Der hasCheated-Flag des Spielers sollte zurückgesetzt werden.");
+        assertTrue(player1.getHousesPlacedThisTurn().isEmpty(), "Die Liste der gelegten Häuser sollte geleert werden.");
+        assertTrue(gameManager.getCheatReportsThisTurn().isEmpty(), "Die Cheat-Meldungen für die Runde sollten gelöscht werden.");
+    }
+
 }

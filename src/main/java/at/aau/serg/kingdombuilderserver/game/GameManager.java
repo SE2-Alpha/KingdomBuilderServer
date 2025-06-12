@@ -21,6 +21,8 @@ public class GameManager {
     private boolean awaitingCheatReports = false;
     private final List<Player> allPlayers;
     private Set<String> reports = new HashSet<>();
+    @Getter
+    @Setter
     private Map<String, List<String>> cheatReportsThisTurn;
 
     public GameManager(List<Player> players) {
