@@ -67,7 +67,23 @@ public class GameManagerCheatLogicTest {
         assertFalse(player1.getHousesPlacedThisTurn().isEmpty(), "Das geschummelte Haus sollte (vor dem Cleanup) noch da sein.");
     }
 
+    @Test
+    void testPlayerIsFalseAccused_AccusedGetsGoldAndAccuserSkipsTurn(){
+        player1.setHasCheated(false); // Der Spieler hat NICHT geschummelt
 
+        // Spieler 2 beschuldigt Spieler 1 fälschlicherweise
+        gameManager.recordCheatReport(player2.getId(), player1.getId());
+
+        int initialAccusedGold = player1.getGold();
+        int initialAccuserGold = player2.getGold();
+
+        gameManager.processCheatReportOutcome();
+
+        assertEquals(initialAccusedGold + 5, player1.getGold(), "Der zu Unrecht Beschuldigte sollte 5 Gold erhalten.");
+        assertEquals(initialAccuserGold - 5, player2.getGold(), "Der Ankläger sollte 5 Gold verlieren.");
+        assertTrue(player2.isSkippedTurn(), "Der Ankläger sollte die nächste Runde aussetzen.");
+        assertFalse(player1.isSkippedTurn(), "Der zu Unrecht Beschuldigte sollte nicht aussetzen.");
+    }
 
 
 }
