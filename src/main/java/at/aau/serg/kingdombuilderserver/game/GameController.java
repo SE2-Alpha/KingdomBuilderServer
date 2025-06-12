@@ -99,9 +99,10 @@ public class GameController {
         if (rooms.containsKey(gameId)) {
             if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
                 logger.info("Card drawn by player {} in game {}", action.getPlayerId(), action.getGameId());
-                TerrainType terrainCardType = TerrainType.fromInt(random.nextInt(5)); //TODO(): Send ENUM instead of int
+//                TerrainType terrainCardType = TerrainType.fromInt(random.nextInt(5)); //TODO(): Send ENUM instead of int
+                TerrainType terrainCardType = TerrainType.RandomTerrain();
                 room.getGameManager().getActivePlayer().setCurrentCard(terrainCardType);
-                broadcastTerrainCardType(action.getGameId(), terrainCardType.toInt());
+                broadcastTerrainCardType(action.getGameId(), terrainCardType);
                 broadcastGameUpdate(rooms.get(gameId));
             }else{
                 logger.warn("Player {} is not the active player in game {}", action.getPlayerId(), gameId);
@@ -131,7 +132,7 @@ public class GameController {
         }
     }
 
-    private void broadcastTerrainCardType(String gameId, int terrainCardType){
+    private void broadcastTerrainCardType(String gameId, TerrainType terrainCardType){
         logger.info("Broadcasting terrain type for game: {}", gameId + terrainCardType);
         messagingTemplate.convertAndSend("/topic/game/card/"+gameId, terrainCardType);
     }
