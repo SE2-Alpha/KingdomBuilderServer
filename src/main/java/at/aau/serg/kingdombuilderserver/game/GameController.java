@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 @Controller
 public class GameController {
@@ -25,7 +24,6 @@ public class GameController {
         this.messagingTemplate = messagingTemplate;
     }
 
-    private final Random random = new Random();
 
 
     private void broadcastGameUpdate(Room room){
@@ -99,7 +97,6 @@ public class GameController {
         if (rooms.containsKey(gameId)) {
             if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
                 logger.info("Card drawn by player {} in game {}", action.getPlayerId(), action.getGameId());
-//                TerrainType terrainCardType = TerrainType.fromInt(random.nextInt(5)); //TODO(): Send ENUM instead of int
                 TerrainType terrainCardType = TerrainType.RandomTerrain();
                 room.getGameManager().getActivePlayer().setCurrentCard(terrainCardType);
                 broadcastTerrainCardType(action.getGameId(), terrainCardType);
