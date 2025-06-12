@@ -1,16 +1,20 @@
 package at.aau.serg.kingdombuilderserver.game;
 
+import at.aau.serg.kingdombuilderserver.board.TerrainType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter @Setter
+@Getter
+@Setter
 public class Player {
-    private @Setter(AccessLevel.NONE) String id;
+    @Setter(AccessLevel.NONE)
+    private String id;
     private String name;
     private int color;
     private int remainingSettlements;
     private int score;
+    private TerrainType currentCard = null; //Card pulled in current turn
 
     public Player(String playerId, String playerName) {
         this.id = playerId;
@@ -41,5 +45,8 @@ public class Player {
         remainingSettlements = Math.max(remainingSettlements - Math.abs(value), 0);
     }
 
-
+    @Override
+    public String toString() {
+        return "ID: " + id + ", Name: " + name + ", Color: " + color + "Settlements: " + remainingSettlements;
+    }
 }

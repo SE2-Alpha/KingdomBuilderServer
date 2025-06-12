@@ -3,6 +3,10 @@ package at.aau.serg.kingdombuilderserver.board;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+
 @Setter
 @Getter
 public class TerrainField {
@@ -72,9 +76,22 @@ public class TerrainField {
         return new int[]{-1};
     }
 
+    /**
+     *
+     * @param ids list of Field IDs
+     * @return List of unique neighbours of all ids
+     */
+    public static List<Integer> getNeighbours(List<Integer> ids) {
+        HashSet<Integer> neighbours = new HashSet<>();
+        for(int id : ids) {
+            neighbours.addAll(Arrays.stream(getNeighbours(id)).boxed().toList());
+        }
+        return neighbours.stream().toList();
+    }
+
+
     public TerrainField(TerrainType type, int id) {
         this.type = type;
         this.id = id;
     }
-    // Getter/Setter, etc.
 }

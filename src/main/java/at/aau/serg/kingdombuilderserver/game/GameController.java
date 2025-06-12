@@ -1,17 +1,15 @@
 package at.aau.serg.kingdombuilderserver.game;
 
+import at.aau.serg.kingdombuilderserver.board.TerrainType;
 import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerActionDTO;
-import at.aau.serg.kingdombuilderserver.messaging.dtos.RoomLobbyDTO;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Controller;
 
-import java.util.Collection;
-import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -26,6 +24,8 @@ public class GameController {
     public GameController(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
     }
+
+    private final Random random = new Random();
 
 
     private void broadcastGameUpdate(Room room){
@@ -67,8 +67,11 @@ public class GameController {
             Room room = rooms.get(gameId);
             GameManager gameManager = room.getGameManager();
             Player activePlayer = gameManager.getActivePlayer();
+            List<Integer> activeBuildings = gameManager.getActiveBuildingsSequence();
 
             if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
+                activePlayer.setCurrentCard(null);
+                activeBuildings.clear();
                 // Logik zum Beenden des Zuges, z.B. Wechsel zum nächsten Spieler
                 gameManager.setActivePlayer(room.getNextPlayer(activePlayer));
                 gameManager.nextRound();
@@ -90,12 +93,20 @@ public class GameController {
         logger.info("Game ID: "+gameId);
         logger.info("Pid: "+action.getPlayerId());
         logger.info("Rooms: "+rooms);
+        Room room = rooms.get(gameId);
+        GameManager gameManager = room.getGameManager();
+        Player activePlayer = gameManager.getActivePlayer();
         if (rooms.containsKey(gameId)) {
-            logger.info("Card drawn by player {} in game {}", action.getPlayerId(), action.getGameId());
-            Random random = new Random();
-            int terrainCardType = random.nextInt(5);
-            broadcastTerrainCardType(action.getGameId(), terrainCardType);
-            broadcastGameUpdate(rooms.get(gameId));
+            if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
+                logger.info("Card drawn by player {} in game {}", action.getPlayerId(), action.getGameId());
+                TerrainType terrainCardType = TerrainType.fromInt(random.nextInt(5)); //TODO(): Send ENUM instead of int
+                room.getGameManager().getActivePlayer().setCurrentCard(terrainCardType);
+                broadcastTerrainCardType(action.getGameId(), terrainCardType.toInt());
+                broadcastGameUpdate(rooms.get(gameId));
+            }else{
+                logger.warn("Player {} is not the active player in game {}", action.getPlayerId(), gameId);
+            }
+
         } else {
             logger.warn("Game not found for gameId: {}", action.getGameId());
         }
@@ -124,4 +135,5 @@ public class GameController {
         logger.info("Broadcasting terrain type for game: {}", gameId + terrainCardType);
         messagingTemplate.convertAndSend("/topic/game/card/"+gameId, terrainCardType);
     }
+
 }

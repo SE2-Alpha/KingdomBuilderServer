@@ -6,7 +6,6 @@ import org.mockito.InjectMocks;
 
 import java.util.Collection;
 
-import static at.aau.serg.kingdombuilderserver.game.RoomList.rooms;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class LobbyServiceTest {
@@ -17,7 +16,7 @@ class LobbyServiceTest {
     @BeforeEach
     void setUp() {
         lobbyService = new LobbyService();
-        RoomList.getInstance().list.clear(); // Clear the room list before each test
+        RoomList.list.clear(); // Clear the room list before each test
     }
 
     @Test

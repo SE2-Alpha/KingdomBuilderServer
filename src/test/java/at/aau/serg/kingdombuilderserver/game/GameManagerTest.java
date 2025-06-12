@@ -4,7 +4,11 @@ import at.aau.serg.kingdombuilderserver.board.GameBoard;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class GameManagerTest {
@@ -12,6 +16,7 @@ class GameManagerTest {
     private GameManager gameManager;
     private GameBoard mockGameBoard;
     private Player mockPlayer;
+    private List<Integer> fieldBuffer;
 
     @BeforeEach
     void setUp() {
@@ -21,9 +26,12 @@ class GameManagerTest {
 
         // Testfreundlichen Konstruktor verwenden
         gameManager = new GameManager(mockGameBoard);
-
+        fieldBuffer = new ArrayList<>();
         // Aktiven Spieler setzen
         gameManager.setActivePlayer(mockPlayer);
+
+        //Liste platzierter Gebäude setzen
+        gameManager.setActiveBuildingsSequence(fieldBuffer);
     }
 
     @Test
@@ -34,7 +42,7 @@ class GameManagerTest {
         gameManager.placeHouse(position);
 
         // Überprüfen, ob placeHouse korrekt aufgerufen wurde
-        verify(mockGameBoard, times(1)).placeHouse(mockPlayer, position, 0);
+        verify(mockGameBoard, times(1)).placeHouse(mockPlayer, fieldBuffer, position, 0);
     }
 
     @Test
@@ -42,13 +50,11 @@ class GameManagerTest {
         GameHousePosition position = new GameHousePosition(2, 4);
         when(mockGameBoard.isPositionValid(position)).thenReturn(false);
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
-            gameManager.placeHouse(position);
-        });
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> gameManager.placeHouse(position));
         assertEquals("Ungültige Position für das Platzieren des Hauses: " + position, ex.getMessage());
 
         // Sicherstellen, dass placeHouse NICHT aufgerufen wurde
-        verify(mockGameBoard, never()).placeHouse(any(), any(), anyInt());
+        verify(mockGameBoard, never()).placeHouse(any(),any(), any(), anyInt());
     }
 
     @Test
