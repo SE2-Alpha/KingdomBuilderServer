@@ -12,10 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 @Controller
 public class GameController {
@@ -36,10 +33,15 @@ public class GameController {
         messagingTemplate.convertAndSend("/topic/game/update/"+room.getId(), room);
     }
 
-    private void broadcastCheatReportWindow(Room room){
-        logger.info("Broadcasting CheatReportWindoow status for game: {}", room.getId());
-        messagingTemplate.convertAndSend("/topic/game/cheatReportWindow/"+ room.getId(),
-                Map.of("gameId", room.getId(), "isCheatReportWindowActive", true, "durationSeconds", 3));
+    private void broadcastCheatReportWindow(Room room, boolean isActive, String reportedPlayerId){
+        logger.info("Broadcasting CheatReportWindoow status ({}) for game: {}",isActive, room.getId());
+
+        Map<String, Object> playload = new HashMap<>();
+        playload.put("gameId", room.getId());
+        playload.put("isWindowActive", isActive);
+        playload.put("reportedPlayerId", reportedPlayerId);
+
+        messagingTemplate.convertAndSend("/topic/game/cheatReportWindow/"+ room.getId(), playload);
     }
 
     @MessageMapping("/game/placeHouses")
@@ -79,11 +81,14 @@ public class GameController {
 
             if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
                 // Logik zum Beenden des Zuges, z.B. Wechsel zum nächsten Spieler
+                activePlayer.setHasCheated(action.isDidCheat());
+                logger.info("Player {} ended turn. HasCheated is now: {}", activePlayer.getId(), activePlayer.hasCheated());
+
                 logger.info("Initiating cheat report window for game {}", gameId);
 
                 // Cheat-Report-Fenster aktivieren"
                 gameManager.setAwaitingCheatReports(true);
-                broadcastCheatReportWindow(room);
+                broadcastCheatReportWindow(room, true, activePlayer.getId());
 
                 // Timer für 3 Sekunden aktivieren
                 new java.util.Timer().schedule(new java.util.TimerTask(){
