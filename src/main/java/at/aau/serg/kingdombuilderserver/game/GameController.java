@@ -141,9 +141,7 @@ public class GameController {
         messagingTemplate.convertAndSend("/topic/game/card/"+gameId, terrainCardType);
     }
 
-    @MessageMapping("/game/getScores")
-    @SendTo("/topic/game/scores")
-    public List<PlayerScoreDTO> sendPlayerScores(@Payload String gameId) {
+    public void sendPlayerScores(@Payload String gameId) {
         if (rooms.containsKey(gameId)) {
             Room room = rooms.get(gameId);
             GameManager gameManager = room.getGameManager();
@@ -153,15 +151,7 @@ public class GameController {
                     gameManager.getGameBoard(), players
             );
 
-            Map<String, Integer> scores = evaluator.getPlayerPoints();
-
-            return scores.entrySet().stream()
-                    .map(entry -> new PlayerScoreDTO(entry.getKey(), entry.getValue()))
-                    .collect(Collectors.toList());
-        } else {
-            logger.warn("Game not found for gameId: {}", gameId);
-            return Collections.emptyList();
+            messagingTemplate.convertAndSend("/topic/game/scores/"+gameId, evaluator.getPlayerPoints());
         }
     }
-
 }

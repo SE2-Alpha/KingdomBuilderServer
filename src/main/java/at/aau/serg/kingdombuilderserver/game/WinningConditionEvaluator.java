@@ -3,6 +3,7 @@ package at.aau.serg.kingdombuilderserver.game;
 import at.aau.serg.kingdombuilderserver.board.GameBoard;
 import at.aau.serg.kingdombuilderserver.board.TerrainField;
 import at.aau.serg.kingdombuilderserver.board.TerrainType;
+import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerScoreDTO;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,15 +23,15 @@ public class WinningConditionEvaluator {
      * Methode um alle Spieler mit ihren Punkten zu berechnen
      * @return result (Hashmap playerid, points)
      */
-    public Map<String, Integer> getPlayerPoints() {
-        Map<String, Integer> result = new HashMap<>();
+    public List<PlayerScoreDTO> getPlayerPoints() {
+        List<PlayerScoreDTO> result = new ArrayList<>();
         for (Player player : players) {
             int points =
                     evaluateHermits(player)
                             + evaluateMiners(player)
                             + evaluateDiscoverers(player)
                             + evaluateCastleFields(player);
-            result.put(player.getId(), points);
+            result.add(new PlayerScoreDTO(player.getId(), player.getName(), points));
         }
         return result;
     }
