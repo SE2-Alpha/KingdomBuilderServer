@@ -179,4 +179,23 @@ public class GameManagerCheatLogicTest {
         assertTrue(player2.isSkippedTurn(), "Ankläger 1 muss eine Runde aussetzen.");
         assertTrue(player3.isSkippedTurn(), "Ankläger 2 muss ebenfalls eine Runde aussetzen.");
     }
+
+    @Test
+    void testRecordCheatReport_IgnoresReportAgainstNonActivePlayer(){
+        // player1 ist der aktive Spieler. Spieler 3 meldet Spieler 2
+        gameManager.recordCheatReport(player3.getId(), player2.getId());
+
+        gameManager.processCheatReportOutcome(); // Dies wird für player1 ausgeführt
+
+        // Es sollte absolut nichts passieren, was die Spieler betrifft
+        assertEquals(10, player1.getGold());
+        assertEquals(10, player2.getGold());
+        assertEquals(10, player3.getGold());
+        assertFalse(player1.isSkippedTurn());
+        assertFalse(player2.isSkippedTurn());
+        assertFalse(player3.isSkippedTurn());
+
+        // Wichtig: Die Report-Liste für player1 sollte leer sein
+        assertTrue(gameManager.getCheatReportsThisTurn().getOrDefault(player1.getId(), List.of()).isEmpty());
+    }
 }
