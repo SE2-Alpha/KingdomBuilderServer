@@ -15,7 +15,7 @@ public class GameManagerCheatLogicTest {
     private Player player3;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         player1 = new Player("p1", "Cheater");
         player1.setGold(10);
         player2 = new Player("p2", "Reporter");
@@ -23,7 +23,7 @@ public class GameManagerCheatLogicTest {
         player3 = new Player("p3", "Bystander");
         player3.setGold(10);
 
-        List<Player> players = Arrays.asList(player1,player2,player3);
+        List<Player> players = Arrays.asList(player1, player2, player3);
 
         gameManager = new GameManager(players);
         gameManager.setActivePlayer(player1);
@@ -31,10 +31,10 @@ public class GameManagerCheatLogicTest {
     }
 
     @Test
-    void testPlayerCheatsAndIsCaught_HousesRemovedAndReporterGetsGold(){
+    void testPlayerCheatsAndIsCaught_HousesRemovedAndReporterGetsGold() {
         player1.setHasCheated(true);
         // Simuliere, dass der Spieler ein Haus gesetzt hat
-        GameHousePosition cheatedHouse = new GameHousePosition(5,5);
+        GameHousePosition cheatedHouse = new GameHousePosition(5, 5);
         player1.getHousesPlacedThisTurn().add(cheatedHouse);
         player1.decreaseSettlementsBy(1);
 
@@ -42,7 +42,7 @@ public class GameManagerCheatLogicTest {
         gameManager.recordCheatReport(player2.getId(), player1.getId());
 
         int initialReporterGold = player2.getGold();
-        int initialCheaterSettlements=player1.getRemainingSettlements();
+        int initialCheaterSettlements = player1.getRemainingSettlements();
 
         gameManager.processCheatReportOutcome();
 
@@ -54,7 +54,7 @@ public class GameManagerCheatLogicTest {
     }
 
     @Test
-    void testPlayerCheatsAndGetsAwayWithIt_StateRemains(){
+    void testPlayerCheatsAndGetsAwayWithIt_StateRemains() {
         player1.setHasCheated(true);
         GameHousePosition cheatedHouse = new GameHousePosition(5, 5);
         player1.getHousePlacedThisTurn().add(cheatedHouse);
@@ -68,7 +68,7 @@ public class GameManagerCheatLogicTest {
     }
 
     @Test
-    void testPlayerIsFalseAccused_AccusedGetsGoldAndAccuserSkipsTurn(){
+    void testPlayerIsFalseAccused_AccusedGetsGoldAndAccuserSkipsTurn() {
         player1.setHasCheated(false); // Der Spieler hat NICHT geschummelt
 
         // Spieler 2 beschuldigt Spieler 1 fälschlicherweise
@@ -100,7 +100,7 @@ public class GameManagerCheatLogicTest {
     }
 
     @Test
-    void testNormalTurnWithoutCheatingOrReports_NoStateChanges(){
+    void testNormalTurnWithoutCheatingOrReports_NoStateChanges() {
         player1.setHasCheated(false);
 
         gameManager.processCheatReportOutcome();
@@ -112,9 +112,9 @@ public class GameManagerCheatLogicTest {
     }
 
     @Test
-    void testCleanupTurn_ResetsPlayerAndGameState(){
+    void testCleanupTurn_ResetsPlayerAndGameState() {
         player1.setHasCheated(true);
-        player1.getHousePlacedThisTurn().add(new GameHousePosition(1,1));
+        player1.getHousePlacedThisTurn().add(new GameHousePosition(1, 1));
         gameManager.recordCheatReport(player2.getId(), player1.getId());
 
         gameManager.cleanupTurn();
@@ -122,6 +122,21 @@ public class GameManagerCheatLogicTest {
         assertFalse(player1.hasCheated(), "Der hasCheated-Flag des Spielers sollte zurückgesetzt werden.");
         assertTrue(player1.getHousesPlacedThisTurn().isEmpty(), "Die Liste der gelegten Häuser sollte geleert werden.");
         assertTrue(gameManager.getCheatReportsThisTurn().isEmpty(), "Die Cheat-Meldungen für die Runde sollten gelöscht werden.");
+    }
+
+
+    @Test
+    void testRecordCheatReport_OnlyRecordsWhenAwaitingReports() {
+        gameManager.setAwaitingCheatReports(false); // Das Fenster ist geschlossen
+        gameManager.recordCheatReport(player2.getId(), player1.getId());
+
+        assertTrue(gameManager.getCheatReportsThisTurn().getOrDefault(player1.getId(), List.of()).isEmpty(), "Es sollte kein Report registriert werden, wenn das Fenster geschlossen ist.");
+
+        gameManager.setAwaitingCheatReports(true);
+        gameManager.recordCheatReport(player2.getId(),player1.getId());
+
+        assertFalse(gameManager.getCheatReportsThisTurn().get(player1.getId()).isEmpty(), "Der Report sollte registriert werden, wenn das Fenster offen ist.");
+
     }
 
 }
