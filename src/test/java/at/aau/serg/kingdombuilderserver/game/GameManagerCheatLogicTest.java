@@ -159,4 +159,24 @@ public class GameManagerCheatLogicTest {
         assertEquals(10, player1.getGold(), "Der Schummler sollte kein Gold verlieren.");
     }
 
+    @Test
+    void testPlayerIsFalselyAccusedByMultiplePlayers_AccusedGetsGoldFromAll() {
+        player1.setHasCheated(false); // Nicht geschummelt
+
+        // Spieler 2 und 3 beschuldigen Spieler 1
+        gameManager.recordCheatReport(player2.getId(), player1.getId());
+        gameManager.recordCheatReport(player3.getId(), player1.getId());
+
+        int initialGoldP1 = player1.getGold();
+        int initialGoldP2 = player2.getGold();
+        int initialGoldP3 = player3.getGold();
+
+        gameManager.processCheatReportOutcome();
+
+        assertEquals(initialGoldP1 + 10, player1.getGold(), "Der Beschuldigte sollte von beiden Anklägern je 5 Gold erhalten.");
+        assertEquals(initialGoldP2 - 5, player2.getGold(), "Ankläger 1 (Spieler 2) sollte 5 Gold verlieren.");
+        assertEquals(initialGoldP3 - 5, player3.getGold(), "Ankläger 2 (Spieler 3) sollte 5 Gold verlieren.");
+        assertTrue(player2.isSkippedTurn(), "Ankläger 1 muss eine Runde aussetzen.");
+        assertTrue(player3.isSkippedTurn(), "Ankläger 2 muss ebenfalls eine Runde aussetzen.");
+    }
 }
