@@ -56,7 +56,6 @@ public class GameManager {
         }
         if (gameBoard.isPositionValid(position)) {
             gameBoard.placeHouse(activePlayer,activeBuildingsSequence, position, roundCounter);
-            gameBoard.placeHouse(activePlayer, position, roundCounter);
 
             activePlayer.getHousesPlacedThisTurn().add(position);
         } else {
