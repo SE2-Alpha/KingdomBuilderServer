@@ -78,7 +78,15 @@ public class GameController {
                 activePlayer.setCurrentCard(null);
                 activeBuildings.clear();
                 // Logik zum Beenden des Zuges, z.B. Wechsel zum nächsten Spieler
+
                 gameManager.setActivePlayer(room.getNextPlayer(activePlayer));
+                if(gameManager.getActivePlayer().getRemainingSettlements() == 0)
+                {
+                    //Spiel ist vorbei.
+                    sendPlayerScores(gameId);
+                    return;
+                }
+
                 gameManager.nextRound();
                 logger.info("Turn ended successfully for player {}", action.getPlayerId());
                 broadcastGameUpdate(room);
