@@ -84,6 +84,7 @@ public class GameController {
                 {
                     //Spiel ist vorbei.
                     sendPlayerScores(gameId);
+                    room.setStatus(RoomStatus.FINISHED);
                     return;
                 }
 
