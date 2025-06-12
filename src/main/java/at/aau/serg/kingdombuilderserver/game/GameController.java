@@ -81,8 +81,9 @@ public class GameController {
 
             if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
                 // Logik zum Beenden des Zuges, z.B. Wechsel zum nächsten Spieler
+                logger.info("Received endTurn from Player {}. Client-Payload says didCheat={}", action.getPlayerId(), action.isDidCheat());
                 activePlayer.setHasCheated(action.isDidCheat());
-                logger.info("Player {} ended turn. HasCheated is now: {}", activePlayer.getId(), activePlayer.hasCheated());
+                logger.info("Player {}'s internal hasCheated flag is now set to: {}", activePlayer.getId(), activePlayer.hasCheated());
 
                 logger.info("Initiating cheat report window for game {}", gameId);
 
