@@ -53,6 +53,20 @@ public class GameManagerCheatLogicTest {
         assertEquals(initialCheaterSettlements, player1.getRemainingSettlements(), "Siedlungen sollten (noch) nicht zurückgegeben werden, basierend auf dem Code.");
     }
 
+    @Test
+    void testPlayerCheatsAndGetsAwayWithIt_StateRemains(){
+        player1.setHasCheated(true);
+        GameHousePosition cheatedHouse = new GameHousePosition(5, 5);
+        player1.getHousePlacedThisTurn().add(cheatedHouse);
+        // Keine Meldung wird registriert (leere Reporterliste)
+
+        gameManager.processCheatReportOutcome();
+
+        assertEquals(10, player1.getGold(), "Gold des Schummlers sollte unverändert sein.");
+        assertEquals(10, player2.getGold(), "Gold des anderen Spielers sollte unverändert sein.");
+        assertFalse(player1.getHousesPlacedThisTurn().isEmpty(), "Das geschummelte Haus sollte (vor dem Cleanup) noch da sein.");
+    }
+
 
 
 
