@@ -85,5 +85,18 @@ public class GameManagerCheatLogicTest {
         assertFalse(player1.isSkippedTurn(), "Der zu Unrecht Beschuldigte sollte nicht aussetzen.");
     }
 
+    @Test
+    void testPlayerIsFalselyAccused_AccuserHasNotEnoughGold() {
+        player1.setHasCheated(false);
+        player2.setGold(3); // Ankläger hat nur 3 Gold
+
+        gameManager.recordCheatReport(player2.getId(), player1.getId());
+
+        gameManager.processCheatReportOutcome();
+
+        assertEquals(10 + 3, player1.getGold(), "Der Beschuldigte sollte nur das verfügbare Gold (3) erhalten.");
+        assertEquals(0, player2.getGold(), "Der Ankläger sollte all sein Gold verlieren.");
+        assertTrue(player2.isSkippedTurn(), "Der Ankläger sollte trotzdem eine Runde aussetzen.");
+    }
 
 }
