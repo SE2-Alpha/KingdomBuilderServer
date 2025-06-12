@@ -99,4 +99,16 @@ public class GameManagerCheatLogicTest {
         assertTrue(player2.isSkippedTurn(), "Der Ankläger sollte trotzdem eine Runde aussetzen.");
     }
 
+    @Test
+    void testNormalTurnWithoutCheatingOrReports_NoStateChanges(){
+        player1.setHasCheated(false);
+
+        gameManager.processCheatReportOutcome();
+
+        assertEquals(10, player1.getGold(), "Gold von Spieler 1 sollte unverändert sein.");
+        assertEquals(10, player2.getGold(), "Gold von Spieler 2 sollte unverändert sein.");
+        assertFalse(player1.isSkippedTurn(), "Spieler 1");
+        assertFalse(player2.isSkippedTurn(), "Spieler 2");
+    }
+
 }
