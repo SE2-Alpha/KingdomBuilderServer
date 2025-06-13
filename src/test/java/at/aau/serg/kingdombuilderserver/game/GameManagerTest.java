@@ -29,7 +29,7 @@ class GameManagerTest {
         mockPlayerList.add(mockPlayer);
 
         // Testfreundlichen Konstruktor verwenden
-        gameManager = new GameManager(mockGameBoard);
+        gameManager = new GameManager((List<Player>) mockGameBoard);
         fieldBuffer = new ArrayList<>();
         // Aktiven Spieler setzen
         gameManager.setActivePlayer(mockPlayer);

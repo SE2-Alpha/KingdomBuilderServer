@@ -39,14 +39,14 @@ public class GameController {
     }
 
     private void broadcastCheatReportWindow(Room room, boolean isActive, String reportedPlayerId){
-        logger.info("Broadcasting CheatReportWindoow status ({}) for game: {}",isActive, room.getId());
+        logger.info("Broadcasting CheatReportWindow status ({}) for game: {}",isActive, room.getId());
 
-        Map<String, Object> playload = new HashMap<>();
-        playload.put("gameId", room.getId());
-        playload.put("isWindowActive", isActive);
-        playload.put("reportedPlayerId", reportedPlayerId);
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("gameId", room.getId());
+        payload.put("isWindowActive", isActive);
+        payload.put("reportedPlayerId", reportedPlayerId);
 
-        messagingTemplate.convertAndSend("/topic/game/cheatReportWindow/"+ room.getId(), playload);
+        messagingTemplate.convertAndSend("/topic/game/cheatWindow/"+ room.getId(), payload);
     }
 
     @MessageMapping("/game/placeHouses")
@@ -129,7 +129,7 @@ public class GameController {
                         // Game update senden
                         broadcastGameUpdate(room);
                     }
-                }, 3000); // 3 Sekunden Delay (Zeit für das Entlarfen)
+                }, 5000); // 5 Sekunden Delay (Zeit für das Entlarfen)
 
             } else {
                 logger.warn("Player {} is not the active player in game {}", action.getPlayerId(), gameId);
