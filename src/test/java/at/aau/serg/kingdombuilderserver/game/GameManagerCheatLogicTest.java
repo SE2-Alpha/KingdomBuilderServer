@@ -225,4 +225,21 @@ public class GameManagerCheatLogicTest {
         assertFalse(p2.isSkippedTurn(), "Das skip-Flag von p2 sollte für die Zukunft zurückgesetzt worden sein.");
     }
 
+    @Test
+    void testProcessCheatReportOutcome_WithNullActivePlayer() {
+        gameManager.setActivePlayer(null);
+
+        assertDoesNotThrow(() -> gameManager.processCheatReportOutcome());
+    }
+    @Test
+    void testProcessCheatReportOutcome_FalselyAccusedByNonExistentPlayer() {
+        player1.setHasCheated(false);
+        int initialGold = player1.getGold();
+
+        gameManager.recordCheatReport("non-existent-accuser", player1.getId());
+
+        gameManager.processCheatReportOutcome();
+
+        assertEquals(initialGold, player1.getGold(), "Gold sollte sich nicht ändern, wenn der Ankläger nicht existiert.");
+    }
 }
