@@ -71,5 +71,13 @@ public class PlayerTest {
         assertTrue(player.isSkippedTurn());
     }
 
+    @Test
+    void testHasCheatedFlag(){
+        player = new Player("p1", "Cheater");
+        assertFalse(player.hasCheated());
+        player.setHasCheated(true);
+        assertTrue(player.hasCheated());
+    }
+
 
 }
