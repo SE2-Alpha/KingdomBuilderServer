@@ -3,7 +3,9 @@ package at.aau.serg.kingdombuilderserver.game;
 import at.aau.serg.kingdombuilderserver.board.GameBoard;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,5 +70,19 @@ class GameManagerTest {
         assertEquals(1, gameManager.getRoundCounter());
         gameManager.nextRound();
         assertEquals(2, gameManager.getRoundCounter());
+    }
+
+    @Test
+    void testPlaceHouse_PlayerHasNoSettlements() {
+
+        when(mockPlayer.getRemainingSettlements()).thenReturn(0);
+        GameHousePosition position = new GameHousePosition(1, 1);
+        when(mockGameBoard.isPositionValid(position)).thenReturn(true);
+
+        gameManager.placeHouse(position);
+
+        verify(mockGameBoard, times(1)).placeHouse(any(), any(), any(), anyInt());
+        verify(mockPlayer, never()).decreaseSettlementsBy(1);
+        assertTrue(mockPlayer.getHousesPlacedThisTurn().isEmpty());
     }
 }
