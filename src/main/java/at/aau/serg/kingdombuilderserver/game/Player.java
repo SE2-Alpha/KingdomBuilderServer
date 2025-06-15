@@ -5,8 +5,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+@Getter @Setter
 public class Player {
     @Setter(AccessLevel.NONE)
     private String id;
@@ -14,6 +17,11 @@ public class Player {
     private int color;
     private int remainingSettlements;
     private int score;
+    private boolean hasCheated = false;
+    private boolean skippedTurn = false;
+    private int gold = 0;
+    private List<GameHousePosition> housesPlacedThisTurn = new ArrayList<>();
+
     private TerrainType currentCard = null; //Card pulled in current turn
 
     public Player(String playerId, String playerName) {
@@ -44,6 +52,17 @@ public class Player {
     public void decreaseSettlementsBy(int value){
         remainingSettlements = Math.max(remainingSettlements - Math.abs(value), 0);
     }
+
+    public boolean hasCheated() {
+        return hasCheated;
+    }
+
+    public List <GameHousePosition> getHousePlacedThisTurn(){
+        return housesPlacedThisTurn;
+    }
+    public void addGold(int amount) { this.gold += amount; }
+
+    public void decreaseGold(int amount) { this.gold -= amount; }
 
     @Override
     public String toString() {

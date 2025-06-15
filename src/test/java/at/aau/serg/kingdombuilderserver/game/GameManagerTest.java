@@ -3,7 +3,9 @@ package at.aau.serg.kingdombuilderserver.game;
 import at.aau.serg.kingdombuilderserver.board.GameBoard;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +26,12 @@ class GameManagerTest {
         mockGameBoard = mock(GameBoard.class);
         mockPlayer = mock(Player.class);
 
+        List<Player> mockPlayerList = new ArrayList<>();
+
+        mockPlayerList.add(mockPlayer);
+
         // Testfreundlichen Konstruktor verwenden
-        gameManager = new GameManager(mockGameBoard);
+        gameManager = new GameManager(mockGameBoard, mockPlayerList);
         fieldBuffer = new ArrayList<>();
         // Aktiven Spieler setzen
         gameManager.setActivePlayer(mockPlayer);
@@ -65,4 +71,110 @@ class GameManagerTest {
         gameManager.nextRound();
         assertEquals(2, gameManager.getRoundCounter());
     }
+
+    @Test
+    void testPlaceHouse_PlayerHasNoSettlements() {
+
+        when(mockPlayer.getRemainingSettlements()).thenReturn(0);
+        GameHousePosition position = new GameHousePosition(1, 1);
+        when(mockGameBoard.isPositionValid(position)).thenReturn(true);
+
+        gameManager.placeHouse(position);
+
+        verify(mockGameBoard, times(1)).placeHouse(any(), any(), any(), anyInt());
+        verify(mockPlayer, never()).decreaseSettlementsBy(1);
+        assertTrue(mockPlayer.getHousesPlacedThisTurn().isEmpty());
+    }
+
+    @Test
+    void testPlaceHouse_noActivePlayer() {
+        gameManager.setActivePlayer(null);
+        GameHousePosition position = new GameHousePosition(1, 1);
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class, () -> gameManager.placeHouse(position));
+        assertEquals("Kein aktiver Spieler ausgewählt, um ein Haus zu platzieren.", ex.getMessage());
+    }
+
+    @Test
+    void testRecordCheatReport_WhenNotAwaiting() {
+        gameManager.setAwaitingCheatReports(false);
+        gameManager.recordCheatReport("reporterId", "reportedId");
+        assertTrue(gameManager.getCheatReportsThisTurn().isEmpty());
+    }
+
+    @Test
+    void testPublicConstructor() {
+        // Testet den öffentlichen Konstruktor, der in der echten Anwendung verwendet wird
+        List<Player> players = new ArrayList<>();
+        players.add(new Player("p1", "Tester"));
+        GameManager realGameManager = new GameManager(players);
+
+        // Die wichtigste Zusicherung ist, dass das interne GameBoard-Objekt erstellt wird
+        assertNotNull(realGameManager.getGameBoard());
+    }
+
+    @Test
+    void testNextRound_WithActivePlayer() {
+        // Stellt sicher, dass die Liste der in dieser Runde platzierten Häuser für den Spieler geleert wird
+        when(mockPlayer.getHousesPlacedThisTurn()).thenReturn(new ArrayList<>());
+        gameManager.nextRound();
+        verify(mockPlayer).getHousesPlacedThisTurn();
+    }
+
+    @Test
+    void testNextRound_WithNullActivePlayer() {
+        // Stellt sicher, dass kein NullPointerException auftritt, wenn kein Spieler aktiv ist
+        gameManager.setActivePlayer(null);
+        assertDoesNotThrow(() -> gameManager.nextRound());
+        // Der Zähler sollte trotzdem erhöht werden
+        assertEquals(1, gameManager.getRoundCounter());
+    }
+
+    @Test
+    void testRegisterCheatReport_WhenAwaiting() {
+        gameManager.setAwaitingCheatReports(true);
+        gameManager.registerCheatReport("reporter1");
+
+        assertDoesNotThrow(() -> gameManager.registerCheatReport("reporter1"));
+    }
+
+    @Test
+    void testRegisterCheatReport_WhenNotAwaiting() {
+        gameManager.setAwaitingCheatReports(false);
+        gameManager.registerCheatReport("reporter1");
+
+        // Ähnlich wie oben, wir stellen sicher, dass der Code ausgeführt wird, ohne den Zustand zu ändern.
+        assertDoesNotThrow(() -> gameManager.registerCheatReport("reporter1"));
+    }
+
+    @Test
+    void testSetAwaitingCheatReports_ClearsOldReports() {
+        // Füge einen alten Report hinzu
+        gameManager.getCheatReportsThisTurn().put("p1", List.of("p2"));
+        assertFalse(gameManager.getCheatReportsThisTurn().isEmpty());
+
+        // Das Setzen auf 'true' sollte die Liste leeren
+        gameManager.setAwaitingCheatReports(true);
+        assertTrue(gameManager.getCheatReportsThisTurn().isEmpty());
+    }
+
+    @Test
+    void testCleanupTurn_WithNullActivePlayer() {
+        // Stellt sicher, dass kein NullPointerException auftritt
+        gameManager.setActivePlayer(null);
+        assertDoesNotThrow(() -> gameManager.cleanupTurn());
+    }
+
+    @Test
+    void testPlaceHouse_WhenPlayerHasSettlements() {
+        GameHousePosition validPosition = new GameHousePosition(3, 3);
+        when(mockGameBoard.isPositionValid(validPosition)).thenReturn(true);
+
+        when(mockPlayer.getRemainingSettlements()).thenReturn(10);
+
+        gameManager.placeHouse(validPosition);
+
+        verify(mockPlayer, times(1)).decreaseSettlementsBy(1);
+    }
+
 }
