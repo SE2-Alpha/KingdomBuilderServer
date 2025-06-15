@@ -85,4 +85,16 @@ class GameManagerTest {
         verify(mockPlayer, never()).decreaseSettlementsBy(1);
         assertTrue(mockPlayer.getHousesPlacedThisTurn().isEmpty());
     }
+
+    @Test
+    void testPlaceHouse_noActivePlayer() {
+        gameManager.setActivePlayer(null);
+        GameHousePosition position = new GameHousePosition(1, 1);
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class, () -> gameManager.placeHouse(position));
+        assertEquals("Kein aktiver Spieler ausgewählt, um ein Haus zu platzieren.", ex.getMessage());
+    }
+
+
+
 }
