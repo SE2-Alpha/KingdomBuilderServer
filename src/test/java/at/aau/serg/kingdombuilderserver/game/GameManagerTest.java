@@ -95,6 +95,11 @@ class GameManagerTest {
         assertEquals("Kein aktiver Spieler ausgewählt, um ein Haus zu platzieren.", ex.getMessage());
     }
 
-
+    @Test
+    void testRecordCheatReport_WhenNotAwaiting() {
+        gameManager.setAwaitingCheatReports(false);
+        gameManager.recordCheatReport("reporterId", "reportedId");
+        assertTrue(gameManager.getCheatReportsThisTurn().isEmpty());
+    }
 
 }
