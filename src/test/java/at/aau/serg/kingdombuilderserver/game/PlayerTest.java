@@ -79,5 +79,12 @@ public class PlayerTest {
         assertTrue(player.hasCheated());
     }
 
-
+    @Test
+    void testToStringMethod(){
+        player = new Player("p1", "Tester");
+        player.setColor(5);
+        player.setRemainingSettlements(35);
+        String expected = "ID: p1, Name: Tester, Color: 5Settlements: 35";
+        assertEquals(expected.replaceAll("\\s+", ""), player.toString().replaceAll("\\s+", ""));
+    }
 }
