@@ -2,7 +2,7 @@ package at.aau.serg.kingdombuilderserver.game;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PlayerTest {
     private Player player;
@@ -62,5 +62,14 @@ public class PlayerTest {
         player.decreaseGold(3);
         assertEquals(7, player.getGold());
     }
+
+    @Test
+    void testSkippedTurnFlag(){
+        player = new Player("p1", "Skipper");
+        assertFalse(player.isSkippedTurn());
+        player.setSkippedTurn(true);
+        assertTrue(player.isSkippedTurn());
+    }
+
 
 }
