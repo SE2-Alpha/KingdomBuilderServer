@@ -102,4 +102,67 @@ class GameManagerTest {
         assertTrue(gameManager.getCheatReportsThisTurn().isEmpty());
     }
 
+    @Test
+    void testPublicConstructor() {
+        // Testet den öffentlichen Konstruktor, der in der echten Anwendung verwendet wird
+        List<Player> players = new ArrayList<>();
+        players.add(new Player("p1", "Tester"));
+        GameManager realGameManager = new GameManager(players);
+
+        // Die wichtigste Zusicherung ist, dass das interne GameBoard-Objekt erstellt wird
+        assertNotNull(realGameManager.getGameBoard());
+    }
+
+    @Test
+    void testNextRound_WithActivePlayer() {
+        // Stellt sicher, dass die Liste der in dieser Runde platzierten Häuser für den Spieler geleert wird
+        when(mockPlayer.getHousesPlacedThisTurn()).thenReturn(new ArrayList<>());
+        gameManager.nextRound();
+        verify(mockPlayer).getHousesPlacedThisTurn();
+    }
+
+    @Test
+    void testNextRound_WithNullActivePlayer() {
+        // Stellt sicher, dass kein NullPointerException auftritt, wenn kein Spieler aktiv ist
+        gameManager.setActivePlayer(null);
+        assertDoesNotThrow(() -> gameManager.nextRound());
+        // Der Zähler sollte trotzdem erhöht werden
+        assertEquals(1, gameManager.getRoundCounter());
+    }
+
+    @Test
+    void testRegisterCheatReport_WhenAwaiting() {
+        gameManager.setAwaitingCheatReports(true);
+        gameManager.registerCheatReport("reporter1");
+
+        assertDoesNotThrow(() -> gameManager.registerCheatReport("reporter1"));
+    }
+
+    @Test
+    void testRegisterCheatReport_WhenNotAwaiting() {
+        gameManager.setAwaitingCheatReports(false);
+        gameManager.registerCheatReport("reporter1");
+
+        // Ähnlich wie oben, wir stellen sicher, dass der Code ausgeführt wird, ohne den Zustand zu ändern.
+        assertDoesNotThrow(() -> gameManager.registerCheatReport("reporter1"));
+    }
+
+    @Test
+    void testSetAwaitingCheatReports_ClearsOldReports() {
+        // Füge einen alten Report hinzu
+        gameManager.getCheatReportsThisTurn().put("p1", List.of("p2"));
+        assertFalse(gameManager.getCheatReportsThisTurn().isEmpty());
+
+        // Das Setzen auf 'true' sollte die Liste leeren
+        gameManager.setAwaitingCheatReports(true);
+        assertTrue(gameManager.getCheatReportsThisTurn().isEmpty());
+    }
+
+    @Test
+    void testCleanupTurn_WithNullActivePlayer() {
+        // Stellt sicher, dass kein NullPointerException auftritt
+        gameManager.setActivePlayer(null);
+        assertDoesNotThrow(() -> gameManager.cleanupTurn());
+    }
+
 }

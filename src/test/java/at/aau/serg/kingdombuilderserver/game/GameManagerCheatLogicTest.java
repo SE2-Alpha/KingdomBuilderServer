@@ -224,4 +224,5 @@ public class GameManagerCheatLogicTest {
         assertEquals(p3.getId(), nextPlayer.getId(), "Der nächst Spieler sollte p3 sein, da p2 übersprungen wurde.");
         assertFalse(p2.isSkippedTurn(), "Das skip-Flag von p2 sollte für die Zukunft zurückgesetzt worden sein.");
     }
+
 }
