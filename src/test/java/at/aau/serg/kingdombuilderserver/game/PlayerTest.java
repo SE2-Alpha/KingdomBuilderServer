@@ -53,4 +53,14 @@ public class PlayerTest {
         assertEquals(10,player.getRemainingSettlements());
     }
 
+    @Test
+    void testGoldManagement(){
+        player = new Player("p1", "Goldfinger");
+        assertEquals(0, player.getGold());
+        player.addGold(10);
+        assertEquals(10, player.getGold());
+        player.decreaseGold(3);
+        assertEquals(7, player.getGold());
+    }
+
 }
