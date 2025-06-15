@@ -47,12 +47,10 @@ public class GameManager {
 
     public void placeHouse(GameHousePosition position) {
         if (activePlayer == null) {
-            System.err.println("Kein aktiver Spieler ausgewählt, um ein Haus zu platzieren.");
-            return;
+            throw new IllegalStateException("Kein aktiver Spieler ausgewählt, um ein Haus zu platzieren.");
         }
         if (!gameBoard.isPositionValid(position)) {
-            System.err.println("Ungültige Position (außerhalb des Spielfelds): " + position + " für Spieler " + activePlayer.getId());
-            return;
+            throw new IllegalArgumentException("Ungültige Position für das Platzieren des Hauses: " + position);
         }
         if (gameBoard.isPositionValid(position)) {
             gameBoard.placeHouse(activePlayer,activeBuildingsSequence, position, roundCounter);
