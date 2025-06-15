@@ -165,4 +165,16 @@ class GameManagerTest {
         assertDoesNotThrow(() -> gameManager.cleanupTurn());
     }
 
+    @Test
+    void testPlaceHouse_WhenPlayerHasSettlements() {
+        GameHousePosition validPosition = new GameHousePosition(3, 3);
+        when(mockGameBoard.isPositionValid(validPosition)).thenReturn(true);
+
+        when(mockPlayer.getRemainingSettlements()).thenReturn(10);
+
+        gameManager.placeHouse(validPosition);
+
+        verify(mockPlayer, times(1)).decreaseSettlementsBy(1);
+    }
+
 }
