@@ -341,4 +341,19 @@ class GameBoardTest {
         // aber wir testen das implementierte Verhalten.
         assertEquals(31, player2.getRemainingSettlements(), "Trying player's settlement count should still increase.");
     }
+
+    @Test
+    void undoMove_WithEmptyList_ShouldDoNothing() {
+        // Arrange
+        player.setRemainingSettlements(35);
+        int initialSettlements = player.getRemainingSettlements();
+        List<Integer> emptyList = new ArrayList<>();
+
+        // Act & Assert
+        assertDoesNotThrow(() -> gameBoardTest.undoMove(emptyList, player));
+        assertEquals(initialSettlements, player.getRemainingSettlements(), "Settlement count should not change for an empty undo list.");
+    }
 }
+
+
+
