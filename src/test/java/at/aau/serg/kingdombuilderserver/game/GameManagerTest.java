@@ -83,4 +83,18 @@ class GameManagerTest {
         // Überprüfe, ob die Liste der platzierten Gebäude im GameManager geleert wurde
         assertTrue(gameManager.getActiveBuildingsSequence().isEmpty(), "Active buildings sequence should be empty after undo.");
     }
+
+    @Test
+    void undoLastMove_WhenNoHousesArePlaced_ShouldNotCallGameBoard() {
+        // Arrange
+        // Die Liste ist bereits leer nach dem Setup
+        assertTrue(gameManager.getActiveBuildingsSequence().isEmpty());
+
+        // Act
+        gameManager.undoLastMove(mockPlayer);
+
+        // Assert
+        // Überprüfe, ob die undoMove Methode des GameBoards NIEMALS aufgerufen wurde
+        verify(mockGameBoard, never()).undoMove(any(), any());
+    }
 }
