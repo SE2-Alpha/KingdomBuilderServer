@@ -287,4 +287,37 @@ class GameBoardTest {
         assertTrue(list2.contains(5));
     }
 
+    @Test
+    void undoMove_ShouldRemoveHousesAndRestoreSettlements() {
+        // Arrange
+        int initialSettlements = player.getRemainingSettlements();
+
+        // Platziere 3 Häuser direkt auf dem Brett
+        TerrainField field1 = gameBoardTest.getFields()[10];
+        TerrainField field2 = gameBoardTest.getFields()[11];
+        TerrainField field3 = gameBoardTest.getFields()[12];
+        field1.setOwner(player.getId());
+        field2.setOwner(player.getId());
+        field3.setOwner(player.getId());
+
+        List<Integer> housesToUndo = Arrays.asList(10, 11, 12);
+        player.decreaseSettlementsBy(3);
+        assertEquals(initialSettlements - 3, player.getRemainingSettlements());
+
+
+        // Act
+        gameBoardTest.undoMove(housesToUndo, player);
+
+        // Assert
+        assertNull(field1.getOwner(), "Owner of field 1 should be null after undo.");
+        assertEquals(-1, field1.getOwnerSinceRound());
+        assertNull(field2.getOwner(), "Owner of field 2 should be null after undo.");
+        assertEquals(-1, field2.getOwnerSinceRound());
+        assertNull(field3.getOwner(), "Owner of field 3 should be null after undo.");
+        assertEquals(-1, field3.getOwnerSinceRound());
+
+        assertEquals(initialSettlements, player.getRemainingSettlements(), "Player should have their settlements restored.");
+    }
+
+
 }
