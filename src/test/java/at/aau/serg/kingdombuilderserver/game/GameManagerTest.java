@@ -5,10 +5,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class GameManagerTest {
@@ -64,5 +64,23 @@ class GameManagerTest {
         assertEquals(1, gameManager.getRoundCounter());
         gameManager.nextRound();
         assertEquals(2, gameManager.getRoundCounter());
+    }
+
+    @Test
+    void undoLastMove_WhenHousesArePlaced_ShouldCallGameBoardAndClearList() {
+        // Arrange
+        // Füge platzierte Gebäude zur Sequenzliste hinzu
+        List<Integer> placedHouses = new ArrayList<>(Arrays.asList(5, 10, 15));
+        gameManager.setActiveBuildingsSequence(placedHouses);
+        assertTrue(gameManager.getActiveBuildingsSequence().contains(5));
+
+        // Act
+        gameManager.undoLastMove(mockPlayer);
+
+        // Assert
+        // Überprüfe, ob die undoMove Methode auf dem GameBoard mit der korrekten Liste aufgerufen wurde
+        verify(mockGameBoard, times(1)).undoMove(placedHouses, mockPlayer);
+        // Überprüfe, ob die Liste der platzierten Gebäude im GameManager geleert wurde
+        assertTrue(gameManager.getActiveBuildingsSequence().isEmpty(), "Active buildings sequence should be empty after undo.");
     }
 }
