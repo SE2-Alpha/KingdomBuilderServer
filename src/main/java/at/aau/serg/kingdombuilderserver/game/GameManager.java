@@ -40,6 +40,13 @@ public class GameManager {
         }
     }
 
+    public void undoLastMove(Player player){
+        if (!activeBuildingsSequence.isEmpty()){
+            gameBoard.undoMove(activeBuildingsSequence, player);
+            activeBuildingsSequence.clear();
+        }
+    }
+
     public void nextRound() {
         roundCounter++;
     }
