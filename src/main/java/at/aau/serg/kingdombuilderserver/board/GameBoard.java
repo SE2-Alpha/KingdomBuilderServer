@@ -232,6 +232,18 @@ public class GameBoard {
 
     }
 
+    public void undoMove(List<Integer> housesToUndo, Player player){
+        int numberOfHouses = housesToUndo.size();
+        for (Integer fieldId: housesToUndo) {
+            TerrainField field = fields[fieldId];
+            if (field.getOwner() != null && field.getOwner().equals(player.getId())){
+                field.setOwner(null);
+                field.setOwnerSinceRound(-1);
+            }
+        }
+        player.increaseSettlementsBy(numberOfHouses);
+    }
+
     /**
      * Prüft, ob zwei Felder benachbart sind
      * @param field1 Erstes Feld

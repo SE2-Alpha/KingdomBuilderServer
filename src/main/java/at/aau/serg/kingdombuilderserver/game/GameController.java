@@ -58,6 +58,21 @@ public class GameController {
 
     }
 
+    @MessageMapping("/game/undoLastMove")
+    public void undoLoastMove(@Payload PlayerActionDTO action){
+        logger.info("Received undoLastMove request for game: {}", action.getGameId());
+        String gameId = action.getGameId();
+        if(rooms.containsKey(gameId)){
+            Room room = rooms.get(gameId);
+            GameManager gameManager = room.getGameManager();
+            Player activePlayer = gameManager.getActivePlayer();
+
+            if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
+                logger.info("Undoing last move for player {}", action.getPlayerId());
+            }
+        }
+    }
+
     @MessageMapping("/game/endTurn")
     public void endTurn(@Payload PlayerActionDTO action) {
         logger.info("Received endTurn request: {}", action);
