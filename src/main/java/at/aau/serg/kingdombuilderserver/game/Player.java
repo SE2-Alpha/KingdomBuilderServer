@@ -9,8 +9,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Getter @Setter
-@Getter
-@Setter
 public class Player {
     @Setter(AccessLevel.NONE)
     private String id;
