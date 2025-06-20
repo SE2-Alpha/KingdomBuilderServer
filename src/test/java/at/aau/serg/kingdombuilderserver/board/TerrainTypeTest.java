@@ -3,6 +3,7 @@ package at.aau.serg.kingdombuilderserver.board;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 public class TerrainTypeTest {
@@ -53,5 +54,17 @@ public class TerrainTypeTest {
         assertEquals("GRASS has ordinal 0",0,terrainType1.toInt());
         assertEquals("WATER has ordinal 5",5,terrainType2.toInt());
         assertEquals("CITY has ordinal 8",8,terrainType3.toInt());
+    }
+
+    @Test
+    void RandomTerrainTest(){
+        boolean inRange = true;
+        for(int i = 0; i < 100; i++){
+            terrainType0 = TerrainType.RandomTerrain();
+            if(!terrainType0.isBuildable){
+                inRange = false;
+            }
+        }
+        assertTrue(inRange);
     }
 }
