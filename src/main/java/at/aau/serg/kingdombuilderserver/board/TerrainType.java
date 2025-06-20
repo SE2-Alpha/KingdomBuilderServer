@@ -1,5 +1,6 @@
 package at.aau.serg.kingdombuilderserver.board;
 
+import java.util.Random;
 public enum TerrainType {
     GRASS(true),
     CANYON(true),
@@ -12,7 +13,7 @@ public enum TerrainType {
     CITY(false);
 
     public final boolean isBuildable;
-
+    private static final Random rand = new Random();
     TerrainType(boolean isBuildable) {
         this.isBuildable = isBuildable;
     }
@@ -30,6 +31,11 @@ public enum TerrainType {
             case 8 -> CITY;
             default -> throw new IllegalArgumentException("Unknown terrain type: " + value);
         };
+    }
+
+    public static TerrainType RandomTerrain(){
+
+        return fromInt(rand.nextInt(5));
     }
 
     public int toInt(){
