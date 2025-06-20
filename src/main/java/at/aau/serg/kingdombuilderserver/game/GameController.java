@@ -3,15 +3,19 @@ package at.aau.serg.kingdombuilderserver.game;
 import at.aau.serg.kingdombuilderserver.messaging.dtos.CheatReportDTO;
 import at.aau.serg.kingdombuilderserver.board.TerrainType;
 import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerActionDTO;
-import at.aau.serg.kingdombuilderserver.messaging.dtos.RoomLobbyDTO;
 import io.micrometer.observation.GlobalObservationConvention;
+import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerScoreDTO;
+import at.aau.serg.kingdombuilderserver.messaging.dtos.RoomLobbyDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -29,7 +33,6 @@ public class GameController {
         this.messagingTemplate = messagingTemplate;
     }
 
-    private final Random random = new Random();
 
 
     private void broadcastGameUpdate(Room room){
@@ -111,6 +114,14 @@ public class GameController {
                 activePlayer.setCurrentCard(null);
                 activeBuildings.clear();
                 // Logik zum Beenden des Zuges, z.B. Wechsel zum nächsten Spieler
+
+                if(gameManager.getActivePlayer().getRemainingSettlements() == 0)
+                {
+                    //Spiel ist vorbei.
+                    sendPlayerScores(gameId);
+                    room.setStatus(RoomStatus.FINISHED);
+                    return;
+                }
                 logger.info("Received endTurn from Player {}. Client-Payload says didCheat={}", action.getPlayerId(), action.isDidCheat());
                 activePlayer.setHasCheated(action.isDidCheat());
                 logger.info("Player {}'s internal hasCheated flag is now set to: {}", activePlayer.getId(), activePlayer.hasCheated());
@@ -175,9 +186,9 @@ public class GameController {
         if (rooms.containsKey(gameId)) {
             if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
                 logger.info("Card drawn by player {} in game {}", action.getPlayerId(), action.getGameId());
-                TerrainType terrainCardType = TerrainType.fromInt(random.nextInt(5)); //TODO(): Send ENUM instead of int
+                TerrainType terrainCardType = TerrainType.RandomTerrain();
                 room.getGameManager().getActivePlayer().setCurrentCard(terrainCardType);
-                broadcastTerrainCardType(action.getGameId(), terrainCardType.toInt());
+                broadcastTerrainCardType(action.getGameId(), terrainCardType);
                 broadcastGameUpdate(rooms.get(gameId));
             }else{
                 logger.warn("Player {} is not the active player in game {}", action.getPlayerId(), gameId);
@@ -207,7 +218,7 @@ public class GameController {
         }
     }
 
-    private void broadcastTerrainCardType(String gameId, int terrainCardType){
+    private void broadcastTerrainCardType(String gameId, TerrainType terrainCardType){
         logger.info("Broadcasting terrain type for game: {}", gameId + terrainCardType);
         messagingTemplate.convertAndSend("/topic/game/card/"+gameId, terrainCardType);
     }
@@ -276,6 +287,19 @@ public class GameController {
         // Die Auswertung erfolgt gesammelt in processCheatReportOutcome.
     } else {
         logger.warn("Game not found for gameId in cheat report: {}", report.getGameId());
+        }
+    }
+    public void sendPlayerScores(@Payload String gameId) {
+        if (rooms.containsKey(gameId)) {
+            Room room = rooms.get(gameId);
+            GameManager gameManager = room.getGameManager();
+            List<Player> players = room.getPlayers();
+
+            WinningConditionEvaluator evaluator = new WinningConditionEvaluator(
+                    gameManager.getGameBoard(), players
+            );
+
+            messagingTemplate.convertAndSend("/topic/game/scores/"+gameId, evaluator.getPlayerPoints());
         }
     }
 }

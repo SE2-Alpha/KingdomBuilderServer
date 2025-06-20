@@ -8,6 +8,8 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter @Setter
 public class Player {
@@ -17,6 +19,7 @@ public class Player {
     private int color;
     private int remainingSettlements;
     private int score;
+    private Set<Integer> houseFieldIds = new HashSet<>();
     private boolean hasCheated = false;
     private boolean skippedTurn = false;
     private int gold = 0;
@@ -51,6 +54,16 @@ public class Player {
      */
     public void decreaseSettlementsBy(int value){
         remainingSettlements = Math.max(remainingSettlements - Math.abs(value), 0);
+    }
+
+    // Haus auf ein Feld setzen
+    public boolean placeHouse(int fieldId) {
+        return houseFieldIds.add(fieldId); // Gibt false zurück, wenn schon gesetzt
+    }
+
+    // Prüfen ob ein Haus auf dem Feld steht
+    public boolean hasHouseOnField(int fieldId) {
+        return houseFieldIds.contains(fieldId);
     }
 
     public boolean hasCheated() {
