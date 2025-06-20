@@ -2,7 +2,7 @@ package at.aau.serg.kingdombuilderserver.game;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PlayerTest {
     private Player player;
@@ -53,4 +53,38 @@ public class PlayerTest {
         assertEquals(10,player.getRemainingSettlements());
     }
 
+    @Test
+    void testGoldManagement(){
+        player = new Player("p1", "Goldfinger");
+        assertEquals(0, player.getGold());
+        player.addGold(10);
+        assertEquals(10, player.getGold());
+        player.decreaseGold(3);
+        assertEquals(7, player.getGold());
+    }
+
+    @Test
+    void testSkippedTurnFlag(){
+        player = new Player("p1", "Skipper");
+        assertFalse(player.isSkippedTurn());
+        player.setSkippedTurn(true);
+        assertTrue(player.isSkippedTurn());
+    }
+
+    @Test
+    void testHasCheatedFlag(){
+        player = new Player("p1", "Cheater");
+        assertFalse(player.hasCheated());
+        player.setHasCheated(true);
+        assertTrue(player.hasCheated());
+    }
+
+    @Test
+    void testToStringMethod(){
+        player = new Player("p1", "Tester");
+        player.setColor(5);
+        player.setRemainingSettlements(35);
+        String expected = "ID: p1, Name: Tester, Color: 5Settlements: 35";
+        assertEquals(expected.replaceAll("\\s+", ""), player.toString().replaceAll("\\s+", ""));
+    }
 }

@@ -32,7 +32,7 @@ public class Room {
         }
         setPlayerColor();
         this.status = RoomStatus.STARTED;
-        this.gameManager = new GameManager();
+        this.gameManager = new GameManager(this.players);
         this.gameManager.setActivePlayer(players.get(0)); // Set the first player as the active player
         logger.info("Active Player set to {}",players.get(0));
         logger.info("Game started in room {}", id);
@@ -74,5 +74,19 @@ public class Room {
         }
         int nextIndex = (currentIndex + 1) % players.size();
         return players.get(nextIndex);
+    }
+
+    public Player getPlayerById(String playerId) {
+        if (playerId == null || playerId.isEmpty()){
+            logger.warn("getPlayerById called with null or empty playerId.");
+            return null;
+        }
+        for (Player player : this.players){
+            if (player.getId().equals(playerId)){
+                return player; // Spieler gefunden
+            }
+        }
+        logger.debug("Player with id {} not found in room {}.", playerId, this.id);
+        return null; // Spieler nicht in diesem Raum gefunden
     }
 }

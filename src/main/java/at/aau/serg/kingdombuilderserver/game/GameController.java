@@ -1,7 +1,10 @@
 package at.aau.serg.kingdombuilderserver.game;
 
+import at.aau.serg.kingdombuilderserver.messaging.dtos.CheatReportDTO;
 import at.aau.serg.kingdombuilderserver.board.TerrainType;
 import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerActionDTO;
+import at.aau.serg.kingdombuilderserver.messaging.dtos.RoomLobbyDTO;
+import io.micrometer.observation.GlobalObservationConvention;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.*;
 
 @Controller
 public class GameController {
@@ -32,6 +36,17 @@ public class GameController {
         logger.info("Broadcasting GameUpdate for game: {}", room.getId());
         System.out.println("Broadcasting GameUpdate for game: " + room.getId());
         messagingTemplate.convertAndSend("/topic/game/update/"+room.getId(), room);
+    }
+
+    private void broadcastCheatReportWindow(Room room, boolean isActive, String reportedPlayerId){
+        logger.info("Broadcasting CheatReportWindow status ({}) for game: {}",isActive, room.getId());
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("gameId", room.getId());
+        payload.put("isWindowActive", isActive);
+        payload.put("reportedPlayerId", reportedPlayerId);
+
+        messagingTemplate.convertAndSend("/topic/game/cheatWindow/"+ room.getId(), payload);
     }
 
     @MessageMapping("/game/placeHouses")
@@ -84,6 +99,7 @@ public class GameController {
     public void endTurn(@Payload PlayerActionDTO action) {
         logger.info("Received endTurn request: {}", action);
         String gameId = action.getGameId();
+
         if (rooms.containsKey(gameId)) {
             logger.info("Ending turn for player {} in game {}", action.getPlayerId(), gameId);
             Room room = rooms.get(gameId);
@@ -95,10 +111,48 @@ public class GameController {
                 activePlayer.setCurrentCard(null);
                 activeBuildings.clear();
                 // Logik zum Beenden des Zuges, z.B. Wechsel zum nächsten Spieler
-                gameManager.setActivePlayer(room.getNextPlayer(activePlayer));
-                gameManager.nextRound();
-                logger.info("Turn ended successfully for player {}", action.getPlayerId());
-                broadcastGameUpdate(room);
+                logger.info("Received endTurn from Player {}. Client-Payload says didCheat={}", action.getPlayerId(), action.isDidCheat());
+                activePlayer.setHasCheated(action.isDidCheat());
+                logger.info("Player {}'s internal hasCheated flag is now set to: {}", activePlayer.getId(), activePlayer.hasCheated());
+
+                logger.info("Initiating cheat report window for game {}", gameId);
+
+                // Cheat-Report-Fenster aktivieren"
+                gameManager.setAwaitingCheatReports(true);
+                broadcastCheatReportWindow(room, true, activePlayer.getId());
+
+                // Timer für 3 Sekunden aktivieren
+                new java.util.Timer().schedule(new java.util.TimerTask(){
+                    @Override
+                    public void run(){
+                        logger.info("Processing cheat reports for game {}", gameId);
+
+                        // Cheat-Auswertung durchführen
+                        gameManager.processCheatReportOutcome();
+
+                        // Reset & cleanup
+                        gameManager.setAwaitingCheatReports(false);
+                        gameManager.cleanupTurn();
+
+                        Player nextPlayer = room.getNextPlayer(activePlayer);
+                        if (nextPlayer != null && nextPlayer.isSkippedTurn()) {
+                            logger.info("Player " + nextPlayer.getId() + " is skipping their turn.");
+                            nextPlayer.setSkippedTurn(false); // WICHTIG: Flag für die Zukunft zurücksetzen
+                            nextPlayer = room.getNextPlayer(nextPlayer); // Erneut aufrufen, um den Übernächsten Spieler zu bekommen
+                        }
+
+                        gameManager.setActivePlayer(nextPlayer);
+                        if (nextPlayer != null) {
+                            gameManager.nextRound();
+                        } else {
+                            logger.info("No next player found, potentially game end for game {}", gameId);
+                        }
+
+                        // Game update senden
+                        broadcastGameUpdate(room);
+                    }
+                }, 5000); // 5 Sekunden Delay (Zeit für das Entlarfen)
+
             } else {
                 logger.warn("Player {} is not the active player in game {}", action.getPlayerId(), gameId);
             }
@@ -158,4 +212,70 @@ public class GameController {
         messagingTemplate.convertAndSend("/topic/game/card/"+gameId, terrainCardType);
     }
 
+
+    @MessageMapping("/game/cheat")
+    public void handleCheat(@Payload PlayerActionDTO action) {
+        logger.info("Received cheat attempt from player {} in game {}", action.getPlayerId(), action.getGameId());
+
+        String gameID = action.getGameId();
+        if (rooms.containsKey(gameID)){
+            Room room = rooms.get(gameID);
+            GameManager gameManager = room.getGameManager();
+            Player activePlayer = gameManager.getActivePlayer();
+
+            if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())){
+               activePlayer.setHasCheated(true);
+
+               // zusätzliches Haus setzen
+                gameManager.placeHouse(action.getPosition());
+
+                logger.info("Player {} placed an extra (cheated) house in game {}", action.getPlayerId(), gameID);
+
+                       broadcastGameUpdate(room);
+                } else {
+                logger.warn("Player {} tried to cheat but is not the active player", action.getPlayerId());
+            }
+            } else {
+            logger.warn("Game not found for gameId: {}", action.getGameId());
+        }
+    }
+    @MessageMapping("/game/reportCheat")
+    public void reportCheat(@Payload CheatReportDTO report) {
+        logger.info("Received cheat report: {}", report);
+        String gameId = report.getGameId();
+
+        if (rooms.containsKey(gameId)) {
+            Room room = rooms.get(gameId);
+            GameManager gameManager = room.getGameManager();
+            if (gameManager == null) {
+                logger.error("GameManager not found for room: {}", gameId);
+                return;
+            }
+
+            // Prüfen, ob gerade Meldungen erwartet werden
+            if (gameManager.isAwaitingCheatReports()){
+                gameManager.recordCheatReport(report.getReporterPlayerId(),report.getReportedPlayerId());
+                Player reporter = room.getPlayerById(report.getReporterPlayerId());
+                Player reported = room.getPlayerById(report.getReportedPlayerId());
+
+                if (reporter != null && reported != null) {
+                // Sicherstellen, dass der gemeldete Spieler der aktive Spier ist (optional, aber sinnvoll)
+                if (gameManager.getActivePlayer() != null && gameManager.getActivePlayer().getId().equals(reported.getId())) {
+                    // Die eigentliche Aufzeichnung des Reports geschieht im Gamemanager
+                    logger.info("Player {} reported player {} for cheating in game {}", reporter.getId(), reported.getId(), gameId);
+                } else {
+                    logger.warn("Cheat report invalid: Reported player {} is not the current active player in game {}.", reported.getId(), gameId);
+                }
+            } else {
+                logger.warn("Reporter {} or reported player {} not found in game {}.", report.getReporterPlayerId(), report.getReportedPlayerId(), gameId);
+            }
+        } else {
+            logger.warn("Cheat report received for game {} but not currently awaiting reports", gameId);
+        }
+        // Kein broadcastGameUpdate hier, da dies die 3-Sekunden-Phase stören könnte.
+        // Die Auswertung erfolgt gesammelt in processCheatReportOutcome.
+    } else {
+        logger.warn("Game not found for gameId in cheat report: {}", report.getGameId());
+        }
+    }
 }
