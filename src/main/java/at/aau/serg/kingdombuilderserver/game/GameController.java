@@ -2,13 +2,18 @@ package at.aau.serg.kingdombuilderserver.game;
 
 import at.aau.serg.kingdombuilderserver.board.TerrainType;
 import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerActionDTO;
+import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerScoreDTO;
+import at.aau.serg.kingdombuilderserver.messaging.dtos.RoomLobbyDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -73,7 +78,16 @@ public class GameController {
                 activePlayer.setCurrentCard(null);
                 activeBuildings.clear();
                 // Logik zum Beenden des Zuges, z.B. Wechsel zum nächsten Spieler
+
                 gameManager.setActivePlayer(room.getNextPlayer(activePlayer));
+                if(gameManager.getActivePlayer().getRemainingSettlements() == 0)
+                {
+                    //Spiel ist vorbei.
+                    sendPlayerScores(gameId);
+                    room.setStatus(RoomStatus.FINISHED);
+                    return;
+                }
+
                 gameManager.nextRound();
                 logger.info("Turn ended successfully for player {}", action.getPlayerId());
                 broadcastGameUpdate(room);
@@ -136,4 +150,17 @@ public class GameController {
         messagingTemplate.convertAndSend("/topic/game/card/"+gameId, terrainCardType);
     }
 
+    public void sendPlayerScores(@Payload String gameId) {
+        if (rooms.containsKey(gameId)) {
+            Room room = rooms.get(gameId);
+            GameManager gameManager = room.getGameManager();
+            List<Player> players = room.getPlayers();
+
+            WinningConditionEvaluator evaluator = new WinningConditionEvaluator(
+                    gameManager.getGameBoard(), players
+            );
+
+            messagingTemplate.convertAndSend("/topic/game/scores/"+gameId, evaluator.getPlayerPoints());
+        }
+    }
 }

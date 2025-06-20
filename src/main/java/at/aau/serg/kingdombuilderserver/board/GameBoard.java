@@ -232,6 +232,13 @@ public class GameBoard {
 
     }
 
+    public TerrainType getFieldType(int id) {
+        if (id < 0 || id >= fields.length) {
+            throw new IllegalArgumentException("Ungültige Feld-ID: " + id);
+        }
+        return fields[id].getType();
+    }
+
     /**
      * Prüft, ob zwei Felder benachbart sind
      * @param field1 Erstes Feld
