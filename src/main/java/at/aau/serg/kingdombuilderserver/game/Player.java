@@ -5,6 +5,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,6 +20,11 @@ public class Player {
     private int remainingSettlements;
     private int score;
     private Set<Integer> houseFieldIds = new HashSet<>();
+    private boolean hasCheated = false;
+    private boolean skippedTurn = false;
+    private int gold = 0;
+    private List<GameHousePosition> housesPlacedThisTurn = new ArrayList<>();
+
     private TerrainType currentCard = null; //Card pulled in current turn
 
     public Player(String playerId, String playerName) {
@@ -57,6 +65,17 @@ public class Player {
     public boolean hasHouseOnField(int fieldId) {
         return houseFieldIds.contains(fieldId);
     }
+
+    public boolean hasCheated() {
+        return hasCheated;
+    }
+
+    public List <GameHousePosition> getHousePlacedThisTurn(){
+        return housesPlacedThisTurn;
+    }
+    public void addGold(int amount) { this.gold += amount; }
+
+    public void decreaseGold(int amount) { this.gold -= amount; }
 
     @Override
     public String toString() {
