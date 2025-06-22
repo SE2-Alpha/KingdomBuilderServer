@@ -111,6 +111,8 @@ public class GameBoard {
         TerrainType currentCard = activePlayer.getCurrentCard();
         String currentPID = activePlayer.getId();
 
+        System.out.println("Cheating: "+ cheatMode);
+
         if (field.getOwner() != null) {
             if(field.getOwner().equals(currentPID) && field.getOwnerSinceRound() == round){
                 remove(field,activeList,activePlayer);
@@ -123,9 +125,11 @@ public class GameBoard {
         if(!field.getType().isBuildable){
             throw new IllegalStateException("Feld kann nicht bebaut werden: " + field);
         }
+
         if(cheatMode){
             place(field,activePlayer,round,activeList);
             activePlayer.setHasCheated(true);
+            System.out.println("Player "+currentPID+" has cheated on Field "+field.getId());
             return;
         }
 

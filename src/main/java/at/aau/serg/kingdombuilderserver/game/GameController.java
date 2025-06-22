@@ -100,19 +100,8 @@ public class GameController {
             List<Integer> activeBuildings = gameManager.getActiveBuildings();
 
             if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
-                activePlayer.setCurrentCard(null);
-                activeBuildings.clear();
                 // Logik zum Beenden des Zuges, z.B. Wechsel zum nächsten Spieler
-
-                if(gameManager.getActivePlayer().getRemainingSettlements() == 0)
-                {
-                    //Spiel ist vorbei.
-                    sendPlayerScores(gameId);
-                    room.setStatus(RoomStatus.FINISHED);
-                    return;
-                }
                 logger.info("Received endTurn from Player {}. Client-Payload says didCheat={}", action.getPlayerId(), action.isDidCheat());
-                activePlayer.setHasCheated(action.isDidCheat());
                 logger.info("Player {}'s internal hasCheated flag is now set to: {}", activePlayer.getId(), activePlayer.getHasCheated());
 
                 logger.info("Initiating cheat report window for game {}", gameId);
@@ -148,6 +137,13 @@ public class GameController {
                             logger.info("No next player found, potentially game end for game {}", gameId);
                         }
 
+                        if(gameManager.getActivePlayer().getRemainingSettlements() == 0)
+                        {
+                            //Spiel ist vorbei.
+                            sendPlayerScores(gameId);
+                            room.setStatus(RoomStatus.FINISHED);
+                            return;
+                        }
                         // Game update senden
                         broadcastGameUpdate(room);
                     }

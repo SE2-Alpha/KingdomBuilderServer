@@ -64,6 +64,7 @@ public class GameManager {
 
     public void nextRound() {
         roundCounter++;
+        activePlayer.setCurrentCard(null);
         activeBuildings.clear();
     }
 

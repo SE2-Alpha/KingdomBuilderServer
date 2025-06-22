@@ -21,7 +21,7 @@ public class Player {
     private int remainingSettlements;
     private int score;
     private Set<Integer> houseFieldIds = new HashSet<>();
-    private boolean hasCheated = false;
+    private boolean hasCheated;
     private boolean skippedTurn = false;
     private int gold = 0;
 
@@ -31,6 +31,7 @@ public class Player {
         this.id = playerId;
         this.name = playerName;
         remainingSettlements = 40;
+        hasCheated = false;
     }
 
     public Player(String playerId, int initialSettlements){
