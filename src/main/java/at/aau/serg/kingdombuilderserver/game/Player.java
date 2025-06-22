@@ -11,7 +11,8 @@ import java.util.Objects;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter @Setter
+@Getter
+@Setter
 public class Player {
     @Setter(AccessLevel.NONE)
     private String id;
@@ -23,7 +24,6 @@ public class Player {
     private boolean hasCheated = false;
     private boolean skippedTurn = false;
     private int gold = 0;
-    private List<GameHousePosition> housesPlacedThisTurn = new ArrayList<>();
 
     private TerrainType currentCard = null; //Card pulled in current turn
 
@@ -61,17 +61,13 @@ public class Player {
         return houseFieldIds.add(fieldId); // Gibt false zurück, wenn schon gesetzt
     }
 
-    // Prüfen ob ein Haus auf dem Feld steht
+    // Prüfen, ob ein Haus auf dem Feld steht
     public boolean hasHouseOnField(int fieldId) {
         return houseFieldIds.contains(fieldId);
     }
 
-    public boolean hasCheated() {
+    public boolean getHasCheated() {
         return hasCheated;
-    }
-
-    public List <GameHousePosition> getHousePlacedThisTurn(){
-        return housesPlacedThisTurn;
     }
     public void addGold(int amount) { this.gold += amount; }
 

@@ -33,9 +33,10 @@ public class GameManagerCheatLogicTest {
     @Test
     void testPlayerCheatsAndIsCaught_HousesRemovedAndReporterGetsGold() {
         player1.setHasCheated(true);
+        gameManager.setActivePlayer(player1);
         // Simuliere, dass der Spieler ein Haus gesetzt hat
         GameHousePosition cheatedHouse = new GameHousePosition(5, 5);
-        player1.getHousesPlacedThisTurn().add(cheatedHouse);
+        gameManager.getActiveBuildings().add(cheatedHouse.toId());
         player1.decreaseSettlementsBy(1);
 
         // Spieler 2 meldet den Cheat
@@ -48,7 +49,7 @@ public class GameManagerCheatLogicTest {
 
         assertEquals(initialReporterGold + 5, player2.getGold(), "Der Melder sollte 5 Gold erhalten.");
         assertEquals(10, player1.getGold(), "Der Schummler sollte kein Gold verlieren oder gewinnen.");
-        assertTrue(player1.getHousesPlacedThisTurn().isEmpty(), "Die in dieser Runde gelegten Häuser des Schummlers sollten entfernt werden.");
+        assertTrue(gameManager.getActiveBuildings().isEmpty(), "Die in dieser Runde gelegten Häuser des Schummlers sollten entfernt werden.");
 
         assertEquals(initialCheaterSettlements, player1.getRemainingSettlements(), "Siedlungen sollten (noch) nicht zurückgegeben werden, basierend auf dem Code.");
     }
@@ -57,14 +58,15 @@ public class GameManagerCheatLogicTest {
     void testPlayerCheatsAndGetsAwayWithIt_StateRemains() {
         player1.setHasCheated(true);
         GameHousePosition cheatedHouse = new GameHousePosition(5, 5);
-        player1.getHousePlacedThisTurn().add(cheatedHouse);
+        int ID = cheatedHouse.getY() * 20 + cheatedHouse.getX();
+        gameManager.getActiveBuildings().add(ID);
         // Keine Meldung wird registriert (leere Reporterliste)
 
         gameManager.processCheatReportOutcome();
 
         assertEquals(10, player1.getGold(), "Gold des Schummlers sollte unverändert sein.");
         assertEquals(10, player2.getGold(), "Gold des anderen Spielers sollte unverändert sein.");
-        assertFalse(player1.getHousesPlacedThisTurn().isEmpty(), "Das geschummelte Haus sollte (vor dem Cleanup) noch da sein.");
+        assertFalse(gameManager.getActiveBuildings().isEmpty(), "Das geschummelte Haus sollte (vor dem Cleanup) noch da sein.");
     }
 
     @Test
@@ -114,13 +116,15 @@ public class GameManagerCheatLogicTest {
     @Test
     void testCleanupTurn_ResetsPlayerAndGameState() {
         player1.setHasCheated(true);
-        player1.getHousePlacedThisTurn().add(new GameHousePosition(1, 1));
+        gameManager.setActivePlayer(player1);
+        GameHousePosition pos = new GameHousePosition(1, 1);
+        gameManager.getActiveBuildings().add(pos.toId());
         gameManager.recordCheatReport(player2.getId(), player1.getId());
 
         gameManager.cleanupTurn();
 
-        assertFalse(player1.hasCheated(), "Der hasCheated-Flag des Spielers sollte zurückgesetzt werden.");
-        assertTrue(player1.getHousesPlacedThisTurn().isEmpty(), "Die Liste der gelegten Häuser sollte geleert werden.");
+        assertFalse(player1.getHasCheated(), "Der hasCheated-Flag des Spielers sollte zurückgesetzt werden.");
+        assertTrue(gameManager.getActiveBuildings().isEmpty(), "Die Liste der gelegten Häuser sollte geleert werden.");
         assertTrue(gameManager.getCheatReportsThisTurn().isEmpty(), "Die Cheat-Meldungen für die Runde sollten gelöscht werden.");
     }
 
@@ -142,7 +146,7 @@ public class GameManagerCheatLogicTest {
     @Test
     void testPlayerCheatsAndIsCaughtByMultipleReporters_AllReportersGetGold() {
         player1.setHasCheated(true);
-        player1.getHousesPlacedThisTurn().add(new GameHousePosition(1, 1));
+        gameManager.getActiveBuildings().add(new GameHousePosition(1, 1).toId());
 
         // Spieler 2 und Spieler 3 melden den Cheat
         gameManager.recordCheatReport(player2.getId(), player1.getId());
@@ -155,7 +159,7 @@ public class GameManagerCheatLogicTest {
 
         assertEquals(initialGoldP2 + 5, player2.getGold(), "Spieler 2 sollte 5 Gold als Belohnung erhalten.");
         assertEquals(initialGoldP3 + 5, player3.getGold(), "Spieler 3 sollte ebenfalls 5 Gold erhalten.");
-        assertTrue(player1.getHousesPlacedThisTurn().isEmpty(), "Die Häuser des Schummlers sollten nur einmal entfernt werden.");
+        assertTrue(gameManager.getActiveBuildings().isEmpty(), "Die Häuser des Schummlers sollten nur einmal entfernt werden.");
         assertEquals(10, player1.getGold(), "Der Schummler sollte kein Gold verlieren.");
     }
 

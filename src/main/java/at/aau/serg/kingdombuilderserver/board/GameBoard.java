@@ -74,6 +74,7 @@ public class GameBoard {
         }
     }
 
+
     public boolean isPositionValid(GameHousePosition position) {
         if (position == null) {
             return false;
@@ -83,24 +84,14 @@ public class GameBoard {
         return x >= 0 && x < 20 && y >= 0 && y < 20; // 20x20 Spielfeld
     }
 
-    /*
-    -Special House placing (Farm, Oracle, Tavern, Tower): Separate function?
-            - Farm: Build one additional settlement on Grass (adjacent if possible)
-            - Oracle: Build one additional settlement of the same type as required Field type (Draw Card, must be adjacent)
-            - Tavern: Build one additional settlement on the end of a straight line of at least 3 settlements
-            - Tower: Build one Settlement on the Edge of the Board (adjacent if possible)
-     */
-
-    //TODO Special action implementation
-
     /**
-     * Check if house can be placed given parameters and places if possible
+     * Check if a house can be placed given parameters and places if possible
      * @param activePlayer currently active player (by GameManager)
-     * @param activeList List of IDs of houses placed this round by active player
-     * @param position clicked position on wich house will be built if possible
+     * @param activeList List of Houses-IDs placed this round by active player
+     * @param position clicked position on a wich house will be built if possible
      * @param round current round number (by GameManager)
      */
-    public void placeHouse(Player activePlayer,List<Integer> activeList, GameHousePosition position, int round) {
+    public void placeHouse(Player activePlayer,List<Integer> activeList, GameHousePosition position,boolean cheatMode, int round) {
         if (activePlayer == null || position == null || activePlayer.getCurrentCard() == null || activeList == null) {
             int errcode = 0;
             if(activeList == null) errcode +=1;
@@ -110,34 +101,40 @@ public class GameBoard {
             throw new IllegalArgumentException("Aktiver Spieler, Position und Karte dürfen nicht null sein. " + errcode);
         }
 
+        if(!isPositionValid(position)){
+            throw new IllegalArgumentException("Kann hier nichts platzieren " + position);
+        }
+
+        int id = position.toId(); // Umrechnung in 1D-Index
+        TerrainField field = fields[id];
+
+        TerrainType currentCard = activePlayer.getCurrentCard();
+        String currentPID = activePlayer.getId();
+
+        if (field.getOwner() != null) {
+            if(field.getOwner().equals(currentPID) && field.getOwnerSinceRound() == round){
+                remove(field,activeList,activePlayer);
+                return;
+            }else{
+                throw new IllegalStateException("Feld ist bereits von einem anderen Spieler besetzt: " + field);
+            }
+        }
+        
+        if(!field.getType().isBuildable){
+            throw new IllegalStateException("Feld kann nicht bebaut werden: " + field);
+        }
+        if(cheatMode){
+            place(field,activePlayer,round,activeList);
+            activePlayer.setHasCheated(true);
+            return;
+        }
+
         if(activePlayer.getRemainingSettlements() == 0){
             throw new IllegalArgumentException("Spieler hat keine Gebäude übrig " + activePlayer);
         }
 
         if(activeList.size() >= 3){
             throw new IllegalArgumentException("Spieler hat schon 3 Gebäude Platziert " + activePlayer);
-        }
-
-        if(!isPositionValid(position)){
-            throw new IllegalArgumentException("Kann hier nichts platzieren " + position);
-        }
-        TerrainType currentCard = activePlayer.getCurrentCard();
-        String currentPID = activePlayer.getId();
-
-        int id = position.getY() * 20 + position.getX(); // Umrechnung in 1D-Index
-        TerrainField field = fields[id];
-
-        if(!field.getType().isBuildable){
-            throw new IllegalStateException("Feld kann nicht bebaut werden: " + field);
-        }
-
-        if (field.getOwner() != null) {
-            if(field.getOwner().equals(currentPID) && field.getOwnerSinceRound() == round){
-                removeLegally(field,activeList,activePlayer);
-                return;
-            }else{
-                throw new IllegalStateException("Feld ist bereits von einem anderen Spieler besetzt: " + field);
-            }
         }
 
         List<Integer> freeFieldsOfCurrentType = getFreeFieldsOfType(currentCard);
@@ -156,13 +153,13 @@ public class GameBoard {
         //First building
         if(builtByActivePlayer.isEmpty() && freeFieldsOfCurrentType.contains(id)
         ){
-            placeLegally(field,activePlayer,round,activeList);
+            place(field,activePlayer,round,activeList);
             System.out.println("Built field "+field.getId());
             return;
         }
         if(freeFieldsOfCurrentType.isEmpty()){//When all fields of current Type are occupied (unlikely) allow player to place on any neighboring field
             if(allFreeAdjacentFields.contains(id)){
-                placeLegally(field,activePlayer,round,activeList);
+                place(field,activePlayer,round,activeList);
                 System.out.println("Built field "+field.getId());
                 return;
             }else{
@@ -176,7 +173,7 @@ public class GameBoard {
                 freeAdjacentCurrentTypeFields.isEmpty() &&
                 (freeFieldsOfCurrentType.contains(id))
         ){
-            placeLegally(field,activePlayer,round,activeList);
+            place(field,activePlayer,round,activeList);
             System.out.println("Built field "+field.getId());
             return;
         }
@@ -204,7 +201,7 @@ public class GameBoard {
      * @param round int round number
      * @param buffer list of houses built in current round
      */
-    public void placeLegally(TerrainField field, Player player, int round,List<Integer> buffer){
+    public void place(TerrainField field, Player player, int round, List<Integer> buffer){
         field.setOwner(player.getId());
         field.setOwnerSinceRound(round);
         buffer.add(field.getId());
@@ -216,7 +213,7 @@ public class GameBoard {
      * @param field field to be cleared
      * @param buffer list of houses built in current round
      */
-    public void removeLegally(TerrainField field,List<Integer> buffer, Player player){
+    public void remove(TerrainField field, List<Integer> buffer, Player player){
         int index = buffer.indexOf(field.getId());
         if(index == -1) {
             throw new RuntimeException("Field "+ field +" not in buffer array " + buffer);
@@ -228,10 +225,10 @@ public class GameBoard {
             fields[f].setOwnerSinceRound(-1);
         }
         buffer.subList(index,buffer.size()).clear();
-        player.increaseSettlementsBy(buffer.size());
-
+        if(!player.getHasCheated()){
+            player.increaseSettlementsBy(buffer.size());
+        }
     }
-
     public TerrainType getFieldType(int id) {
         if (id < 0 || id >= fields.length) {
             throw new IllegalArgumentException("Ungültige Feld-ID: " + id);

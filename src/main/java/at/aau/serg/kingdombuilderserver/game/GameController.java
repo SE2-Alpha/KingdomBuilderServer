@@ -1,11 +1,8 @@
 package at.aau.serg.kingdombuilderserver.game;
 
-import at.aau.serg.kingdombuilderserver.messaging.dtos.CheatReportDTO;
+import at.aau.serg.kingdombuilderserver.messaging.dtos.*;
 import at.aau.serg.kingdombuilderserver.board.TerrainType;
-import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerActionDTO;
 import io.micrometer.observation.GlobalObservationConvention;
-import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerScoreDTO;
-import at.aau.serg.kingdombuilderserver.messaging.dtos.RoomLobbyDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -76,6 +73,20 @@ public class GameController {
 
     }
 
+    @MessageMapping("/game/toggleCheatMode")
+    public void toggleCheatMode(@Payload BasicMessage msg) {
+        logger.info("Received cheat toggle request from {} in Room {}",msg.getPlayerId(), msg.getGameId());
+        Room room = rooms.get(msg.getGameId());
+        GameManager gameManager = room.getGameManager();
+        Player activePlayer = room.getGameManager().getActivePlayer();
+        if (activePlayer != null && activePlayer.getId().equals(msg.getPlayerId())) {
+            boolean newMode = gameManager.toggleCheatMode();
+            logger.info("Cheat mode for Room {} toggled to {}", msg.getGameId(), newMode);
+        }else {
+            logger.warn("Player {} is not the active player in game {}", msg.getPlayerId(), msg.getGameId());
+        }
+    }
+
     @MessageMapping("/game/endTurn")
     public void endTurn(@Payload PlayerActionDTO action) {
         logger.info("Received endTurn request: {}", action);
@@ -86,7 +97,7 @@ public class GameController {
             Room room = rooms.get(gameId);
             GameManager gameManager = room.getGameManager();
             Player activePlayer = gameManager.getActivePlayer();
-            List<Integer> activeBuildings = gameManager.getActiveBuildingsSequence();
+            List<Integer> activeBuildings = gameManager.getActiveBuildings();
 
             if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
                 activePlayer.setCurrentCard(null);
@@ -102,7 +113,7 @@ public class GameController {
                 }
                 logger.info("Received endTurn from Player {}. Client-Payload says didCheat={}", action.getPlayerId(), action.isDidCheat());
                 activePlayer.setHasCheated(action.isDidCheat());
-                logger.info("Player {}'s internal hasCheated flag is now set to: {}", activePlayer.getId(), activePlayer.hasCheated());
+                logger.info("Player {}'s internal hasCheated flag is now set to: {}", activePlayer.getId(), activePlayer.getHasCheated());
 
                 logger.info("Initiating cheat report window for game {}", gameId);
 

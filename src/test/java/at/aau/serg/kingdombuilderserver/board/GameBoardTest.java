@@ -166,9 +166,9 @@ class GameBoardTest {
     }
 
     @Test
-    void placeLegallyTest(){
+    void placeTest(){
         field  = gameBoardTest.getFieldByRowAndCol(1,1); //ID 21 corresponds to (1,1)
-        gameBoardTest.placeLegally(field,player,5,list);
+        gameBoardTest.place(field,player,5,list);
         assertEquals(21, field.getId());
         assertEquals(player.getId(),gameBoardTest.getFieldByRowAndCol(1,1).getOwner());
         assertEquals(5,gameBoardTest.getFieldByRowAndCol(1,1).getOwnerSinceRound());
@@ -176,21 +176,21 @@ class GameBoardTest {
     }
 
     @Test
-    void removeLegallySuccessTest(){
+    void removeSuccessTest(){
         field  = gameBoardTest.getFieldByRowAndCol(1,1); //ID 21 corresponds to (1,1)
-        gameBoardTest.placeLegally(field,player,5,list);
-        gameBoardTest.removeLegally(field,list,player);
+        gameBoardTest.place(field,player,5,list);
+        gameBoardTest.remove(field,list,player);
         assertNull(field.getOwner());
         assertEquals(-1,field.getOwnerSinceRound());
         assertFalse(list.contains(field.getId()));
     }
 
     @Test
-    void removeLegallyFailTest(){
+    void removeFailTest(){
         field  = gameBoardTest.getFieldByRowAndCol(1,1); //ID 21 corresponds to (1,1)
-        gameBoardTest.placeLegally(field,player,5,list);
+        gameBoardTest.place(field,player,5,list);
         list.clear();
-        assertThrows(RuntimeException.class, () -> gameBoardTest.removeLegally(field,list,player));
+        assertThrows(RuntimeException.class, () -> gameBoardTest.remove(field,list,player));
 
     }
 
@@ -198,14 +198,14 @@ class GameBoardTest {
     void placeHouseFails1Test(){//Fails at null check
         player.setCurrentCard(TerrainType.MOUNTAIN);
         GameHousePosition pos = null;
-        assertThrows(IllegalArgumentException.class, () -> gameBoardTest.placeHouse(player,list,pos,5));
+        assertThrows(IllegalArgumentException.class, () -> gameBoardTest.placeHouse(player,list,pos,false,5));
     }
 
     @Test
     void placeHouseFails2Test(){//Fails at invalid position
         player.setCurrentCard(TerrainType.MOUNTAIN);
         GameHousePosition pos = new GameHousePosition(40,30);
-        assertThrows(IllegalArgumentException.class, () -> gameBoardTest.placeHouse(player,list,pos,5));
+        assertThrows(IllegalArgumentException.class, () -> gameBoardTest.placeHouse(player,list,pos,false,5));
     }
 
     @Test
@@ -215,7 +215,7 @@ class GameBoardTest {
         field.setOwner("123123123");
         field.setType(TerrainType.GRASS);
         player.setCurrentCard(field.getType());
-        assertThrows(IllegalStateException.class, () -> gameBoardTest.placeHouse(player,list,pos,5));
+        assertThrows(IllegalStateException.class, () -> gameBoardTest.placeHouse(player,list,pos,false,5));
     }
 
     @Test
@@ -224,7 +224,7 @@ class GameBoardTest {
         field = gameBoardTest.getFieldByRowAndCol(1,1);
         field.setType(TerrainType.SPECIALABILITY);
         player.setCurrentCard(field.getType());
-        assertThrows(IllegalStateException.class, () -> gameBoardTest.placeHouse(player,list,pos,5));
+        assertThrows(IllegalStateException.class, () -> gameBoardTest.placeHouse(player,list,pos,false,5));
     }
 
     @Test
@@ -234,7 +234,7 @@ class GameBoardTest {
         field.setType(TerrainType.GRASS);
         player.setRemainingSettlements(0);
         player.setCurrentCard(field.getType());
-        assertThrows(IllegalArgumentException.class, () -> gameBoardTest.placeHouse(player,list,pos,5));
+        assertThrows(IllegalArgumentException.class, () -> gameBoardTest.placeHouse(player,list,pos,false,5));
     }
 
     @Test
@@ -244,7 +244,7 @@ class GameBoardTest {
         field.setType(TerrainType.GRASS);
         list.addAll(Arrays.asList(0,1,2));
         player.setCurrentCard(field.getType());
-        assertThrows(IllegalArgumentException.class, () -> gameBoardTest.placeHouse(player,list,pos,5));
+        assertThrows(IllegalArgumentException.class, () -> gameBoardTest.placeHouse(player,list,pos,false,5));
     }
 
     @Test
@@ -253,7 +253,7 @@ class GameBoardTest {
         field = gameBoardTest.getFieldByRowAndCol(1,1);
         field.setType(TerrainType.GRASS);
         player.setCurrentCard(TerrainType.FOREST);
-        assertThrows(IllegalStateException.class, () -> gameBoardTest.placeHouse(player,list,pos,5));
+        assertThrows(IllegalStateException.class, () -> gameBoardTest.placeHouse(player,list,pos,false,5));
     }
 
     @Test
@@ -265,7 +265,7 @@ class GameBoardTest {
         field.setOwnerSinceRound(3);
         player.setCurrentCard(field.getType());
         list.add(field.getId());
-        gameBoardTest.placeHouse(player,list,pos,3);
+        gameBoardTest.placeHouse(player,list,pos,false,3);
         assertNull(field.getOwner());
         assertEquals(-1,field.getOwnerSinceRound());
     }
@@ -276,7 +276,7 @@ class GameBoardTest {
         field =  gameBoardTest.getFieldByRowAndCol(5,5);
         field.setType(TerrainType.GRASS);
         player.setCurrentCard(field.getType());
-        assertDoesNotThrow(() -> gameBoardTest.placeHouse(player,list,pos,5));
+        assertDoesNotThrow(() -> gameBoardTest.placeHouse(player,list,pos,false,5));
 
     }
 

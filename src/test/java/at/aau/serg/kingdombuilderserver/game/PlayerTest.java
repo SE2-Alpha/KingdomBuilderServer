@@ -74,9 +74,9 @@ public class PlayerTest {
     @Test
     void testHasCheatedFlag(){
         player = new Player("p1", "Cheater");
-        assertFalse(player.hasCheated());
+        assertFalse(player.getHasCheated());
         player.setHasCheated(true);
-        assertTrue(player.hasCheated());
+        assertTrue(player.getHasCheated());
     }
 
     @Test
