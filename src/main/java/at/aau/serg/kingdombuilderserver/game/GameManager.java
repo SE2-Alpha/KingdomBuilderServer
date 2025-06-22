@@ -94,7 +94,7 @@ public class GameManager {
                 for (String reporterId : reporters) {
                     Player reporter = getPlayerById(reporterId);
                     if (reporter != null) {
-                        reporter.addGold(5);
+                        reporter.addCheatPoints(5);
                         System.out.println("Player " + reporterId + " receives 5 gold for reporting.");
                     }
                 }
@@ -111,9 +111,9 @@ public class GameManager {
                     Player accuser = getPlayerById(accuserId);
                     if (accuser != null) {
                         // 1. Beschuldigter bekommt Gold vom Anschuldigenden
-                        int goldTransfer = Math.min(accuser.getGold(), 5); // Nicht mehr als der Ankläger hat
-                        activePlayer.addGold(goldTransfer);
-                        accuser.decreaseGold(goldTransfer);
+                        int goldTransfer = Math.min(accuser.getCheatPoints(), 5); // Nicht mehr als der Ankläger hat
+                        activePlayer.addCheatPoints(goldTransfer);
+                        accuser.decreaseCheatPoints(goldTransfer);
                         System.out.println("Player " + activePlayerId + " receives " + goldTransfer + " gold from accuser " + accuserId);
 
                         // 2. Reporter setzt eine Runde aus

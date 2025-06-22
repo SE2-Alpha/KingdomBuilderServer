@@ -56,11 +56,11 @@ public class PlayerTest {
     @Test
     void testGoldManagement(){
         player = new Player("p1", "Goldfinger");
-        assertEquals(0, player.getGold());
-        player.addGold(10);
-        assertEquals(10, player.getGold());
-        player.decreaseGold(3);
-        assertEquals(7, player.getGold());
+        assertEquals(0, player.getCheatPoints());
+        player.addCheatPoints(10);
+        assertEquals(10, player.getCheatPoints());
+        player.decreaseCheatPoints(3);
+        assertEquals(7, player.getCheatPoints());
     }
 
     @Test

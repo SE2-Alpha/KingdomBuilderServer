@@ -26,11 +26,13 @@ public class WinningConditionEvaluator {
     public List<PlayerScoreDTO> getPlayerPoints() {
         List<PlayerScoreDTO> result = new ArrayList<>();
         for (Player player : players) {
+            player.updateHouseFields(board);
             int points =
                     evaluateHermits(player)
                             + evaluateMiners(player)
                             + evaluateDiscoverers(player)
                             + evaluateCastleFields(player);
+            points += player.getCheatPoints();
             result.add(new PlayerScoreDTO(player.getId(), player.getName(), points));
         }
         return result;

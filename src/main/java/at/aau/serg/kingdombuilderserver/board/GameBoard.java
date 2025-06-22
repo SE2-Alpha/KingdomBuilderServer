@@ -224,13 +224,15 @@ public class GameBoard {
         }
 
         List<Integer> choppingBlock = buffer.subList(index,buffer.size());
+        int count = 0;
         for(Integer f : choppingBlock){
             fields[f].setOwner(null);
             fields[f].setOwnerSinceRound(-1);
+            count++;
         }
         buffer.subList(index,buffer.size()).clear();
         if(!player.getHasCheated()){
-            player.increaseSettlementsBy(buffer.size());
+            player.increaseSettlementsBy(count);
         }
     }
     public TerrainType getFieldType(int id) {
