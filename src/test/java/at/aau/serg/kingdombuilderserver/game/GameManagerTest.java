@@ -7,10 +7,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class GameManagerTest {
@@ -130,4 +130,48 @@ class GameManagerTest {
         assertDoesNotThrow(() -> gameManager.cleanupTurn());
     }
 
+    @Test
+    void testPlaceHouse_WhenPlayerHasSettlements() {
+        GameHousePosition validPosition = new GameHousePosition(3, 3);
+        when(mockGameBoard.isPositionValid(validPosition)).thenReturn(true);
+
+        when(mockPlayer.getRemainingSettlements()).thenReturn(10);
+
+        gameManager.placeHouse(validPosition);
+
+        verify(mockPlayer, times(1)).decreaseSettlementsBy(1);
+    }
+
+
+    @Test
+    void undoLastMove_WhenHousesArePlaced_ShouldCallGameBoardAndClearList() {
+        // Arrange
+        // Füge platzierte Gebäude zur Sequenzliste hinzu
+        List<Integer> placedHouses = new ArrayList<>(Arrays.asList(5, 10, 15));
+        gameManager.setActiveBuildingsSequence(placedHouses);
+        assertTrue(gameManager.getActiveBuildingsSequence().contains(5));
+
+        // Act
+        gameManager.undoLastMove(mockPlayer);
+
+        // Assert
+        // Überprüfe, ob die undoMove Methode auf dem GameBoard mit der korrekten Liste aufgerufen wurde
+        verify(mockGameBoard, times(1)).undoMove(placedHouses, mockPlayer);
+        // Überprüfe, ob die Liste der platzierten Gebäude im GameManager geleert wurde
+        assertTrue(gameManager.getActiveBuildingsSequence().isEmpty(), "Active buildings sequence should be empty after undo.");
+    }
+
+    @Test
+    void undoLastMove_WhenNoHousesArePlaced_ShouldNotCallGameBoard() {
+        // Arrange
+        // Die Liste ist bereits leer nach dem Setup
+        assertTrue(gameManager.getActiveBuildingsSequence().isEmpty());
+
+        // Act
+        gameManager.undoLastMove(mockPlayer);
+
+        // Assert
+        // Überprüfe, ob die undoMove Methode des GameBoards NIEMALS aufgerufen wurde
+        verify(mockGameBoard, never()).undoMove(any(), any());
+    }
 }
