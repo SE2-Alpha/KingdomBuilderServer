@@ -244,12 +244,9 @@ public class GameBoard {
 
     public void undoMove(List<Integer> housesToUndo, Player player){
         int numberOfHouses = housesToUndo.size();
-        for (Integer fieldId: housesToUndo) {
-            TerrainField field = fields[fieldId];
-            if (field.getOwner() != null && field.getOwner().equals(player.getId())){
-                field.setOwner(null);
-                field.setOwnerSinceRound(-1);
-            }
+        for (Integer f: housesToUndo) {
+            fields[f].setOwner(null);
+            fields[f].setOwnerSinceRound(-1);
         }
         player.increaseSettlementsBy(numberOfHouses);
     }

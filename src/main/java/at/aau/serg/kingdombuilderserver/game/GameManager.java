@@ -63,9 +63,9 @@ public class GameManager {
     }
 
     public void undoLastMove(Player player){
-        if (!activeBuildingsSequence.isEmpty()){
-            gameBoard.undoMove(activeBuildingsSequence, player);
-            activeBuildingsSequence.clear();
+        if (!activeBuildings.isEmpty()){
+            gameBoard.undoMove(activeBuildings, player);
+            activeBuildings.clear();
         }
     }
 
