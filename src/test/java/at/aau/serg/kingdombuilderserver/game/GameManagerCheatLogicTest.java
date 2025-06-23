@@ -17,11 +17,11 @@ public class GameManagerCheatLogicTest {
     @BeforeEach
     void setUp() {
         player1 = new Player("p1", "Cheater");
-        player1.setGold(10);
+        player1.setCheatPoints(10);
         player2 = new Player("p2", "Reporter");
-        player2.setGold(10);
+        player2.setCheatPoints(10);
         player3 = new Player("p3", "Bystander");
-        player3.setGold(10);
+        player3.setCheatPoints(10);
 
         List<Player> players = Arrays.asList(player1, player2, player3);
 
@@ -33,22 +33,23 @@ public class GameManagerCheatLogicTest {
     @Test
     void testPlayerCheatsAndIsCaught_HousesRemovedAndReporterGetsGold() {
         player1.setHasCheated(true);
+        gameManager.setActivePlayer(player1);
         // Simuliere, dass der Spieler ein Haus gesetzt hat
         GameHousePosition cheatedHouse = new GameHousePosition(5, 5);
-        player1.getHousesPlacedThisTurn().add(cheatedHouse);
+        gameManager.getActiveBuildings().add(cheatedHouse.toId());
         player1.decreaseSettlementsBy(1);
 
         // Spieler 2 meldet den Cheat
         gameManager.recordCheatReport(player2.getId(), player1.getId());
 
-        int initialReporterGold = player2.getGold();
+        int initialReporterGold = player2.getCheatPoints();
         int initialCheaterSettlements = player1.getRemainingSettlements();
 
         gameManager.processCheatReportOutcome();
 
-        assertEquals(initialReporterGold + 5, player2.getGold(), "Der Melder sollte 5 Gold erhalten.");
-        assertEquals(10, player1.getGold(), "Der Schummler sollte kein Gold verlieren oder gewinnen.");
-        assertTrue(player1.getHousesPlacedThisTurn().isEmpty(), "Die in dieser Runde gelegten Häuser des Schummlers sollten entfernt werden.");
+        assertEquals(initialReporterGold + 5, player2.getCheatPoints(), "Der Melder sollte 5 Gold erhalten.");
+        assertEquals(10, player1.getCheatPoints(), "Der Schummler sollte kein Gold verlieren oder gewinnen.");
+        assertTrue(gameManager.getActiveBuildings().isEmpty(), "Die in dieser Runde gelegten Häuser des Schummlers sollten entfernt werden.");
 
         assertEquals(initialCheaterSettlements, player1.getRemainingSettlements(), "Siedlungen sollten (noch) nicht zurückgegeben werden, basierend auf dem Code.");
     }
@@ -57,14 +58,15 @@ public class GameManagerCheatLogicTest {
     void testPlayerCheatsAndGetsAwayWithIt_StateRemains() {
         player1.setHasCheated(true);
         GameHousePosition cheatedHouse = new GameHousePosition(5, 5);
-        player1.getHousePlacedThisTurn().add(cheatedHouse);
+        int ID = cheatedHouse.getY() * 20 + cheatedHouse.getX();
+        gameManager.getActiveBuildings().add(ID);
         // Keine Meldung wird registriert (leere Reporterliste)
 
         gameManager.processCheatReportOutcome();
 
-        assertEquals(10, player1.getGold(), "Gold des Schummlers sollte unverändert sein.");
-        assertEquals(10, player2.getGold(), "Gold des anderen Spielers sollte unverändert sein.");
-        assertFalse(player1.getHousesPlacedThisTurn().isEmpty(), "Das geschummelte Haus sollte (vor dem Cleanup) noch da sein.");
+        assertEquals(10, player1.getCheatPoints(), "Gold des Schummlers sollte unverändert sein.");
+        assertEquals(10, player2.getCheatPoints(), "Gold des anderen Spielers sollte unverändert sein.");
+        assertFalse(gameManager.getActiveBuildings().isEmpty(), "Das geschummelte Haus sollte (vor dem Cleanup) noch da sein.");
     }
 
     @Test
@@ -74,13 +76,13 @@ public class GameManagerCheatLogicTest {
         // Spieler 2 beschuldigt Spieler 1 fälschlicherweise
         gameManager.recordCheatReport(player2.getId(), player1.getId());
 
-        int initialAccusedGold = player1.getGold();
-        int initialAccuserGold = player2.getGold();
+        int initialAccusedGold = player1.getCheatPoints();
+        int initialAccuserGold = player2.getCheatPoints();
 
         gameManager.processCheatReportOutcome();
 
-        assertEquals(initialAccusedGold + 5, player1.getGold(), "Der zu Unrecht Beschuldigte sollte 5 Gold erhalten.");
-        assertEquals(initialAccuserGold - 5, player2.getGold(), "Der Ankläger sollte 5 Gold verlieren.");
+        assertEquals(initialAccusedGold + 5, player1.getCheatPoints(), "Der zu Unrecht Beschuldigte sollte 5 Gold erhalten.");
+        assertEquals(initialAccuserGold - 5, player2.getCheatPoints(), "Der Ankläger sollte 5 Gold verlieren.");
         assertTrue(player2.isSkippedTurn(), "Der Ankläger sollte die nächste Runde aussetzen.");
         assertFalse(player1.isSkippedTurn(), "Der zu Unrecht Beschuldigte sollte nicht aussetzen.");
     }
@@ -88,14 +90,14 @@ public class GameManagerCheatLogicTest {
     @Test
     void testPlayerIsFalselyAccused_AccuserHasNotEnoughGold() {
         player1.setHasCheated(false);
-        player2.setGold(3); // Ankläger hat nur 3 Gold
+        player2.setCheatPoints(3); // Ankläger hat nur 3 Gold
 
         gameManager.recordCheatReport(player2.getId(), player1.getId());
 
         gameManager.processCheatReportOutcome();
 
-        assertEquals(10 + 3, player1.getGold(), "Der Beschuldigte sollte nur das verfügbare Gold (3) erhalten.");
-        assertEquals(0, player2.getGold(), "Der Ankläger sollte all sein Gold verlieren.");
+        assertEquals(10 + 3, player1.getCheatPoints(), "Der Beschuldigte sollte nur das verfügbare Gold (3) erhalten.");
+        assertEquals(0, player2.getCheatPoints(), "Der Ankläger sollte all sein Gold verlieren.");
         assertTrue(player2.isSkippedTurn(), "Der Ankläger sollte trotzdem eine Runde aussetzen.");
     }
 
@@ -105,8 +107,8 @@ public class GameManagerCheatLogicTest {
 
         gameManager.processCheatReportOutcome();
 
-        assertEquals(10, player1.getGold(), "Gold von Spieler 1 sollte unverändert sein.");
-        assertEquals(10, player2.getGold(), "Gold von Spieler 2 sollte unverändert sein.");
+        assertEquals(10, player1.getCheatPoints(), "Gold von Spieler 1 sollte unverändert sein.");
+        assertEquals(10, player2.getCheatPoints(), "Gold von Spieler 2 sollte unverändert sein.");
         assertFalse(player1.isSkippedTurn(), "Spieler 1");
         assertFalse(player2.isSkippedTurn(), "Spieler 2");
     }
@@ -114,13 +116,15 @@ public class GameManagerCheatLogicTest {
     @Test
     void testCleanupTurn_ResetsPlayerAndGameState() {
         player1.setHasCheated(true);
-        player1.getHousePlacedThisTurn().add(new GameHousePosition(1, 1));
+        gameManager.setActivePlayer(player1);
+        GameHousePosition pos = new GameHousePosition(1, 1);
+        gameManager.getActiveBuildings().add(pos.toId());
         gameManager.recordCheatReport(player2.getId(), player1.getId());
 
         gameManager.cleanupTurn();
 
-        assertFalse(player1.hasCheated(), "Der hasCheated-Flag des Spielers sollte zurückgesetzt werden.");
-        assertTrue(player1.getHousesPlacedThisTurn().isEmpty(), "Die Liste der gelegten Häuser sollte geleert werden.");
+        assertFalse(player1.getHasCheated(), "Der hasCheated-Flag des Spielers sollte zurückgesetzt werden.");
+        assertTrue(gameManager.getActiveBuildings().isEmpty(), "Die Liste der gelegten Häuser sollte geleert werden.");
         assertTrue(gameManager.getCheatReportsThisTurn().isEmpty(), "Die Cheat-Meldungen für die Runde sollten gelöscht werden.");
     }
 
@@ -142,21 +146,21 @@ public class GameManagerCheatLogicTest {
     @Test
     void testPlayerCheatsAndIsCaughtByMultipleReporters_AllReportersGetGold() {
         player1.setHasCheated(true);
-        player1.getHousesPlacedThisTurn().add(new GameHousePosition(1, 1));
+        gameManager.getActiveBuildings().add(new GameHousePosition(1, 1).toId());
 
         // Spieler 2 und Spieler 3 melden den Cheat
         gameManager.recordCheatReport(player2.getId(), player1.getId());
         gameManager.recordCheatReport(player3.getId(), player1.getId());
 
-        int initialGoldP2 = player2.getGold();
-        int initialGoldP3 = player3.getGold();
+        int initialGoldP2 = player2.getCheatPoints();
+        int initialGoldP3 = player3.getCheatPoints();
 
         gameManager.processCheatReportOutcome();
 
-        assertEquals(initialGoldP2 + 5, player2.getGold(), "Spieler 2 sollte 5 Gold als Belohnung erhalten.");
-        assertEquals(initialGoldP3 + 5, player3.getGold(), "Spieler 3 sollte ebenfalls 5 Gold erhalten.");
-        assertTrue(player1.getHousesPlacedThisTurn().isEmpty(), "Die Häuser des Schummlers sollten nur einmal entfernt werden.");
-        assertEquals(10, player1.getGold(), "Der Schummler sollte kein Gold verlieren.");
+        assertEquals(initialGoldP2 + 5, player2.getCheatPoints(), "Spieler 2 sollte 5 Gold als Belohnung erhalten.");
+        assertEquals(initialGoldP3 + 5, player3.getCheatPoints(), "Spieler 3 sollte ebenfalls 5 Gold erhalten.");
+        assertTrue(gameManager.getActiveBuildings().isEmpty(), "Die Häuser des Schummlers sollten nur einmal entfernt werden.");
+        assertEquals(10, player1.getCheatPoints(), "Der Schummler sollte kein Gold verlieren.");
     }
 
     @Test
@@ -167,15 +171,15 @@ public class GameManagerCheatLogicTest {
         gameManager.recordCheatReport(player2.getId(), player1.getId());
         gameManager.recordCheatReport(player3.getId(), player1.getId());
 
-        int initialGoldP1 = player1.getGold();
-        int initialGoldP2 = player2.getGold();
-        int initialGoldP3 = player3.getGold();
+        int initialGoldP1 = player1.getCheatPoints();
+        int initialGoldP2 = player2.getCheatPoints();
+        int initialGoldP3 = player3.getCheatPoints();
 
         gameManager.processCheatReportOutcome();
 
-        assertEquals(initialGoldP1 + 10, player1.getGold(), "Der Beschuldigte sollte von beiden Anklägern je 5 Gold erhalten.");
-        assertEquals(initialGoldP2 - 5, player2.getGold(), "Ankläger 1 (Spieler 2) sollte 5 Gold verlieren.");
-        assertEquals(initialGoldP3 - 5, player3.getGold(), "Ankläger 2 (Spieler 3) sollte 5 Gold verlieren.");
+        assertEquals(initialGoldP1 + 10, player1.getCheatPoints(), "Der Beschuldigte sollte von beiden Anklägern je 5 Gold erhalten.");
+        assertEquals(initialGoldP2 - 5, player2.getCheatPoints(), "Ankläger 1 (Spieler 2) sollte 5 Gold verlieren.");
+        assertEquals(initialGoldP3 - 5, player3.getCheatPoints(), "Ankläger 2 (Spieler 3) sollte 5 Gold verlieren.");
         assertTrue(player2.isSkippedTurn(), "Ankläger 1 muss eine Runde aussetzen.");
         assertTrue(player3.isSkippedTurn(), "Ankläger 2 muss ebenfalls eine Runde aussetzen.");
     }
@@ -188,9 +192,9 @@ public class GameManagerCheatLogicTest {
         gameManager.processCheatReportOutcome(); // Dies wird für player1 ausgeführt
 
         // Es sollte absolut nichts passieren, was die Spieler betrifft
-        assertEquals(10, player1.getGold());
-        assertEquals(10, player2.getGold());
-        assertEquals(10, player3.getGold());
+        assertEquals(10, player1.getCheatPoints());
+        assertEquals(10, player2.getCheatPoints());
+        assertEquals(10, player3.getCheatPoints());
         assertFalse(player1.isSkippedTurn());
         assertFalse(player2.isSkippedTurn());
         assertFalse(player3.isSkippedTurn());
@@ -234,12 +238,12 @@ public class GameManagerCheatLogicTest {
     @Test
     void testProcessCheatReportOutcome_FalselyAccusedByNonExistentPlayer() {
         player1.setHasCheated(false);
-        int initialGold = player1.getGold();
+        int initialGold = player1.getCheatPoints();
 
         gameManager.recordCheatReport("non-existent-accuser", player1.getId());
 
         gameManager.processCheatReportOutcome();
 
-        assertEquals(initialGold, player1.getGold(), "Gold sollte sich nicht ändern, wenn der Ankläger nicht existiert.");
+        assertEquals(initialGold, player1.getCheatPoints(), "Gold sollte sich nicht ändern, wenn der Ankläger nicht existiert.");
     }
 }

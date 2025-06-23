@@ -34,12 +34,14 @@ class GameControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        gameController.rooms.clear();
-        gameController.rooms.put(gameId, room);
+        RoomList.list.clear();
+        RoomList.list.put(gameId, room);
 
-        when(room.getId()).thenReturn(gameId);
-        when(gameManager.getActivePlayer()).thenReturn(activePlayer);
-        when(activePlayer.getId()).thenReturn(playerId);
+        // Konfiguriere das Mock-Verhalten
+        when(room.getGameManager()).thenReturn(gameManager);
+        lenient().when(gameManager.getActivePlayer()).thenReturn(activePlayer);
+        lenient().when(activePlayer.getId()).thenReturn(playerId);
+        lenient().when(room.getId()).thenReturn(gameId);
     }
 
     @Test
@@ -82,26 +84,56 @@ class GameControllerTest {
         verify(gameManager, never()).recordCheatReport(anyString(), anyString());
     }
 
+
     @Test
-    void reportCheat_ReportedPlayerNotActive() {
+    void undoLastMove_WhenPlayerIsActive_ShouldUndoAndBroadcast() {
         // Arrange
-        CheatReportDTO report = new CheatReportDTO();
-        report.setGameId(gameId);
-        report.setReporterPlayerId("reporterPlayer");
-        report.setReportedPlayerId("someOtherPlayer"); // NOT the active player
-
-        Player reporterPlayer = mock(Player.class);
-        Player reportedPlayer = mock(Player.class);
-        when(reportedPlayer.getId()).thenReturn("someOtherPlayer");
-
-        when(room.getPlayerById(report.getReporterPlayerId())).thenReturn(reporterPlayer);
-        when(room.getPlayerById(report.getReportedPlayerId())).thenReturn(reportedPlayer);
-        when(gameManager.isAwaitingCheatReports()).thenReturn(true);
+        PlayerActionDTO action = new PlayerActionDTO();
+        action.setGameId(gameId);
+        action.setPlayerId(playerId);
+        action.setType(GameActionType.UNDO_LAST_MOVE);
 
         // Act
-        gameController.reportCheat(report);
+        gameController.undoLastMove(action);
 
         // Assert
-        verify(gameManager, never()).recordCheatReport(any(), any());
+        // Überprüfe, ob die Undo-Logik im GameManager aufgerufen wurde
+        verify(gameManager, times(1)).undoLastMove(activePlayer);
+        // Überprüfe, ob ein Update an alle Clients im Raum gesendet wurde
+        verify(messagingTemplate, times(1)).convertAndSend(eq("/topic/game/update/" + gameId), any(Room.class));
+    }
+    @Test
+    void undoLastMove_WhenPlayerIsNotActive_ShouldNotUndoButBroadcast() {
+        // Arrange
+        PlayerActionDTO action = new PlayerActionDTO();
+        action.setGameId(gameId);
+        action.setPlayerId("someOtherPlayerId"); // Ein anderer Spieler
+        action.setType(GameActionType.UNDO_LAST_MOVE);
+
+        // Act
+        gameController.undoLastMove(action);
+
+        // Assert
+        // Undo-Logik darf NICHT aufgerufen werden
+        verify(gameManager, never()).undoLastMove(any(Player.class));
+        // Ein Update wird trotzdem gesendet, um den Zustand zu synchronisieren (gutes Verhalten)
+        verify(messagingTemplate, times(1)).convertAndSend(eq("/topic/game/update/" + gameId), any(Room.class));
+    }
+
+
+    @Test
+    void undoLastMove_WhenActivePlayerIsNull_ShouldNotUndo() {
+        // Arrange
+        when(gameManager.getActivePlayer()).thenReturn(null); // Kein aktiver Spieler
+        PlayerActionDTO action = new PlayerActionDTO();
+        action.setGameId(gameId);
+        action.setPlayerId(playerId);
+
+        // Act
+        gameController.undoLastMove(action);
+
+        // Assert
+        verify(gameManager, never()).undoLastMove(any());
+        verify(messagingTemplate, times(1)).convertAndSend(eq("/topic/game/update/" + gameId), any(Room.class));
     }
 }

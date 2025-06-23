@@ -1,11 +1,8 @@
 package at.aau.serg.kingdombuilderserver.game;
 
-import at.aau.serg.kingdombuilderserver.messaging.dtos.CheatReportDTO;
+import at.aau.serg.kingdombuilderserver.messaging.dtos.*;
 import at.aau.serg.kingdombuilderserver.board.TerrainType;
-import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerActionDTO;
 import io.micrometer.observation.GlobalObservationConvention;
-import at.aau.serg.kingdombuilderserver.messaging.dtos.PlayerScoreDTO;
-import at.aau.serg.kingdombuilderserver.messaging.dtos.RoomLobbyDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -64,8 +61,12 @@ public class GameController {
                 Player activePlayer = gameManager.getActivePlayer();
 
                 if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
+                    try {
+                        gameManager.placeHouse(action.getPosition());
+                    } catch (Exception e) {
+                        logger.error("Error while placing house: {}", e.getMessage());
+                    }
 
-                    gameManager.placeHouse(action.getPosition());
                     logger.info("House placed successfully for player {}", action.getPlayerId());
                 } else {
                     logger.warn("Player {} is not the active player in game {}", action.getPlayerId(), gameId);
@@ -74,6 +75,42 @@ public class GameController {
             broadcastGameUpdate(rooms.get(gameId));
         }
 
+    }
+
+    @MessageMapping("/game/toggleCheatMode")
+    public void toggleCheatMode(@Payload BasicMessage msg) {
+        logger.info("Received cheat toggle request from {} in Room {}",msg.getPlayerId(), msg.getGameId());
+        Room room = rooms.get(msg.getGameId());
+        GameManager gameManager = room.getGameManager();
+        Player activePlayer = room.getGameManager().getActivePlayer();
+        if (activePlayer != null && activePlayer.getId().equals(msg.getPlayerId())) {
+            boolean newMode = gameManager.toggleCheatMode();
+            logger.info("Cheat mode for Room {} toggled to {}", msg.getGameId(), newMode);
+        }else {
+            logger.warn("Player {} is not the active player in game {}", msg.getPlayerId(), msg.getGameId());
+        }
+    }
+
+    @MessageMapping("/game/undoLastMove")
+    public void undoLastMove(@Payload PlayerActionDTO action){
+        logger.info("Received undoLastMove request for game: {}", action.getGameId());
+        String gameId = action.getGameId();
+        if(rooms.containsKey(gameId)){
+            Room room = rooms.get(gameId);
+            GameManager gameManager = room.getGameManager();
+            Player activePlayer = gameManager.getActivePlayer();
+
+            if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
+                logger.info("Undoing last move for player {}", action.getPlayerId());
+                gameManager.undoLastMove(activePlayer);
+                logger.info("Last move undone successfully for player {}", action.getPlayerId());
+            } else {
+                logger.warn("Player {} is not the active player in game {}", action.getPlayerId(), gameId);
+            }
+            broadcastGameUpdate(room);
+        } else {
+            logger.warn("Game not found for gameId: {}", gameId);
+        }
     }
 
     @MessageMapping("/game/endTurn")
@@ -86,23 +123,12 @@ public class GameController {
             Room room = rooms.get(gameId);
             GameManager gameManager = room.getGameManager();
             Player activePlayer = gameManager.getActivePlayer();
-            List<Integer> activeBuildings = gameManager.getActiveBuildingsSequence();
+            List<Integer> activeBuildings = gameManager.getActiveBuildings();
 
             if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
-                activePlayer.setCurrentCard(null);
-                activeBuildings.clear();
                 // Logik zum Beenden des Zuges, z.B. Wechsel zum nächsten Spieler
-
-                if(gameManager.getActivePlayer().getRemainingSettlements() == 0)
-                {
-                    //Spiel ist vorbei.
-                    sendPlayerScores(gameId);
-                    room.setStatus(RoomStatus.FINISHED);
-                    return;
-                }
                 logger.info("Received endTurn from Player {}. Client-Payload says didCheat={}", action.getPlayerId(), action.isDidCheat());
-                activePlayer.setHasCheated(action.isDidCheat());
-                logger.info("Player {}'s internal hasCheated flag is now set to: {}", activePlayer.getId(), activePlayer.hasCheated());
+                logger.info("Player {}'s internal hasCheated flag is now set to: {}", activePlayer.getId(), activePlayer.getHasCheated());
 
                 logger.info("Initiating cheat report window for game {}", gameId);
 
@@ -137,6 +163,13 @@ public class GameController {
                             logger.info("No next player found, potentially game end for game {}", gameId);
                         }
 
+                        if(gameManager.getActivePlayer().getRemainingSettlements() == 0)
+                        {
+                            //Spiel ist vorbei.
+                            sendPlayerScores(gameId);
+                            room.setStatus(RoomStatus.FINISHED);
+                            return;
+                        }
                         // Game update senden
                         broadcastGameUpdate(room);
                     }

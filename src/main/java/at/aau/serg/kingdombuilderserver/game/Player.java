@@ -1,17 +1,17 @@
 package at.aau.serg.kingdombuilderserver.game;
 
+import at.aau.serg.kingdombuilderserver.board.GameBoard;
 import at.aau.serg.kingdombuilderserver.board.TerrainType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-@Getter @Setter
+@Getter
+@Setter
 public class Player {
     @Setter(AccessLevel.NONE)
     private String id;
@@ -20,17 +20,17 @@ public class Player {
     private int remainingSettlements;
     private int score;
     private Set<Integer> houseFieldIds = new HashSet<>();
-    private boolean hasCheated = false;
+    private boolean hasCheated;
     private boolean skippedTurn = false;
-    private int gold = 0;
-    private List<GameHousePosition> housesPlacedThisTurn = new ArrayList<>();
+    private int cheatPoints = 0;//Points gained/lost when cheating/reporting
 
     private TerrainType currentCard = null; //Card pulled in current turn
 
     public Player(String playerId, String playerName) {
         this.id = playerId;
         this.name = playerName;
-        remainingSettlements = 40;
+        remainingSettlements = 10; //TODO revert to 40
+        hasCheated = false;
     }
 
     public Player(String playerId, int initialSettlements){
@@ -56,26 +56,16 @@ public class Player {
         remainingSettlements = Math.max(remainingSettlements - Math.abs(value), 0);
     }
 
-    // Haus auf ein Feld setzen
-    public boolean placeHouse(int fieldId) {
-        return houseFieldIds.add(fieldId); // Gibt false zurück, wenn schon gesetzt
+    public void updateHouseFields(GameBoard board) {
+        houseFieldIds = new HashSet<>(board.getFieldsBuiltBy(this.id));
     }
 
-    // Prüfen ob ein Haus auf dem Feld steht
-    public boolean hasHouseOnField(int fieldId) {
-        return houseFieldIds.contains(fieldId);
-    }
-
-    public boolean hasCheated() {
+    public boolean getHasCheated() {
         return hasCheated;
     }
+    public void addCheatPoints(int amount) { this.cheatPoints += amount; }
 
-    public List <GameHousePosition> getHousePlacedThisTurn(){
-        return housesPlacedThisTurn;
-    }
-    public void addGold(int amount) { this.gold += amount; }
-
-    public void decreaseGold(int amount) { this.gold -= amount; }
+    public void decreaseCheatPoints(int amount) { this.cheatPoints -= amount; }
 
     @Override
     public String toString() {

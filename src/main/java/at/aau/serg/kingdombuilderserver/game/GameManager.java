@@ -1,6 +1,7 @@
 package at.aau.serg.kingdombuilderserver.game;
 
 import at.aau.serg.kingdombuilderserver.board.GameBoard;
+import at.aau.serg.kingdombuilderserver.board.TerrainField;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,7 +22,7 @@ public class GameManager {
     private int roundCounter = 0;
     @Getter
     @Setter
-    private List<Integer> activeBuildingsSequence = new ArrayList<>();
+    private List<Integer> activeBuildings = new ArrayList<>();
     @Getter
     private boolean awaitingCheatReports = false;
     private final List<Player> allPlayers;
@@ -29,6 +30,9 @@ public class GameManager {
     @Getter
     @Setter
     private Map<String, List<String>> cheatReportsThisTurn;
+    @Getter
+    @Setter
+    private boolean cheatMode;
 
     public GameManager(List<Player> players) {
         // Private constructor to prevent instantiation
@@ -36,6 +40,7 @@ public class GameManager {
         gameBoard.buildGameBoard();
         this.allPlayers = players;
         this.cheatReportsThisTurn = new HashMap<>();
+        this.cheatMode = false;
     }
 
     // Zusätzlicher Konstruktor NUR FÜR TESTS (package-private)
@@ -46,33 +51,26 @@ public class GameManager {
     }
 
     public void placeHouse(GameHousePosition position) {
-        if (activePlayer == null) {
-            throw new IllegalStateException("Kein aktiver Spieler ausgewählt, um ein Haus zu platzieren.");
-        }
-        if (!gameBoard.isPositionValid(position)) {
-            throw new IllegalArgumentException("Ungültige Position für das Platzieren des Hauses: " + position);
-        }
-        if (gameBoard.isPositionValid(position)) {
-            gameBoard.placeHouse(activePlayer,activeBuildingsSequence, position, roundCounter);
+        gameBoard.placeHouse(activePlayer,activeBuildings,position,cheatMode,roundCounter);
+    }
 
-            activePlayer.getHousesPlacedThisTurn().add(position);
-        } else {
-            throw new IllegalArgumentException("Ungültige Position für das Platzieren des Hauses: " + position);
-        }
-        if(activePlayer != null && isPositionValidForPlayer(activePlayer, position)) {
-            activePlayer.getHousesPlacedThisTurn().add(position);
-            activePlayer.decreaseSettlementsBy(1); // Siedlungen des Spieler reduzieren
-            System.out.println("Player" + activePlayer.getId() + " placed house at " + position + ". Remaining: " + activePlayer.getRemainingSettlements());
-        } else {
-            System.err.println("Invalid house placement attempt by " + (activePlayer != null ? activePlayer.getId() : "null") + " at " + position);
+    /**
+     * @return new cheatMode (boolean)
+     */
+    public boolean toggleCheatMode(){
+        cheatMode = !cheatMode;
+        return cheatMode;
+    }
+
+    public void undoLastMove(Player player){
+        if (!activeBuildings.isEmpty()){
+            gameBoard.undoMove(activeBuildings, player);
+            activeBuildings.clear();
         }
     }
 
     public void nextRound() {
         roundCounter++;
-        if (activePlayer != null) {
-            activePlayer.getHousesPlacedThisTurn().clear();
-        }
     }
 
     public void registerCheatReport (String reporterId){
@@ -87,27 +85,21 @@ public class GameManager {
             return;
         }
         String activePlayerId = activePlayer.getId();
-        boolean playerActuallyCheated = activePlayer.hasCheated();
+        boolean playerActuallyCheated = activePlayer.getHasCheated();
         List<String> reporters = cheatReportsThisTurn.getOrDefault(activePlayerId, new ArrayList<>());
 
         if (playerActuallyCheated){
             if(!reporters.isEmpty()){
                 // Falls: Erfolgreich erwischt!
                 System.err.println("Player " + activePlayerId + " was caught cheating by " + reporters.size() + " player(s).");
-
-                // 1. Alle Häuser dieser Runde entfernen
-                for (GameHousePosition pos: activePlayer.getHousesPlacedThisTurn()){
-                    // gameBoard.removeHouse(pos);
-                    System.out.println("Removing cheated house at " + pos + " for player " + activePlayerId);
-                }
-                activePlayer.getHousesPlacedThisTurn().clear(); // Liste der Häuser leeren
-                activePlayer.decreaseSettlementsBy(0); // Später ändern zu increaseSettlementsBy(anzahlEntfernterHäuser)
+                TerrainField first = gameBoard.getFields()[activeBuildings.get(0)];
+                gameBoard.remove(first,activeBuildings,activePlayer);
 
                 // 2. Gold an die Entlarvenden übertragen
                 for (String reporterId : reporters) {
                     Player reporter = getPlayerById(reporterId);
                     if (reporter != null) {
-                        reporter.setGold(reporter.getGold() + 5);
+                        reporter.addCheatPoints(5);
                         System.out.println("Player " + reporterId + " receives 5 gold for reporting.");
                     }
                 }
@@ -124,9 +116,9 @@ public class GameManager {
                     Player accuser = getPlayerById(accuserId);
                     if (accuser != null) {
                         // 1. Beschuldigter bekommt Gold vom Anschuldigenden
-                        int goldTransfer = Math.min(accuser.getGold(), 5); // Nicht mehr als der Ankläger hat
-                        activePlayer.setGold(activePlayer.getGold() + goldTransfer);
-                        accuser.setGold(accuser.getGold() - goldTransfer);
+                        int goldTransfer = Math.min(accuser.getCheatPoints(), 5); // Nicht mehr als der Ankläger hat
+                        activePlayer.addCheatPoints(goldTransfer);
+                        accuser.decreaseCheatPoints(goldTransfer);
                         System.out.println("Player " + activePlayerId + " receives " + goldTransfer + " gold from accuser " + accuserId);
 
                         // 2. Reporter setzt eine Runde aus
@@ -163,7 +155,9 @@ public class GameManager {
     public void cleanupTurn() {
         if (activePlayer != null){
             activePlayer.setHasCheated(false);
-            activePlayer.getHousesPlacedThisTurn().clear(); // Liste der in dieser Runde platzierten Häuser für den nächsten Zug zurücksetzen
+            cheatMode = false;
+            activeBuildings.clear(); // Liste der in dieser Runde platzierten Häuser für den nächsten Zug zurücksetzen
+            activePlayer.setCurrentCard(null);
         }
         this.cheatReportsThisTurn.clear(); // Auch hier die Reports löschen
         System.out.println("Turn cleanup for player" + (activePlayer != null ? activePlayer.getId() : "null"));

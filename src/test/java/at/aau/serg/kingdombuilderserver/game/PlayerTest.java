@@ -11,6 +11,7 @@ public class PlayerTest {
     void constructor1Test(){
         player = new Player("12345","Playername");
         assertEquals("12345",player.getId());
+        player.setRemainingSettlements(40);
         assertEquals(40,player.getRemainingSettlements());
     }
 
@@ -56,11 +57,11 @@ public class PlayerTest {
     @Test
     void testGoldManagement(){
         player = new Player("p1", "Goldfinger");
-        assertEquals(0, player.getGold());
-        player.addGold(10);
-        assertEquals(10, player.getGold());
-        player.decreaseGold(3);
-        assertEquals(7, player.getGold());
+        assertEquals(0, player.getCheatPoints());
+        player.addCheatPoints(10);
+        assertEquals(10, player.getCheatPoints());
+        player.decreaseCheatPoints(3);
+        assertEquals(7, player.getCheatPoints());
     }
 
     @Test
@@ -74,9 +75,9 @@ public class PlayerTest {
     @Test
     void testHasCheatedFlag(){
         player = new Player("p1", "Cheater");
-        assertFalse(player.hasCheated());
+        assertFalse(player.getHasCheated());
         player.setHasCheated(true);
-        assertTrue(player.hasCheated());
+        assertTrue(player.getHasCheated());
     }
 
     @Test

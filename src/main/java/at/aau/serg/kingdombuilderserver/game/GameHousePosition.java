@@ -25,6 +25,10 @@ public class GameHousePosition {
         return y;
     }
 
+    public int toId(){
+        return 20*y+x;
+    }
+
     @Override
     public String toString() {
         return "GameHousePosition{" +

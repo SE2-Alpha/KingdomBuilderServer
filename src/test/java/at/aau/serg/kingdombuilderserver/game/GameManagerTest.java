@@ -7,10 +7,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class GameManagerTest {
@@ -37,7 +37,7 @@ class GameManagerTest {
         gameManager.setActivePlayer(mockPlayer);
 
         //Liste platzierter Gebäude setzen
-        gameManager.setActiveBuildingsSequence(fieldBuffer);
+        gameManager.setActiveBuildings(fieldBuffer);
     }
 
     @Test
@@ -48,19 +48,7 @@ class GameManagerTest {
         gameManager.placeHouse(position);
 
         // Überprüfen, ob placeHouse korrekt aufgerufen wurde
-        verify(mockGameBoard, times(1)).placeHouse(mockPlayer, fieldBuffer, position, 0);
-    }
-
-    @Test
-    void testPlaceHouse_UngueltigePosition() {
-        GameHousePosition position = new GameHousePosition(2, 4);
-        when(mockGameBoard.isPositionValid(position)).thenReturn(false);
-
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> gameManager.placeHouse(position));
-        assertEquals("Ungültige Position für das Platzieren des Hauses: " + position, ex.getMessage());
-
-        // Sicherstellen, dass placeHouse NICHT aufgerufen wurde
-        verify(mockGameBoard, never()).placeHouse(any(),any(), any(), anyInt());
+        verify(mockGameBoard, times(1)).placeHouse(mockPlayer, fieldBuffer, position, false,0);
     }
 
     @Test
@@ -72,28 +60,6 @@ class GameManagerTest {
         assertEquals(2, gameManager.getRoundCounter());
     }
 
-    @Test
-    void testPlaceHouse_PlayerHasNoSettlements() {
-
-        when(mockPlayer.getRemainingSettlements()).thenReturn(0);
-        GameHousePosition position = new GameHousePosition(1, 1);
-        when(mockGameBoard.isPositionValid(position)).thenReturn(true);
-
-        gameManager.placeHouse(position);
-
-        verify(mockGameBoard, times(1)).placeHouse(any(), any(), any(), anyInt());
-        verify(mockPlayer, never()).decreaseSettlementsBy(1);
-        assertTrue(mockPlayer.getHousesPlacedThisTurn().isEmpty());
-    }
-
-    @Test
-    void testPlaceHouse_noActivePlayer() {
-        gameManager.setActivePlayer(null);
-        GameHousePosition position = new GameHousePosition(1, 1);
-
-        IllegalStateException ex = assertThrows(IllegalStateException.class, () -> gameManager.placeHouse(position));
-        assertEquals("Kein aktiver Spieler ausgewählt, um ein Haus zu platzieren.", ex.getMessage());
-    }
 
     @Test
     void testRecordCheatReport_WhenNotAwaiting() {
@@ -116,9 +82,8 @@ class GameManagerTest {
     @Test
     void testNextRound_WithActivePlayer() {
         // Stellt sicher, dass die Liste der in dieser Runde platzierten Häuser für den Spieler geleert wird
-        when(mockPlayer.getHousesPlacedThisTurn()).thenReturn(new ArrayList<>());
         gameManager.nextRound();
-        verify(mockPlayer).getHousesPlacedThisTurn();
+        assertTrue(gameManager.getActiveBuildings().isEmpty());
     }
 
     @Test
@@ -166,15 +131,34 @@ class GameManagerTest {
     }
 
     @Test
-    void testPlaceHouse_WhenPlayerHasSettlements() {
-        GameHousePosition validPosition = new GameHousePosition(3, 3);
-        when(mockGameBoard.isPositionValid(validPosition)).thenReturn(true);
+    void undoLastMove_WhenHousesArePlaced_ShouldCallGameBoardAndClearList() {
+        // Arrange
+        // Füge platzierte Gebäude zur Sequenzliste hinzu
+        List<Integer> placedHouses = new ArrayList<>(Arrays.asList(5, 10, 15));
+        gameManager.setActiveBuildings(placedHouses);
+        assertTrue(gameManager.getActiveBuildings().contains(5));
 
-        when(mockPlayer.getRemainingSettlements()).thenReturn(10);
+        // Act
+        gameManager.undoLastMove(mockPlayer);
 
-        gameManager.placeHouse(validPosition);
-
-        verify(mockPlayer, times(1)).decreaseSettlementsBy(1);
+        // Assert
+        // Überprüfe, ob die undoMove Methode auf dem GameBoard mit der korrekten Liste aufgerufen wurde
+        verify(mockGameBoard, times(1)).undoMove(placedHouses, mockPlayer);
+        // Überprüfe, ob die Liste der platzierten Gebäude im GameManager geleert wurde
+        assertTrue(gameManager.getActiveBuildings().isEmpty(), "Active buildings sequence should be empty after undo.");
     }
 
+    @Test
+    void undoLastMove_WhenNoHousesArePlaced_ShouldNotCallGameBoard() {
+        // Arrange
+        // Die Liste ist bereits leer nach dem Setup
+        assertTrue(gameManager.getActiveBuildings().isEmpty());
+
+        // Act
+        gameManager.undoLastMove(mockPlayer);
+
+        // Assert
+        // Überprüfe, ob die undoMove Methode des GameBoards NIEMALS aufgerufen wurde
+        verify(mockGameBoard, never()).undoMove(any(), any());
+    }
 }
