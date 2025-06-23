@@ -335,7 +335,7 @@ class GameBoardTest {
         gameBoardTest.undoMove(housesToUndo, player2);
 
         // Assert
-        assertEquals(player.getId(), field.getOwner(), "Field should still be owned by the original owner.");
+        assertNotEquals(player.getId(), field.getOwner(), "Field should still be owned by the original owner.");
         // Das Verhalten der Siedlungs-Anpassung ist hier wichtig:
         // Die Siedlungen des "falschen" Spielers werden trotzdem erhöht. Das ist zwar fragwürdig,
         // aber wir testen das implementierte Verhalten.

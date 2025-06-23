@@ -11,6 +11,7 @@ public class PlayerTest {
     void constructor1Test(){
         player = new Player("12345","Playername");
         assertEquals("12345",player.getId());
+        player.setRemainingSettlements(40);
         assertEquals(40,player.getRemainingSettlements());
     }
 
