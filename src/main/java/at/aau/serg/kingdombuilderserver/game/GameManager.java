@@ -64,8 +64,6 @@ public class GameManager {
 
     public void nextRound() {
         roundCounter++;
-        activePlayer.setCurrentCard(null);
-        activeBuildings.clear();
     }
 
     public void registerCheatReport (String reporterId){
@@ -152,6 +150,7 @@ public class GameManager {
             activePlayer.setHasCheated(false);
             cheatMode = false;
             activeBuildings.clear(); // Liste der in dieser Runde platzierten Häuser für den nächsten Zug zurücksetzen
+            activePlayer.setCurrentCard(null);
         }
         this.cheatReportsThisTurn.clear(); // Auch hier die Reports löschen
         System.out.println("Turn cleanup for player" + (activePlayer != null ? activePlayer.getId() : "null"));
