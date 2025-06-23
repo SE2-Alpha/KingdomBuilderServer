@@ -61,8 +61,12 @@ public class GameController {
                 Player activePlayer = gameManager.getActivePlayer();
 
                 if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
+                    try {
+                        gameManager.placeHouse(action.getPosition());
+                    } catch (Exception e) {
+                        logger.error("Error while placing house: {}", e.getMessage());
+                    }
 
-                    gameManager.placeHouse(action.getPosition());
                     logger.info("House placed successfully for player {}", action.getPlayerId());
                 } else {
                     logger.warn("Player {} is not the active player in game {}", action.getPlayerId(), gameId);
