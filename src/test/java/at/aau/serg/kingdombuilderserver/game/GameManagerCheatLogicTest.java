@@ -58,8 +58,8 @@ class GameManagerCheatLogicTest {
     void testPlayerCheatsAndGetsAwayWithIt_StateRemains() {
         player1.setHasCheated(true);
         GameHousePosition cheatedHouse = new GameHousePosition(5, 5);
-        int ID = cheatedHouse.getY() * 20 + cheatedHouse.getX();
-        gameManager.getActiveBuildings().add(ID);
+        int id = cheatedHouse.getY() * 20 + cheatedHouse.getX();
+        gameManager.getActiveBuildings().add(id);
         // Keine Meldung wird registriert (leere Reporterliste)
 
         gameManager.processCheatReportOutcome();
