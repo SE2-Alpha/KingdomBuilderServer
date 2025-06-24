@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
-public class StartRoomMessageTest {
+class StartRoomMessageTest {
     private Room room;
     private Player player1;
     private Player player2;

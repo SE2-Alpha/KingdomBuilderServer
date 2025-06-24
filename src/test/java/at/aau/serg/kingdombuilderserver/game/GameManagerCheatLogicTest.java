@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Arrays;
 import java.util.List;
 
-public class GameManagerCheatLogicTest {
+class GameManagerCheatLogicTest {
 
     private GameManager gameManager;
     private Player player1;

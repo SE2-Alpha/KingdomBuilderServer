@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
-public class TerrainTypeTest {
+class TerrainTypeTest {
 
     private TerrainType terrainType0;
     private TerrainType terrainType1;
