@@ -57,10 +57,10 @@ public class TerrainTypeTest {
     }
 
     @Test
-    void RandomTerrainTest(){
+    void randomTerrainTest(){
         boolean inRange = true;
         for(int i = 0; i < 100; i++){
-            terrainType0 = TerrainType.RandomTerrain();
+            terrainType0 = TerrainType.randomTerrain();
             if(!terrainType0.isBuildable){
                 inRange = false;
             }

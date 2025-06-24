@@ -33,7 +33,7 @@ public enum TerrainType {
         };
     }
 
-    public static TerrainType RandomTerrain(){
+    public static TerrainType randomTerrain(){
 
         return fromInt(rand.nextInt(5));
     }
