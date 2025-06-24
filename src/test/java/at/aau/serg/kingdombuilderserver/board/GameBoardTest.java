@@ -114,7 +114,7 @@ class GameBoardTest {
         TerrainField firstFieldQuadrant2 = gameBoardTest.getFieldByRowAndCol(10, 10);
 
 
-        System.out.printf("Field 1 ID: %d, Position: (%d, %d)\n", lastFieldQuadrant1.getId(), lastFieldQuadrant1.getId() % 20, lastFieldQuadrant1.getId() / 20);
+        System.out.printf("Field 1 ID: %d, Position: (%d, %d)%n", lastFieldQuadrant1.getId(), lastFieldQuadrant1.getId() % 20, lastFieldQuadrant1.getId() / 20);
         System.out.printf("Field 2 ID: %d, Position: (%d, %d)", firstFieldQuadrant2.getId(), firstFieldQuadrant2.getId() % 20, firstFieldQuadrant2.getId() / 20);
 
         assertTrue(
@@ -296,9 +296,9 @@ class GameBoardTest {
         int initialSettlements = player.getRemainingSettlements();
 
         // Platziere 3 Häuser direkt auf dem Brett
-        TerrainField field1 = gameBoardTest.getFields()[10];
-        TerrainField field2 = gameBoardTest.getFields()[11];
-        TerrainField field3 = gameBoardTest.getFields()[12];
+        field1 = gameBoardTest.getFields()[10];
+        field2 = gameBoardTest.getFields()[11];
+        field3 = gameBoardTest.getFields()[12];
         field1.setOwner(player.getId());
         field2.setOwner(player.getId());
         field3.setOwner(player.getId());
@@ -327,7 +327,7 @@ class GameBoardTest {
         player.setRemainingSettlements(40);
         player2.setRemainingSettlements(30);
         // Arrange
-        TerrainField field = gameBoardTest.getFields()[25];
+        field = gameBoardTest.getFields()[25];
         field.setOwner(player.getId());
         List<Integer> housesToUndo = Collections.singletonList(25);
 
