@@ -12,7 +12,5 @@ public class CreateRoomMessage {
     @Setter
     private String userName;
 
-    // Standard-Konstruktor
-    public CreateRoomMessage() { }
 
 }

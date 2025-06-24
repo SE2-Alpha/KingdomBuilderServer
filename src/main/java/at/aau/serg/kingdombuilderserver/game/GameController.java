@@ -2,21 +2,16 @@ package at.aau.serg.kingdombuilderserver.game;
 
 import at.aau.serg.kingdombuilderserver.messaging.dtos.*;
 import at.aau.serg.kingdombuilderserver.board.TerrainType;
-import io.micrometer.observation.GlobalObservationConvention;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
-import java.util.*;
 
 @Controller
 public class GameController {
@@ -197,7 +192,7 @@ public class GameController {
         if (rooms.containsKey(gameId)) {
             if (activePlayer != null && activePlayer.getId().equals(action.getPlayerId())) {
                 logger.info("Card drawn by player {} in game {}", action.getPlayerId(), action.getGameId());
-                TerrainType terrainCardType = TerrainType.RandomTerrain();
+                TerrainType terrainCardType = TerrainType.randomTerrain();
                 room.getGameManager().getActivePlayer().setCurrentCard(terrainCardType);
                 broadcastTerrainCardType(action.getGameId(), terrainCardType);
                 broadcastGameUpdate(rooms.get(gameId));

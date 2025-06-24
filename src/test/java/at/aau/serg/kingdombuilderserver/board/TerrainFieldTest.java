@@ -17,7 +17,6 @@ class TerrainFieldTest {
     @ParameterizedTest
     @MethodSource("fieldnums")
     void getNeighboursAmountTest(int id) {
-        TerrainField terrainField = new TerrainField(TerrainType.GRASS, id);
         int size = TerrainField.getNeighbours(id).length;
 
         if (id < 0 || id > 399) {

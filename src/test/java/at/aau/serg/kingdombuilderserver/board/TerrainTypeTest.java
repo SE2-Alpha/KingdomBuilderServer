@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
-public class TerrainTypeTest {
+class TerrainTypeTest {
 
     private TerrainType terrainType0;
     private TerrainType terrainType1;
@@ -57,10 +57,10 @@ public class TerrainTypeTest {
     }
 
     @Test
-    void RandomTerrainTest(){
+    void randomTerrainTest(){
         boolean inRange = true;
         for(int i = 0; i < 100; i++){
-            terrainType0 = TerrainType.RandomTerrain();
+            terrainType0 = TerrainType.randomTerrain();
             if(!terrainType0.isBuildable){
                 inRange = false;
             }

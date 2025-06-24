@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -29,7 +28,7 @@ public class Player {
     public Player(String playerId, String playerName) {
         this.id = playerId;
         this.name = playerName;
-        remainingSettlements = 10; //TODO revert to 40
+        remainingSettlements = 40;
         hasCheated = false;
     }
 

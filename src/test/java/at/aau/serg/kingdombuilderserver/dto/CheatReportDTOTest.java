@@ -4,7 +4,7 @@ import at.aau.serg.kingdombuilderserver.messaging.dtos.CheatReportDTO;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CheatReportDTOTest {
+class CheatReportDTOTest {
     @Test
     void testGettersAndSetters() {
         CheatReportDTO dto = new CheatReportDTO();

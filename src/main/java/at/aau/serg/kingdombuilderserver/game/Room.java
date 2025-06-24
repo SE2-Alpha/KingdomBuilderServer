@@ -26,7 +26,7 @@ public class Room {
     }
 
     public void startGame() {
-        if (players.size() < 1) { //TODO increase to 2 after debugging
+        if (players.size() <= 2) {
             logger.warn("Not enough players to start the game. Minimum 2 players required.");
             return;
         }

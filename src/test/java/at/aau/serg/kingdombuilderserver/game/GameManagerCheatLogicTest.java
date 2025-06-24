@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Arrays;
 import java.util.List;
 
-public class GameManagerCheatLogicTest {
+class GameManagerCheatLogicTest {
 
     private GameManager gameManager;
     private Player player1;
@@ -58,8 +58,8 @@ public class GameManagerCheatLogicTest {
     void testPlayerCheatsAndGetsAwayWithIt_StateRemains() {
         player1.setHasCheated(true);
         GameHousePosition cheatedHouse = new GameHousePosition(5, 5);
-        int ID = cheatedHouse.getY() * 20 + cheatedHouse.getX();
-        gameManager.getActiveBuildings().add(ID);
+        int id = cheatedHouse.getY() * 20 + cheatedHouse.getX();
+        gameManager.getActiveBuildings().add(id);
         // Keine Meldung wird registriert (leere Reporterliste)
 
         gameManager.processCheatReportOutcome();
