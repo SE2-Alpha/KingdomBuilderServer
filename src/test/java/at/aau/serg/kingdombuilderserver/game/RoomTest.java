@@ -104,7 +104,7 @@ class RoomTest {
 
 
         // Assert
-        assertTrue(room.getStatus() == RoomStatus.STARTED, "Room should be in STARTED status after starting the game.");
+        assertSame(room.getStatus(), RoomStatus.STARTED, "Room should be in STARTED status after starting the game.");
     }
 
     @Test
@@ -117,7 +117,7 @@ class RoomTest {
 
 
         // Assert
-        assertFalse(room.getStatus() == RoomStatus.STARTED, "Room should not be in STARTED status if there are no players.");
+        assertNotSame(room.getStatus(), RoomStatus.STARTED, "Room should not be in STARTED status if there are no players.");
     }
 
     @Test
@@ -161,7 +161,7 @@ class RoomTest {
         room.addPlayer(player5); // This should not be added as it exceeds the max players
 
         assertThrows(IllegalArgumentException.class, () -> {
-            Player next = room.getNextPlayer(player5);
+            room.getNextPlayer(player5);
         });
 
     }
