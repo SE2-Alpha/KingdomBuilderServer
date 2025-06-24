@@ -133,7 +133,6 @@ public class GameManager {
         }
         if (activePlayer != null && activePlayer.getId().equals(reportedPlayerId)){
             this.cheatReportsThisTurn.computeIfAbsent(reportedPlayerId, k -> new ArrayList<>()).add(reporterPlayerId);
-        } else {
         }
     }
 

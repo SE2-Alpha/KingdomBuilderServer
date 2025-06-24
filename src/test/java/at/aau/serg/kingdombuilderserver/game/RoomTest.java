@@ -104,7 +104,7 @@ class RoomTest {
 
 
         // Assert
-        assertSame(room.getStatus(), RoomStatus.STARTED, "Room should be in STARTED status after starting the game.");
+        assertSame(RoomStatus.STARTED, room.getStatus(),"Room should be in STARTED status after starting the game.");
     }
 
     @Test
@@ -117,7 +117,7 @@ class RoomTest {
 
 
         // Assert
-        assertNotSame(room.getStatus(), RoomStatus.STARTED, "Room should not be in STARTED status if there are no players.");
+        assertNotSame(RoomStatus.STARTED, room.getStatus(), "Room should not be in STARTED status if there are no players.");
     }
 
     @Test
