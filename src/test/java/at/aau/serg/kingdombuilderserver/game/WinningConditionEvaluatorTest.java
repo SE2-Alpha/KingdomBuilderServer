@@ -11,7 +11,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class WinningConditionEvaluatorTest {
+class WinningConditionEvaluatorTest {
 
     private WinningConditionEvaluator evaluator;
     private WinningConditionEvaluator evaluator2;
@@ -91,8 +91,7 @@ public class WinningConditionEvaluatorTest {
     }
 
     @Test
-    void testEvaluateHermits_MultipleFieldGroups() {
-        // Spieler mit 2 getrennten Gruppen: {0, 1, 2}, {100}
+    void testEvaluateHermits_MultipleFieldGroups() { // Spieler mit 2 getrennten Gruppen: {0, 1, 2}, {100}
         player1.setHouseFieldIds(Set.of(0, 1, 2, 100));
         evaluator = new WinningConditionEvaluator(board, players);
 
