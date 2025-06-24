@@ -111,7 +111,6 @@ public class GameBoard {
         TerrainType currentCard = activePlayer.getCurrentCard();
         String currentPID = activePlayer.getId();
 
-        System.out.println("Cheating: "+ cheatMode);
 
         if (field.getOwner() != null) {
             if(field.getOwner().equals(currentPID) && field.getOwnerSinceRound() == round){
@@ -129,7 +128,6 @@ public class GameBoard {
         if(cheatMode){
             place(field,activePlayer,round,activeList);
             activePlayer.setHasCheated(true);
-            System.out.println("Player "+currentPID+" has cheated on Field "+field.getId());
             return;
         }
 
@@ -147,24 +145,15 @@ public class GameBoard {
         List<Integer> freeAdjacentCurrentTypeFields = getIntersection(allFreeAdjacentFields, freeFieldsOfCurrentType);
 
 
-//        Info dump
-//        System.out.println("My Field-ID: "+ id);
-//        System.out.println("freeFieldsOfCurrentType: "+freeFieldsOfCurrentType);
-//        System.out.println("builtByActivePlayer: "+builtByActivePlayer);
-//        System.out.println("allFreeAdjacentFields: "+allFreeAdjacentFields);
-//        System.out.println("freeAdjacentCurrentTypeFields: "+freeAdjacentCurrentTypeFields);
-
         //First building
         if(builtByActivePlayer.isEmpty() && freeFieldsOfCurrentType.contains(id)
         ){
             place(field,activePlayer,round,activeList);
-            System.out.println("Built field "+field.getId());
             return;
         }
         if(freeFieldsOfCurrentType.isEmpty()){//When all fields of current Type are occupied (unlikely) allow player to place on any neighboring field
             if(allFreeAdjacentFields.contains(id)){
                 place(field,activePlayer,round,activeList);
-                System.out.println("Built field "+field.getId());
                 return;
             }else{
                 throw new IllegalStateException("Gezogener FeldTyp ist voll und feld grenzt nicht an bebautes feld" + allFreeAdjacentFields);
@@ -178,7 +167,6 @@ public class GameBoard {
                 (freeFieldsOfCurrentType.contains(id))
         ){
             place(field,activePlayer,round,activeList);
-            System.out.println("Built field "+field.getId());
             return;
         }
 
