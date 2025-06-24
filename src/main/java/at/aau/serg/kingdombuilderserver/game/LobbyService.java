@@ -62,7 +62,7 @@ public class LobbyService {
     }
     public void startGame(String roomId) {
         Room room = rooms.get(roomId);
-        if (room != null && room.getPlayers().size() <= 2 && room.getStatus()!=RoomStatus.STARTED) {
+        if (room != null && room.getPlayers().size() > 1 && room.getStatus()!=RoomStatus.STARTED) {
             room.setPlayerColor();
             room.setStatus(RoomStatus.STARTED);
             room.startGame();
