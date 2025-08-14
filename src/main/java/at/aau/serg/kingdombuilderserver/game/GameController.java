@@ -230,6 +230,14 @@ public class GameController {
     }
 
 
+    private void broadcastEmote(String gameId, Player player, String emote){
+        logger.info("Broadcasting emote for game: {}", gameId);
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("player", player);
+        payload.put("emote", emote);
+        messagingTemplate.convertAndSend("/topic/game/emote/"+ gameId, payload);
+    }
+
     @MessageMapping("/game/cheat")
     public void handleCheat(@Payload PlayerActionDTO action) {
         logger.info("Received cheat attempt from player {} in game {}", action.getPlayerId(), action.getGameId());
@@ -307,5 +315,26 @@ public class GameController {
 
             messagingTemplate.convertAndSend("/topic/game/scores/"+gameId, evaluator.getPlayerPoints());
         }
+    }
+
+    @MessageMapping("/game/sendEmote")
+    public void sendEmote(@Payload PlayerActionDTO action) throws InterruptedException {
+        logger.info("Received emote for player {} in game {}", action.getPlayerId(), action.getGameId());
+        String gameId = action.getGameId();
+        if(rooms.containsKey(action.getGameId())) {
+            Room room = rooms.get(action.getGameId());
+            GameManager gameManager = room.getGameManager();
+            Player player = room.getPlayerById(action.getPlayerId());
+            String emote = gameManager.emote(action.getEmote());
+
+            broadcastEmote(gameId, player, emote);
+            //broadcastGameUpdate(room);
+
+            Thread.sleep(3000);
+
+            broadcastEmote(gameId, player, "");
+            broadcastGameUpdate(room);
+        }
+
     }
 }
