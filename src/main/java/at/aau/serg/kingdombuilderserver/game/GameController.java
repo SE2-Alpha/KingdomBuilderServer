@@ -327,8 +327,11 @@ public class GameController {
             Player player = room.getPlayerById(action.getPlayerId());
             String emote = gameManager.emote(action.getEmote());
 
+            broadcastEmote(gameId, player, "");
+
+            Thread.sleep(200);
+
             broadcastEmote(gameId, player, emote);
-            //broadcastGameUpdate(room);
 
             Thread.sleep(3000);
 
