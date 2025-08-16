@@ -327,16 +327,23 @@ public class GameController {
             Player player = room.getPlayerById(action.getPlayerId());
             String emote = gameManager.emote(action.getEmote());
 
-            broadcastEmote(gameId, player, "");
+            if(player.getEmoteCounter() < 5) {
 
-            Thread.sleep(200);
+                broadcastEmote(gameId, player, "");
+                player.setEmoteCounter(player.getEmoteCounter() + 1);
 
-            broadcastEmote(gameId, player, emote);
+                Thread.sleep(200);
 
-            Thread.sleep(3000);
+                broadcastEmote(gameId, player, emote);
 
-            broadcastEmote(gameId, player, "");
-            broadcastGameUpdate(room);
+                Thread.sleep(3000);
+
+                player.setEmoteCounter(player.getEmoteCounter() - 1);
+                if (player.getEmoteCounter() == 1) {
+                    broadcastEmote(gameId, player, "");
+                }
+                broadcastGameUpdate(room);
+            }
         }
 
     }

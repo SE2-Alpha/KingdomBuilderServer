@@ -22,6 +22,7 @@ public class Player {
     private boolean hasCheated;
     private boolean skippedTurn = false;
     private int cheatPoints = 0;//Points gained/lost when cheating/reporting
+    private int emoteCounter = 0;
 
     private TerrainType currentCard = null; //Card pulled in current turn
 
