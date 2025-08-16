@@ -38,6 +38,14 @@ public class Player {
         remainingSettlements = initialSettlements;
     }
 
+    public synchronized void setEmoteCounter(int emoteCounter) {
+        this.emoteCounter = emoteCounter;
+    }
+
+    public synchronized int getEmoteCounter() {
+        return emoteCounter;
+    }
+
     public void setRemainingSettlements(int value) {
         remainingSettlements = Math.max(value, 0);
     }

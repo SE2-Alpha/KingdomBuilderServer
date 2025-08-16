@@ -238,6 +238,13 @@ public class GameController {
         messagingTemplate.convertAndSend("/topic/game/emote/"+ gameId, payload);
     }
 
+    private void broadcastEmoteTimeout(String gameId, Player player){
+        logger.info("Broadcasting emote timeout for game: {}", gameId);
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("player", player);
+        messagingTemplate.convertAndSend("/topic/game/emoteTimeout/"+ gameId, payload);
+    }
+
     @MessageMapping("/game/cheat")
     public void handleCheat(@Payload PlayerActionDTO action) {
         logger.info("Received cheat attempt from player {} in game {}", action.getPlayerId(), action.getGameId());
@@ -325,9 +332,10 @@ public class GameController {
             Room room = rooms.get(action.getGameId());
             GameManager gameManager = room.getGameManager();
             Player player = room.getPlayerById(action.getPlayerId());
-            String emote = gameManager.emote(action.getEmote());
 
             if(player.getEmoteCounter() < 5) {
+
+                String emote = gameManager.emote(action.getEmote());
 
                 broadcastEmote(gameId, player, "");
                 player.setEmoteCounter(player.getEmoteCounter() + 1);
@@ -342,7 +350,15 @@ public class GameController {
                 if (player.getEmoteCounter() == 1) {
                     broadcastEmote(gameId, player, "");
                 }
-                broadcastGameUpdate(room);
+            }else if(player.getEmoteCounter() == 5){
+                player.setEmoteCounter(11);
+                broadcastEmoteTimeout(gameId, player);
+                Thread.sleep(200);
+                broadcastEmote(gameId, player, "");
+
+                Thread.sleep(4800);
+
+                player.setEmoteCounter(0);
             }
         }
 
