@@ -15,4 +15,5 @@ public class PlayerActionDTO {
     private GameHousePosition position; // für PLACE_HOUSE
     private String specialActionId; // für SPECIAL_ACTION
     private boolean didCheat;
+    private String emote;
 }

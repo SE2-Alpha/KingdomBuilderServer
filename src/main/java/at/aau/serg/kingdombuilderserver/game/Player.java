@@ -22,6 +22,7 @@ public class Player {
     private boolean hasCheated;
     private boolean skippedTurn = false;
     private int cheatPoints = 0;//Points gained/lost when cheating/reporting
+    private int emoteCounter = 0;
 
     private TerrainType currentCard = null; //Card pulled in current turn
 
@@ -35,6 +36,14 @@ public class Player {
     public Player(String playerId, int initialSettlements){
         this.id = playerId;
         remainingSettlements = initialSettlements;
+    }
+
+    public synchronized void setEmoteCounter(int emoteCounter) {
+        this.emoteCounter = Math.max(emoteCounter, 0);
+    }
+
+    public synchronized int getEmoteCounter() {
+        return emoteCounter;
     }
 
     public void setRemainingSettlements(int value) {

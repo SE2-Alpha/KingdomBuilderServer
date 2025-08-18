@@ -157,5 +157,16 @@ public class GameManager {
         return null;
     }
 
+    public String emote(String input){
+        return switch (input) {
+            case "1" -> "GG!";
+            case "2" -> "Oh no!";
+            case "3" -> "Yess";
+            case "4" -> ";)";
+            case "5" -> "Gotcha!";
+            default -> "";
+        };
+    }
+
 
 }

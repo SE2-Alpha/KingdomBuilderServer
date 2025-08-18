@@ -230,6 +230,21 @@ public class GameController {
     }
 
 
+    private void broadcastEmote(String gameId, Player player, String emote){
+        logger.info("Broadcasting emote for game: {}", gameId);
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("player", player);
+        payload.put("emote", emote);
+        messagingTemplate.convertAndSend("/topic/game/emote/"+ gameId, payload);
+    }
+
+    private void broadcastEmoteTimeout(String gameId, Player player){
+        logger.info("Broadcasting emote timeout for game: {}", gameId);
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("player", player);
+        messagingTemplate.convertAndSend("/topic/game/emoteTimeout/"+ gameId, payload);
+    }
+
     @MessageMapping("/game/cheat")
     public void handleCheat(@Payload PlayerActionDTO action) {
         logger.info("Received cheat attempt from player {} in game {}", action.getPlayerId(), action.getGameId());
@@ -307,5 +322,47 @@ public class GameController {
 
             messagingTemplate.convertAndSend("/topic/game/scores/"+gameId, evaluator.getPlayerPoints());
         }
+    }
+
+    @MessageMapping("/game/sendEmote")
+    public void sendEmote(@Payload PlayerActionDTO action) throws InterruptedException {
+        logger.info("Received emote for player {} in game {}", action.getPlayerId(), action.getGameId());
+        String gameId = action.getGameId();
+        if(rooms.containsKey(action.getGameId())) {
+            Room room = rooms.get(action.getGameId());
+            GameManager gameManager = room.getGameManager();
+            Player player = room.getPlayerById(action.getPlayerId());
+
+            if(player.getEmoteCounter() < 5) {
+
+                String emote = gameManager.emote(action.getEmote());
+
+                broadcastEmote(gameId, player, "");
+                player.setEmoteCounter(player.getEmoteCounter() + 1);
+
+                Thread.sleep(200);
+
+                broadcastEmote(gameId, player, emote);
+
+                Thread.sleep(3000);
+
+
+                if (player.getEmoteCounter() == 1) {
+                    broadcastEmote(gameId, player, "");
+                }
+                player.setEmoteCounter(player.getEmoteCounter() - 1);
+                
+            }else if(player.getEmoteCounter() == 5){
+                player.setEmoteCounter(11);
+                broadcastEmoteTimeout(gameId, player);
+                Thread.sleep(200);
+                broadcastEmote(gameId, player, "");
+
+                Thread.sleep(4800);
+
+                player.setEmoteCounter(0);
+            }
+        }
+
     }
 }

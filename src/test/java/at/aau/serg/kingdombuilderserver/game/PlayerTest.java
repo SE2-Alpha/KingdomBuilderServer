@@ -88,4 +88,18 @@ class PlayerTest {
         String expected = "ID: p1, Name: Tester, Color: 5Settlements: 35";
         assertEquals(expected.replaceAll("\\s+", ""), player.toString().replaceAll("\\s+", ""));
     }
+
+    @Test
+    void setEmoteCounterTest(){
+        player = new Player("12345","Playername");
+        player.setEmoteCounter(5);
+        assertEquals(5,player.getEmoteCounter());
+    }
+
+    @Test
+    void setEmoteCounterFailTest(){
+        player = new Player("12345","Playername");
+        player.setEmoteCounter(-3);
+        assertEquals(0,player.getEmoteCounter());
+    }
 }
