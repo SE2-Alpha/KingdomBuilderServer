@@ -166,5 +166,7 @@ class GameManagerTest {
         assertEquals("Yess", gameManager.emote("3"));
         assertEquals(";)", gameManager.emote("4"));
         assertEquals("Gotcha!", gameManager.emote("5"));
+        assertEquals("", gameManager.emote("6"));
+        assertEquals("", gameManager.emote("0"));
     }
 }
