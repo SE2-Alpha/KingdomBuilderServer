@@ -346,10 +346,12 @@ public class GameController {
 
                 Thread.sleep(3000);
 
-                player.setEmoteCounter(player.getEmoteCounter() - 1);
+
                 if (player.getEmoteCounter() == 1) {
                     broadcastEmote(gameId, player, "");
                 }
+                player.setEmoteCounter(player.getEmoteCounter() - 1);
+                
             }else if(player.getEmoteCounter() == 5){
                 player.setEmoteCounter(11);
                 broadcastEmoteTimeout(gameId, player);
