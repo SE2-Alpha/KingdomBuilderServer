@@ -157,4 +157,14 @@ class GameManagerTest {
         // Überprüfe, ob die undoMove Methode des GameBoards NIEMALS aufgerufen wurde
         verify(mockGameBoard, never()).undoMove(any(), any());
     }
+
+
+    @Test
+    void emoteTest(){
+        assertEquals("GG!", gameManager.emote("1"));
+        assertEquals("Oh no!", gameManager.emote("2"));
+        assertEquals("Yess", gameManager.emote("3"));
+        assertEquals(";)", gameManager.emote("4"));
+        assertEquals("Gotcha!", gameManager.emote("5"));
+    }
 }
