@@ -39,7 +39,7 @@ public class Player {
     }
 
     public synchronized void setEmoteCounter(int emoteCounter) {
-        this.emoteCounter = emoteCounter;
+        this.emoteCounter = Math.max(emoteCounter, 0);
     }
 
     public synchronized int getEmoteCounter() {
